@@ -9,7 +9,8 @@ export default function EditableField({
   isExporting,
 }) {
   if (isExporting) {
-    const hasNoContent = !value || String(value).trim() === "" || String(value) === "0";
+    const hasNoContent =
+      value === null || value === undefined || (typeof value === "string" && value.trim() === "");
     if (hasNoContent) {
       return null;
     }

@@ -318,7 +318,7 @@ export default function App() {
 
       {/* --- WORKSPACE EDITOR --- */}
       <main className="flex-1 overflow-y-auto bg-slate-100 dark:bg-slate-900/60 bg-grid py-8 px-4 flex justify-center items-start">
-        <div className="w-full max-w-[840px] relative">
+        <div className="w-full max-w-210 relative">
           <div className="no-print mb-4 flex items-center justify-between text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-2">
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span> Click
@@ -336,10 +336,10 @@ export default function App() {
             style={{ minHeight: invoice.paperSize === "letter" ? "1050px" : "1120px" }}
           >
             {/* Watermark Overlay */}
-            {invoice.showWatermark && (
+            {invoice.watermarkText && (
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10 select-none overflow-hidden">
-                <span className="text-8xl font-black text-slate-400/10 uppercase tracking-widest -rotate-45 leading-none">
-                  DRAFT
+                <span className="text-7xl md:text-8xl font-black text-slate-700/20 dark:text-slate-500/15 uppercase tracking-widest -rotate-45 leading-none text-center block max-w-full wrap-break-word px-4">
+                  {invoice.watermarkText}
                 </span>
               </div>
             )}
@@ -361,7 +361,9 @@ export default function App() {
       </main>
 
       {/* --- TOAST MESSENGER LAYOUT --- */}
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && !isExporting && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+      )}
     </div>
   );
 }

@@ -20,7 +20,7 @@ export default function TotalsSummary({
             onChange={(e) => onUpdateField("terms", e.target.value)}
             rows="3"
             className="w-full text-slate-500 leading-relaxed"
-            placeholder="Payment terms instructions"
+            placeholder="Please make the payment by the due date."
             isExporting={isExporting}
           />
         </div>
@@ -34,7 +34,7 @@ export default function TotalsSummary({
             onChange={(e) => onUpdateField("notes", e.target.value)}
             rows="2"
             className="w-full text-slate-500 leading-relaxed"
-            placeholder="Internal/Customer notes memo"
+            placeholder="It was great doing business with you."
             isExporting={isExporting}
           />
         </div>

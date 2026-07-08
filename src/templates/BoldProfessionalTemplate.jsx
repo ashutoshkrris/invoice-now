@@ -1,4 +1,4 @@
-import { Icons } from "../components/Header";
+import { Icons } from "../components/Icons";
 import EditableField from "../components/EditableField";
 import InvoiceItemsTable from "../components/shared/InvoiceItemsTable";
 import RemittanceFooter from "../components/shared/RemittanceFooter";
@@ -40,14 +40,14 @@ export default function BoldProfessionalTemplate(props) {
                     ✕
                   </button>
                 </div>
-              ) : (
+              ) : !isExporting ? (
                 <label
                   htmlFor="logo-uploader-bold"
                   className="text-[10px] font-bold text-white/80 hover:text-white flex items-center gap-1 cursor-pointer"
                 >
                   <Icons.Upload /> Upload Logo
                 </label>
-              )}
+              ) : null}
             </div>
             <EditableField
               value={invoice.businessName}

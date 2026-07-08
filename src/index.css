@@ -51,6 +51,16 @@
     opacity: 0 !important;
     visibility: hidden !important;
   }
+  @page {
+    /* This removes the default browser headers and footers */
+    margin: 0;
+  }
+
+  body {
+    /* Re-apply a clean padding/margin to your actual content so it 
+       doesn't clip hard against the physical edge of the paper */
+    padding: 1.5cm;
+  }
   #printable-invoice-area {
     box-shadow: none !important;
     margin: 0 !important;

@@ -1,4 +1,4 @@
-import { Icons } from "../components/Header";
+import { Icons } from "../components/Icons";
 import EditableField from "../components/EditableField";
 import InvoiceItemsTable from "../components/shared/InvoiceItemsTable";
 import RemittanceFooter from "../components/shared/RemittanceFooter";
@@ -38,14 +38,14 @@ export default function EmeraldPremiumTemplate(props) {
                 ✕
               </button>
             </div>
-          ) : (
+          ) : !isExporting ? (
             <label
               htmlFor="logo-uploader-prem"
               className="text-[10px] font-bold font-sans text-slate-400 hover:text-brand-500 flex items-center gap-1 cursor-pointer"
             >
               <Icons.Upload /> Premium Header Logo
             </label>
-          )}
+          ) : null}
         </div>
         <EditableField
           value={invoice.businessName}

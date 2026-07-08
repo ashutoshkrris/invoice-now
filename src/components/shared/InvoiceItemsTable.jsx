@@ -1,5 +1,5 @@
 import EditableField from "../EditableField";
-import { Icons } from "../Header";
+import { Icons } from "../Icons";
 
 export default function InvoiceItemsTable({
   invoice,
@@ -38,7 +38,7 @@ export default function InvoiceItemsTable({
                     value={item.name}
                     onChange={(e) => onUpdateNestedItem(idx, "name", e.target.value)}
                     className="w-full font-bold text-slate-800 text-[13px]"
-                    placeholder="Item Service Title"
+                    placeholder="Item Title"
                     isExporting={isExporting}
                   />
                   <EditableField

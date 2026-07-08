@@ -67,61 +67,66 @@ export const COUNTRIES = [
   },
 ];
 
-export const getTodayDateString = () => "2026-07-05";
-export const getDueDateString = () => "2026-07-19";
+export const getTodayDateString = () => {
+  return new Date().toISOString().split("T")[0];
+};
+
+export const getDueDateString = (days = 14) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().split("T")[0];
+};
 
 export const INITIAL_INVOICE_STATE = {
   invoiceLabel: "INVOICE",
-  businessName: "Vortex Tech Labs LLC",
+  businessName: "",
   businessLogo: "",
-  businessAddress: "500 Innovation Parkway, Suite 100\nSan Francisco, CA 94107",
-  businessPhone: "+1 (555) 444-3322",
-  businessEmail: "billing@vortextech.com",
-  businessWebsite: "www.vortextech.com",
-  businessTaxId: "US-111222333",
-  businessRegId: "REG-999888777",
+  businessAddress: "",
+  businessPhone: "",
+  businessEmail: "",
+  businessWebsite: "",
+  businessTaxId: "",
+  businessRegId: "",
 
-  invoiceNumber: "INV-2026-042",
+  invoiceNumber: "INV-2026-001",
   issueDate: getTodayDateString(),
   dueDate: getDueDateString(),
-  countryCode: "US",
-  currencyCode: "USD",
-  currencySymbol: "$",
+  countryCode: "IN",
+  currencyCode: "INR",
+  currencySymbol: "₹",
   taxName: "Sales Tax",
 
-  customerName: "Sarah Connor",
-  customerCompany: "Cyberdyne Systems",
-  customerEmail: "s.connor@cyberdyne.io",
-  customerPhone: "+1 (555) 987-6543",
-  customerAddress: "742 Cybernetic Blvd\nLos Angeles, CA 90210",
-  customerTaxId: "US-888777666",
+  customerName: "",
+  customerCompany: "",
+  customerEmail: "",
+  customerPhone: "",
+  customerAddress: "",
+  customerTaxId: "",
 
   items: [
     {
-      name: "SaaS Architecture Consultation",
-      description: "Interactive design scaling blueprint planning hourly session",
-      qty: 12,
-      price: 150,
-      taxRate: 8,
+      name: "",
+      description: "",
+      qty: 0,
+      price: 0,
+      taxRate: 0,
       discount: 0,
     },
   ],
 
-  discountValue: 5,
+  discountValue: 0,
   discountType: "percentage",
-  shippingCharges: 25,
+  shippingCharges: 0,
   additionalCharges: 0,
   amountPaid: 0,
 
-  paymentInstructions:
-    "Silicon Founders Bank\nAccount: Vortex Tech Labs LLC Main\nIBAN: US44SFB8888000012345678\nSWIFT: SFBUS44XXX",
-  terms: "Payment is due within 14 days of receipt. Interest of 1.5% applies for late settlements.",
-  notes:
-    "Thank you for choosing Vortex Tech Labs! We look forward to our continuous technical partnership.",
+  paymentInstructions: "",
+  terms: "Please make the payment by the due date.",
+  notes: "It was great doing business with you.",
 
   templateId: "classic",
   brandColor: "#3b82f6",
   typography: "font-sans",
   paperSize: "a4",
-  showWatermark: false,
+  watermarkText: "",
 };

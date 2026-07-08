@@ -1,4 +1,4 @@
-import { Icons } from "../components/Header";
+import { Icons } from "../components/Icons";
 import EditableField from "../components/EditableField";
 
 export default function RetailBoutiqueTemplate({
@@ -41,14 +41,14 @@ export default function RetailBoutiqueTemplate({
                 ✕
               </button>
             </div>
-          ) : (
+          ) : !isExporting ? (
             <label
               htmlFor="logo-uploader-retail"
               className="text-[10px] text-slate-400 hover:text-brand-500 flex items-center gap-1 cursor-pointer"
             >
               <Icons.Upload /> Upload Logo
             </label>
-          )}
+          ) : null}
         </div>
         <EditableField
           value={invoice.businessName}
@@ -174,7 +174,7 @@ export default function RetailBoutiqueTemplate({
                       value={item.name}
                       onChange={(e) => onUpdateNestedItem(idx, "name", e.target.value)}
                       className="w-full font-bold text-slate-900 text-[11px]"
-                      placeholder="Item Service Title"
+                      placeholder="Item Title"
                       isExporting={isExporting}
                     />
                     {item.description && (
@@ -332,7 +332,7 @@ export default function RetailBoutiqueTemplate({
             onChange={(e) => onUpdateField("paymentInstructions", e.target.value)}
             rows="3"
             className="w-full text-center text-[10px] text-slate-500"
-            placeholder="Payment methods info"
+            placeholder="Add bank accounts, wire transfer instructions, check details or digital payment links here..."
             isExporting={isExporting}
           />
         </div>

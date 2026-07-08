@@ -1,4 +1,4 @@
-import { Icons } from "../components/Header";
+import { Icons } from "../components/Icons";
 import EditableField from "../components/EditableField";
 import InvoiceItemsTable from "../components/shared/InvoiceItemsTable";
 import RemittanceFooter from "../components/shared/RemittanceFooter";
@@ -36,7 +36,7 @@ export default function ClassicTemplate(props) {
                   ✕
                 </button>
               </div>
-            ) : (
+            ) : !isExporting ? (
               <label
                 htmlFor="logo-uploader"
                 className="text-[11px] font-bold text-slate-400 hover:text-brand-500 flex flex-col items-center gap-1 cursor-pointer w-full text-center"
@@ -44,7 +44,7 @@ export default function ClassicTemplate(props) {
                 <Icons.Upload />
                 Upload Brand Logo
               </label>
-            )}
+            ) : null}
           </div>
 
           <div className="space-y-1">
