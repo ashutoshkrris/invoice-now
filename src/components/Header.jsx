@@ -155,7 +155,7 @@ export default function Header({
                 <option value="modern-minimalist">Modern Minimalist</option>
                 <option value="bold-professional">Bold Premium</option>
                 <option value="emerald-premium">Emerald Executive</option>
-                <option value="retail">Retail Boutique Receipt</option>
+                <option value="retail">Retail Receipt</option>
               </select>
             </div>
 

@@ -52,7 +52,7 @@ export default function EmeraldPremiumTemplate(props) {
           onChange={(e) => onUpdateField("businessName", e.target.value)}
           className="w-full text-center text-2xl font-black uppercase tracking-wide"
           style={{ color: invoice.brandColor }}
-          placeholder="Corporate Name"
+          placeholder="Your Name / Company Name"
           isExporting={isExporting}
         />
         <EditableField
@@ -61,7 +61,7 @@ export default function EmeraldPremiumTemplate(props) {
           onChange={(e) => onUpdateField("businessAddress", e.target.value)}
           rows="2"
           className="w-full text-center text-xs text-slate-500 mt-2"
-          placeholder="Company Legal Address"
+          placeholder="Your / Your Company Address"
           isExporting={isExporting}
         />
         <div className="flex flex-col items-center justify-center gap-1 text-xs text-slate-500 mt-2 font-sans">
@@ -69,7 +69,7 @@ export default function EmeraldPremiumTemplate(props) {
             value={invoice.businessPhone}
             onChange={(e) => onUpdateField("businessPhone", e.target.value)}
             className="text-center w-48"
-            placeholder="Phone"
+            placeholder="Phone Number"
             isExporting={isExporting}
           />
           <EditableField
@@ -110,7 +110,7 @@ export default function EmeraldPremiumTemplate(props) {
             onChange={(e) => onUpdateField("customerAddress", e.target.value)}
             rows="2"
             className="w-full text-slate-500 mt-1"
-            placeholder="Address"
+            placeholder="Client's Address"
             isExporting={isExporting}
           />
         </div>

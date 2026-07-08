@@ -49,7 +49,7 @@ export default function ModernMinimalistTemplate(props) {
             value={invoice.businessName}
             onChange={(e) => onUpdateField("businessName", e.target.value)}
             className="w-full text-lg font-black tracking-tight text-slate-900"
-            placeholder="Brand LLC"
+            placeholder="Your Name / Company Name"
             isExporting={isExporting}
           />
           <EditableField
@@ -58,7 +58,7 @@ export default function ModernMinimalistTemplate(props) {
             onChange={(e) => onUpdateField("businessAddress", e.target.value)}
             rows="2"
             className="w-full text-[11px] text-slate-500 leading-relaxed"
-            placeholder="Address"
+            placeholder="Your / Your Company Address"
             isExporting={isExporting}
           />
           <div className="flex flex-col gap-0.5 text-xs text-slate-500">
@@ -66,7 +66,7 @@ export default function ModernMinimalistTemplate(props) {
               value={invoice.businessPhone}
               onChange={(e) => onUpdateField("businessPhone", e.target.value)}
               className="w-full"
-              placeholder="Phone"
+              placeholder="Phone Number"
               isExporting={isExporting}
             />
             <EditableField
@@ -131,7 +131,7 @@ export default function ModernMinimalistTemplate(props) {
       <div className="mb-10 text-xs bg-slate-50 p-5 rounded-2xl border border-slate-100/60 grid grid-cols-2 gap-6">
         <div>
           <h3 className="font-extrabold text-slate-400 tracking-wider text-[10px] uppercase mb-1.5">
-            CLIENT
+            Billed To:
           </h3>
           <EditableField
             value={invoice.customerName}
@@ -153,7 +153,7 @@ export default function ModernMinimalistTemplate(props) {
             onChange={(e) => onUpdateField("customerAddress", e.target.value)}
             rows="2"
             className="w-full text-slate-500 mt-1"
-            placeholder="Billing Address"
+            placeholder="Client's Address"
             isExporting={isExporting}
           />
         </div>

@@ -45,7 +45,7 @@ export default function InvoiceItemsTable({
                     value={item.description}
                     onChange={(e) => onUpdateNestedItem(idx, "description", e.target.value)}
                     className="w-full text-slate-500 text-[11px]"
-                    placeholder="Add specific descriptions..."
+                    placeholder="Add specific description..."
                     isExporting={isExporting}
                   />
                 </td>

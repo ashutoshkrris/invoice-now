@@ -53,7 +53,7 @@ export default function BoldProfessionalTemplate(props) {
               value={invoice.businessName}
               onChange={(e) => onUpdateField("businessName", e.target.value)}
               className="w-full text-lg font-black text-white"
-              placeholder="Brand Name"
+              placeholder="Your Name / Company Name"
               isExporting={isExporting}
             />
             <EditableField
@@ -62,7 +62,7 @@ export default function BoldProfessionalTemplate(props) {
               onChange={(e) => onUpdateField("businessAddress", e.target.value)}
               rows="2"
               className="w-full text-[11px] text-white/80 leading-relaxed"
-              placeholder="Address"
+              placeholder="Your / Your Company Address"
               isExporting={isExporting}
             />
             <div className="flex flex-col gap-0.5 text-xs text-white/80">
@@ -70,7 +70,7 @@ export default function BoldProfessionalTemplate(props) {
                 value={invoice.businessPhone}
                 onChange={(e) => onUpdateField("businessPhone", e.target.value)}
                 className="w-full text-white"
-                placeholder="Phone"
+                placeholder="Phone Number"
                 isExporting={isExporting}
               />
               <EditableField
@@ -156,7 +156,7 @@ export default function BoldProfessionalTemplate(props) {
               onChange={(e) => onUpdateField("customerAddress", e.target.value)}
               rows="2"
               className="w-full text-slate-500 mt-1"
-              placeholder="Billing Address"
+              placeholder="Client's Address"
               isExporting={isExporting}
             />
           </div>

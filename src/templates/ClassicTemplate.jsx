@@ -53,7 +53,7 @@ export default function ClassicTemplate(props) {
               onChange={(e) => onUpdateField("businessName", e.target.value)}
               className="w-full text-lg font-extrabold"
               style={{ color: invoice.brandColor }}
-              placeholder="Corporate Legal Name"
+              placeholder="Your Name / Company Name"
               isExporting={isExporting}
             />
             <EditableField
@@ -62,7 +62,7 @@ export default function ClassicTemplate(props) {
               onChange={(e) => onUpdateField("businessAddress", e.target.value)}
               rows="2"
               className="w-full text-xs text-slate-500 leading-relaxed"
-              placeholder="Company Address"
+              placeholder="Your / Your Company Address"
               isExporting={isExporting}
             />
             <div className="flex flex-col gap-0.5 text-xs text-slate-500">
@@ -70,14 +70,14 @@ export default function ClassicTemplate(props) {
                 value={invoice.businessPhone}
                 onChange={(e) => onUpdateField("businessPhone", e.target.value)}
                 className="w-full"
-                placeholder="Corporate Phone"
+                placeholder="Phone Number"
                 isExporting={isExporting}
               />
               <EditableField
                 value={invoice.businessEmail}
                 onChange={(e) => onUpdateField("businessEmail", e.target.value)}
                 className="w-full"
-                placeholder="Billing Email"
+                placeholder="Email"
                 isExporting={isExporting}
               />
             </div>
@@ -122,7 +122,7 @@ export default function ClassicTemplate(props) {
               onChange={(e) => onUpdateField("customerAddress", e.target.value)}
               rows="2"
               className="w-full text-slate-500 leading-relaxed"
-              placeholder="Billing Address"
+              placeholder="Client's Address"
               isExporting={isExporting}
             />
             <EditableField

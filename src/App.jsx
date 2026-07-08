@@ -8,7 +8,7 @@ import BoldProfessionalTemplate from "./templates/BoldProfessionalTemplate";
 import ClassicTemplate from "./templates/ClassicTemplate";
 import EmeraldPremiumTemplate from "./templates/EmeraldPremiumTemplate";
 import ModernMinimalistTemplate from "./templates/ModernMinimalistTemplate";
-import RetailBoutiqueTemplate from "./templates/RetailBoutiqueTemplate";
+import RetailTemplate from "./templates/RetailTemplate";
 
 // Preset Imports
 import { INITIAL_INVOICE_STATE, COUNTRIES } from "./constants/invoicePresets";
@@ -356,7 +356,7 @@ export default function App() {
             {invoice.templateId === "emerald-premium" && (
               <EmeraldPremiumTemplate {...templateProps} />
             )}
-            {invoice.templateId === "retail" && <RetailBoutiqueTemplate {...templateProps} />}
+            {invoice.templateId === "retail" && <RetailTemplate {...templateProps} />}
           </div>
         </div>
       </main>

@@ -1,7 +1,7 @@
 import { Icons } from "../components/Icons";
 import EditableField from "../components/EditableField";
 
-export default function RetailBoutiqueTemplate({
+export default function RetailTemplate({
   invoice,
   onUpdateField,
   onUpdateNestedItem,
@@ -54,7 +54,7 @@ export default function RetailBoutiqueTemplate({
           value={invoice.businessName}
           onChange={(e) => onUpdateField("businessName", e.target.value)}
           className="w-full text-center text-base font-black uppercase tracking-wider block"
-          placeholder="Boutique Name"
+          placeholder="Your Name / Company Name"
           isExporting={isExporting}
         />
         <EditableField
@@ -63,7 +63,7 @@ export default function RetailBoutiqueTemplate({
           onChange={(e) => onUpdateField("businessAddress", e.target.value)}
           rows="2"
           className="w-full text-center text-[10px] text-slate-600 leading-tight"
-          placeholder="Address"
+          placeholder="Your / Your Company Address"
           isExporting={isExporting}
         />
         <div className="flex flex-col items-center justify-center text-[10px] text-slate-500 mt-1">
@@ -71,7 +71,7 @@ export default function RetailBoutiqueTemplate({
             value={invoice.businessPhone}
             onChange={(e) => onUpdateField("businessPhone", e.target.value)}
             className="text-center w-48"
-            placeholder="Phone"
+            placeholder="Phone Number"
             isExporting={isExporting}
           />
           <EditableField
@@ -89,7 +89,7 @@ export default function RetailBoutiqueTemplate({
       <div className="grid grid-cols-2 gap-4 text-[11px] text-slate-700 leading-relaxed mb-4">
         <div className="space-y-1">
           <div>
-            <span className="font-bold">TRANSID: </span>
+            <span className="font-bold">INVOICE#: </span>
             <EditableField
               value={invoice.invoiceNumber}
               onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
@@ -126,7 +126,7 @@ export default function RetailBoutiqueTemplate({
               value={invoice.customerName}
               onChange={(e) => onUpdateField("customerName", e.target.value)}
               className="font-bold text-slate-900 text-right inline-block w-24"
-              placeholder="Walk-in Guest"
+              placeholder="Client Name"
               isExporting={isExporting}
             />
           </div>
@@ -139,10 +139,6 @@ export default function RetailBoutiqueTemplate({
               placeholder="Tax ID"
               isExporting={isExporting}
             />
-          </div>
-          <div>
-            <span>TILL: </span>
-            <span className="text-slate-900 font-bold">#01-FRONT</span>
           </div>
         </div>
       </div>
