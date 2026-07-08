@@ -1,5 +1,7 @@
 # 📄 Invoice Now
 
+![Invoice Now Banner](src/assets/og-preview-banner.png)
+
 A modern, privacy-first invoice generator built with **React 19**, **Vite 8**, and **Tailwind CSS v4**.
 
 Generate professional, print-ready invoices directly in your browser with live customization, flexible branding, and one-click PDF or PNG exports. No server uploads, no account required, and no client data leaves your device.
