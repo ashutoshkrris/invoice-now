@@ -117,20 +117,21 @@ export default function Header({
             : "grid-rows-[0fr] opacity-0 lg:opacity-100 lg:grid-rows-[1fr]"
         }`}
       >
-        <div className="overflow-hidden lg:overflow-visible flex flex-col lg:flex-row items-stretch lg:items-center gap-4 w-full lg:w-auto">
+        {/* Changed lg:items-center to lg:items-end here to drop action buttons flush with inputs */}
+        <div className="overflow-hidden lg:overflow-visible flex flex-col lg:flex-row items-stretch lg:items-end gap-4 w-full lg:w-auto">
           <hr className="border-slate-100 dark:border-slate-900 lg:hidden" />
 
           {/* Controls Config Row */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap lg:flex-nowrap items-center gap-3 w-full lg:w-auto">
             {/* Country Rules */}
-            <div className="flex flex-col flex-1 min-w-[130px] lg:flex-none">
+            <div className="flex flex-col flex-1 min-w-32.5 lg:flex-none lg:w-35">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Country Rules Preset
               </label>
               <select
                 value={invoice.countryCode}
                 onChange={(e) => onCountryChange(e.target.value)}
-                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300"
+                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer"
               >
                 {COUNTRIES.map((c) => (
                   <option key={c.code} value={c.code}>
@@ -141,14 +142,14 @@ export default function Header({
             </div>
 
             {/* Style Template */}
-            <div className="flex flex-col flex-1 min-w-[140px] lg:flex-none">
+            <div className="flex flex-col flex-1 min-w-35 lg:flex-none lg:w-38.75">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Style Template
               </label>
               <select
                 value={invoice.templateId}
                 onChange={(e) => onUpdateField("templateId", e.target.value)}
-                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300"
+                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer"
               >
                 <option value="classic">Classic Corporate</option>
                 <option value="modern-minimalist">Modern Minimalist</option>
@@ -159,7 +160,7 @@ export default function Header({
             </div>
 
             {/* Brand Colors */}
-            <div className="flex flex-col">
+            <div className="flex flex-col lg:flex-none shrink-0">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Brand Color
               </label>
@@ -167,6 +168,7 @@ export default function Header({
                 {BRAND_COLORS.map((color) => (
                   <button
                     key={color.hex}
+                    type="button"
                     onClick={() => onUpdateField("brandColor", color.hex)}
                     className="h-4.5 w-4.5 rounded-full border border-black/10 transition-transform active:scale-95 cursor-pointer"
                     style={{ backgroundColor: color.hex }}
@@ -183,7 +185,7 @@ export default function Header({
             </div>
 
             {/* Typography */}
-            <div className="flex flex-col flex-1 min-w-[120px] lg:flex-none">
+            <div className="flex flex-col flex-1 min-w-30 lg:flex-none lg:w-31.25">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Font Family
               </label>
@@ -199,27 +201,26 @@ export default function Header({
             </div>
 
             {/* Paper Sizes */}
-            <div className="flex flex-col flex-1 min-w-[100px] lg:flex-none">
+            <div className="flex flex-col flex-1 min-w-25 lg:flex-none lg:w-27.5">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Paper Format
               </label>
               <select
                 value={invoice.paperSize}
                 onChange={(e) => onUpdateField("paperSize", e.target.value)}
-                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300"
+                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer"
               >
                 <option value="a4">A4 Standard</option>
                 <option value="letter">Letter Size</option>
               </select>
             </div>
 
-            {/* Upgraded Watermark Dropdown Section */}
-            <div className="flex flex-col flex-1 min-w-[120px] lg:flex-none">
+            {/* Watermark Section */}
+            <div className="flex flex-col flex-1 min-w-30 lg:flex-none lg:w-[140px]">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Watermark
               </label>
-
-              <div className="flex items-center gap-1.5 relative">
+              <div className="flex items-center gap-1.5 relative w-full">
                 <select
                   value={
                     !invoice.watermarkText
@@ -243,9 +244,7 @@ export default function Header({
                   <option value="DRAFT">Draft</option>
                   <option value="PAID">Paid</option>
                   <option value="OVERDUE">Overdue</option>
-                  <option value="custom">
-                    {!isPresetWatermark ? `Custom: ${invoice.watermarkText}` : "Custom"}
-                  </option>
+                  <option value="custom">Custom</option>
                 </select>
 
                 {/* Elegant edit pen button: Only renders when a custom watermark text is active */}
@@ -280,7 +279,7 @@ export default function Header({
 
           {/* Action buttons */}
           <div className="flex items-center gap-2 flex-wrap pb-2 lg:pb-0 relative">
-            {/* Desktop Only Undo/Redo/Theme controls */}
+            {/* Desktop Only Controls */}
             <div className="hidden lg:flex items-center gap-1.5 mr-2">
               <button
                 onClick={onUndo}
@@ -357,11 +356,10 @@ export default function Header({
         </div>
       </div>
 
-      {/* Custom Watermark Modal Dialog Overlay */}
+      {/* Custom Watermark Modal (React Portal) */}
       {isCustomModalOpen &&
         createPortal(
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 isolate">
-            {/* 1. Backdrop Blur Overlay */}
+          <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 isolate">
             <div
               onClick={() => setIsCustomModalOpen(false)}
               className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-200"
