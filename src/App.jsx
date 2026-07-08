@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import Toast from "./components/Toast";
 import BoldProfessionalTemplate from "./templates/BoldProfessionalTemplate";
 import ClassicTemplate from "./templates/ClassicTemplate";
@@ -359,6 +360,8 @@ export default function App() {
           </div>
         </div>
       </main>
+
+      <Footer />
 
       {/* --- TOAST MESSENGER LAYOUT --- */}
       {toast && !isExporting && (
