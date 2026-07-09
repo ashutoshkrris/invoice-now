@@ -1,10 +1,10 @@
 name: Greetings
 
 on:
-  pull_request:
+  issues:
     types:
       - opened
-  issues:
+  pull_request:
     types:
       - opened
 
@@ -18,7 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/first-interaction@v3
+      - name: Greet first-time contributors
+        uses: actions/first-interaction@v3
         with:
           issue_message: |
             @${{ github.actor }} Welcome to Invoice Now! 🥳✨
@@ -31,6 +32,7 @@ jobs:
             `/assign`
 
             We appreciate your contribution and look forward to building Invoice Now together! 🙌
+
           pr_message: |
             @${{ github.actor }} Thank you for opening a pull request! 🥳🎉
 
@@ -39,26 +41,9 @@ jobs:
             Our maintainers will review your changes as soon as possible. Thanks for your patience and for helping improve the project! 🚀
 
             Before the review begins, please make sure:
+
             ✅ The related issue is linked  
             ✅ Tests (if applicable) are passing  
             ✅ The PR description clearly explains your changes  
 
             Happy coding, and thank you for being part of the Invoice Now community! 🙌
-
-      - name: Congratulate on every PR merge
-        if: github.event_name == 'pull_request_target' && github.event.action == 'closed' && github.event.pull_request.merged == true
-        uses: peter-evans/create-or-update-comment@v5
-        with:
-          issue-number: ${{tojson(github.event.number)}}
-          body: |
-            @${{ github.event.pull_request.user.login }} Congratulations! 🎉🚀
-
-            Your pull request has been successfully merged into Invoice Now!
-
-            Thank you for your time, effort, and contribution. 💖 Your work helps make Invoice Now more powerful and useful for everyone.
-
-            We're excited to have you as part of our community and would love to see more of your contributions in the future! 🙌
-
-            Feel free to pick another issue and keep building with us. ✨
-
-            If you enjoy using Invoice Now, consider giving the repository a ⭐ — it helps more people discover the project!
