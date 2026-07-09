@@ -1,0 +1,43 @@
+name: Bug Report
+description: Report something that isn't working.
+title: "[Bug]: "
+labels:
+  - bug
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots (optional)
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: Chrome 138
