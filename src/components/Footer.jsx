@@ -35,6 +35,12 @@ export default function Footer() {
         {/* Navigation & Project Links */}
         <div className="flex items-center gap-5 order-3">
           <a
+            href="#/privacy"
+            className="font-semibold hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            Privacy
+          </a>
+          <a
             href="https://github.com/ashutoshkrris/invoice-now"
             target="_blank"
             rel="noopener noreferrer"

@@ -4,6 +4,7 @@ import { jsPDF } from "jspdf";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Toast from "./components/Toast";
+import PrivacyPage from "./pages/PrivacyPage";
 import BoldProfessionalTemplate from "./templates/BoldProfessionalTemplate";
 import ClassicTemplate from "./templates/ClassicTemplate";
 import EmeraldPremiumTemplate from "./templates/EmeraldPremiumTemplate";
@@ -23,6 +24,7 @@ export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
   const [toast, setToast] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [route, setRoute] = useState(() => window.location.hash.replace(/^#\/?/, "") || "");
 
   // --- HISTORICAL UNDO / REDO ENGINE ---
   const [history, setHistory] = useState([JSON.stringify(INITIAL_INVOICE_STATE)]);
@@ -37,6 +39,12 @@ export default function App() {
     }
     localStorage.setItem("theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    const onHashChange = () => setRoute(window.location.hash.replace(/^#\/?/, "") || "");
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   const triggerToast = (message, type = "success") => {
     setToast({ message, type });
@@ -299,6 +307,10 @@ export default function App() {
     onAddLineItem: addLineItem,
     onLogoUpload: handleLogoUpload,
   };
+
+  if (route === "privacy") {
+    return <PrivacyPage theme={theme} setTheme={setTheme} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-100 dark:bg-slate-900 transition-colors duration-200">
