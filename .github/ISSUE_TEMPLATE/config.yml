@@ -3,4 +3,8 @@ blank_issues_enabled: false
 contact_links:
   - name: Discussions
     url: https://github.com/ashutoshkrris/invoice-now/discussions
-    about: Ask questions here instead of opening issues.
+    about: Ask questions, request help, or discuss ideas.
+
+  - name: Documentation
+    url: https://github.com/ashutoshkrris/invoice-now#readme
+    about: Read the project documentation before opening an issue.
