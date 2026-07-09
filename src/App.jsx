@@ -182,7 +182,11 @@ export default function App() {
         setIsExporting(false);
         return;
       }
+      const originalStyle = target.getAttribute("style") || "";
       try {
+        target.style.width = "794px"; // Standard crisp desktop width base for A4/Letter rendering
+        target.style.minHeight = invoice.paperSize === "letter" ? "1050px" : "1120px";
+        await new Promise((resolve) => setTimeout(resolve, 50));
         // html-to-image handles oklch/oklab perfectly out of the box!
         const dataUrl = await toPng(target, {
           quality: 0.95,
@@ -213,6 +217,7 @@ export default function App() {
         console.error("PNG render failed", err);
         triggerToast("PNG render failed", "error");
       } finally {
+        target.setAttribute("style", originalStyle);
         setIsExporting(false);
       }
     }, 400);
@@ -228,7 +233,12 @@ export default function App() {
         setIsExporting(false);
         return;
       }
+      const originalStyle = target.getAttribute("style") || "";
       try {
+        target.style.width = "794px";
+        target.style.minHeight = invoice.paperSize === "letter" ? "1050px" : "1120px";
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
         const dataUrl = await toPng(target, {
           quality: 0.95,
           pixelRatio: 2.5,
@@ -268,6 +278,7 @@ export default function App() {
         console.error("PDF engine crash", err);
         triggerToast("PDF compilation failed", "error");
       } finally {
+        target.setAttribute("style", originalStyle);
         setIsExporting(false);
       }
     }, 400);
@@ -339,7 +350,7 @@ export default function App() {
             {/* Watermark Overlay */}
             {invoice.watermarkText && (
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10 select-none overflow-hidden">
-                <span className="text-7xl md:text-8xl font-black text-slate-700/20 dark:text-slate-500/15 uppercase tracking-widest -rotate-45 leading-none text-center block max-w-full wrap-break-word px-4">
+                <span className="text-7xl md:text-8xl font-black text-slate-700/20 dark:text-slate-500/15 uppercase tracking-widest -rotate-45 leading-none text-center whitespace-normal break-normal px-4">
                   {invoice.watermarkText}
                 </span>
               </div>
