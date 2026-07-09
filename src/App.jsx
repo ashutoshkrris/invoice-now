@@ -1,9 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Toast from "./components/Toast";
+import AboutPage from "./components/AboutPage";
+
+// Template Imports
 import BoldProfessionalTemplate from "./templates/BoldProfessionalTemplate";
 import ClassicTemplate from "./templates/ClassicTemplate";
 import EmeraldPremiumTemplate from "./templates/EmeraldPremiumTemplate";
@@ -19,6 +23,8 @@ import { loadCachedState, persistState } from "./utils/storage";
 // Bifurcated Template Formats
 
 export default function App() {
+  const navigate = useNavigate();
+
   const [invoice, setInvoice] = useState(loadCachedState);
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
   const [toast, setToast] = useState(null);
@@ -356,49 +362,61 @@ export default function App() {
         onThemeToggle={() => setTheme(theme === "dark" ? "light" : "dark")}
       />
 
-      {/* --- WORKSPACE EDITOR --- */}
-      <main className="flex-1 overflow-y-auto bg-slate-100 dark:bg-slate-900/60 bg-grid py-8 px-4 flex justify-center items-start">
-        <div className="w-full max-w-210 relative">
-          <div className="no-print mb-4 flex items-center justify-between text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-2">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span> Click
-              any field below to rewrite details
-            </span>
-            <span>
-              {invoice.paperSize === "letter" ? "8.5in x 11in (Letter)" : "210mm x 297mm (A4)"}
-            </span>
-          </div>
+      <Routes>
+        {/* --- WORKSPACE EDITOR --- */}
+        <Route
+          path="/"
+          element={
+            <main className="flex-1 overflow-y-auto bg-slate-100 dark:bg-slate-900/60 bg-grid py-8 px-4 flex justify-center items-start">
+              <div className="w-full max-w-210 relative">
+                <div className="no-print mb-4 flex items-center justify-between text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-2">
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>{" "}
+                    Click any field below to rewrite details
+                  </span>
+                  <span>
+                    {invoice.paperSize === "letter"
+                      ? "8.5in x 11in (Letter)"
+                      : "210mm x 297mm (A4)"}
+                  </span>
+                </div>
 
-          {/* Interactive WYSIWYG Paper Layer */}
-          <div
-            id="printable-invoice-area"
-            className={`w-full bg-white text-slate-950 shadow-2xl md:rounded-2xl overflow-hidden relative ${invoice.typography || "font-sans"}`}
-            style={{ minHeight: invoice.paperSize === "letter" ? "1050px" : "1120px" }}
-          >
-            {/* Watermark Overlay */}
-            {invoice.watermarkText && (
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10 select-none overflow-hidden">
-                <span className="text-7xl md:text-8xl font-black text-slate-700/20 dark:text-slate-500/15 uppercase tracking-widest -rotate-45 leading-none text-center whitespace-normal break-normal px-4">
-                  {invoice.watermarkText}
-                </span>
+                {/* Interactive WYSIWYG Paper Layer */}
+                <div
+                  id="printable-invoice-area"
+                  className={`w-full bg-white text-slate-950 shadow-2xl md:rounded-2xl overflow-hidden relative ${invoice.typography || "font-sans"}`}
+                  style={{ minHeight: invoice.paperSize === "letter" ? "1050px" : "1120px" }}
+                >
+                  {/* Watermark Overlay */}
+                  {invoice.watermarkText && (
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10 select-none overflow-hidden">
+                      <span className="text-7xl md:text-8xl font-black text-slate-700/20 dark:text-slate-500/15 uppercase tracking-widest -rotate-45 leading-none text-center whitespace-normal break-normal px-4">
+                        {invoice.watermarkText}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Template Router Switch */}
+                  {invoice.templateId === "classic" && <ClassicTemplate {...templateProps} />}
+                  {invoice.templateId === "modern-minimalist" && (
+                    <ModernMinimalistTemplate {...templateProps} />
+                  )}
+                  {invoice.templateId === "bold-professional" && (
+                    <BoldProfessionalTemplate {...templateProps} />
+                  )}
+                  {invoice.templateId === "emerald-premium" && (
+                    <EmeraldPremiumTemplate {...templateProps} />
+                  )}
+                  {invoice.templateId === "retail" && <RetailTemplate {...templateProps} />}
+                </div>
               </div>
-            )}
+            </main>
+          }
+        />
 
-            {/* Template Router Switch */}
-            {invoice.templateId === "classic" && <ClassicTemplate {...templateProps} />}
-            {invoice.templateId === "modern-minimalist" && (
-              <ModernMinimalistTemplate {...templateProps} />
-            )}
-            {invoice.templateId === "bold-professional" && (
-              <BoldProfessionalTemplate {...templateProps} />
-            )}
-            {invoice.templateId === "emerald-premium" && (
-              <EmeraldPremiumTemplate {...templateProps} />
-            )}
-            {invoice.templateId === "retail" && <RetailTemplate {...templateProps} />}
-          </div>
-        </div>
-      </main>
+        {/* --- ABOUT PAGE --- */}
+        <Route path="/about" element={<AboutPage onNavigateBack={() => navigate("/")} />} />
+      </Routes>
 
       <Footer />
 
