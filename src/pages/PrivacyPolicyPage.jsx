@@ -53,7 +53,7 @@ export default function PrivacyPolicyPage() {
               <li>
                 <strong className="text-slate-800 dark:text-slate-200">Invoice Metadata:</strong>{" "}
                 Line items, client names, payment notes, taxes, and branding colors exist solely
-                inside your browser’s temporary state or local sandbox storage.
+                inside your browser&apos;s temporary state or local sandbox storage.
               </li>
               <li>
                 <strong className="text-slate-800 dark:text-slate-200">Image Uploads:</strong> When

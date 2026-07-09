@@ -4,12 +4,12 @@ import BackButton from "../components/shared/BackButton";
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 md:py-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 md:py-16 text-left space-y-8">
         {/* --- BACK BUTTON NAVIGATION --- */}
         <BackButton />
 
         {/* --- MAIN CORE DESCRIPTION --- */}
-        <header className="space-y-4 mb-12 text-left">
+        <header className="space-y-3 border-b border-slate-200 dark:border-slate-800 pb-6">
           <span className="text-[10px] font-extrabold tracking-widest text-brand-600 dark:text-brand-400 uppercase block">
             ABOUT INVOICE NOW
           </span>

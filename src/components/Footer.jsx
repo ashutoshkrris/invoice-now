@@ -85,7 +85,7 @@ export default function Footer() {
                     to="/terms-of-use"
                     className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
                   >
-                    Terms of Service
+                    Terms of Use
                   </Link>
                 </li>
               </ul>
