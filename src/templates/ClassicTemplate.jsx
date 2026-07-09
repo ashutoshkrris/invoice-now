@@ -1,5 +1,6 @@
 import { Icons } from "../components/Icons";
 import EditableField from "../components/EditableField";
+import { FIELD_LIMITS } from "../constants/fieldLimits";
 import InvoiceItemsTable from "../components/shared/InvoiceItemsTable";
 import RemittanceFooter from "../components/shared/RemittanceFooter";
 import TotalsSummary from "../components/shared/TotalsSummary";
@@ -72,6 +73,7 @@ export default function ClassicTemplate(props) {
                 className="w-full"
                 placeholder="Phone Number"
                 isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessPhone}
               />
               <EditableField
                 value={invoice.businessEmail}
@@ -79,6 +81,7 @@ export default function ClassicTemplate(props) {
                 className="w-full"
                 placeholder="Email"
                 isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessEmail}
               />
             </div>
           </div>
@@ -108,6 +111,7 @@ export default function ClassicTemplate(props) {
               className="w-full font-bold text-sm"
               placeholder="Client Name"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerName}
             />
             <EditableField
               value={invoice.customerCompany}
@@ -115,6 +119,7 @@ export default function ClassicTemplate(props) {
               className="w-full text-slate-600 font-medium"
               placeholder="Client Company LLC"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerCompany}
             />
             <EditableField
               type="textarea"
@@ -131,6 +136,7 @@ export default function ClassicTemplate(props) {
               className="w-full text-[11px] text-slate-500"
               placeholder="Client Tax / VAT ID"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerTaxId}
             />
           </div>
         </div>
@@ -147,6 +153,7 @@ export default function ClassicTemplate(props) {
                 className="w-full text-right font-extrabold text-sm"
                 placeholder="INV-2026-001"
                 isExporting={isExporting}
+            maxLength={FIELD_LIMITS.invoiceNumber}
               />
             </div>
             <div>

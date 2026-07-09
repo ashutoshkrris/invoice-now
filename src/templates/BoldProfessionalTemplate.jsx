@@ -1,5 +1,6 @@
 import { Icons } from "../components/Icons";
 import EditableField from "../components/EditableField";
+import { FIELD_LIMITS } from "../constants/fieldLimits";
 import InvoiceItemsTable from "../components/shared/InvoiceItemsTable";
 import RemittanceFooter from "../components/shared/RemittanceFooter";
 import TotalsSummary from "../components/shared/TotalsSummary";
@@ -55,6 +56,7 @@ export default function BoldProfessionalTemplate(props) {
               className="w-full text-lg font-black text-white"
               placeholder="Your Name / Company Name"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessName}
             />
             <EditableField
               type="textarea"
@@ -72,6 +74,7 @@ export default function BoldProfessionalTemplate(props) {
                 className="w-full text-white"
                 placeholder="Phone Number"
                 isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessPhone}
               />
               <EditableField
                 value={invoice.businessEmail}
@@ -79,6 +82,7 @@ export default function BoldProfessionalTemplate(props) {
                 className="w-full text-white"
                 placeholder="Email"
                 isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessEmail}
               />
             </div>
           </div>
@@ -102,6 +106,7 @@ export default function BoldProfessionalTemplate(props) {
                 className="text-right font-black text-lg text-white"
                 placeholder="INV-2026-10"
                 isExporting={isExporting}
+            maxLength={FIELD_LIMITS.invoiceNumber}
               />
             </div>
           </div>
@@ -142,6 +147,7 @@ export default function BoldProfessionalTemplate(props) {
               className="w-full font-bold text-slate-900"
               placeholder="Client Name"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerName}
             />
             <EditableField
               value={invoice.customerCompany}
@@ -149,6 +155,7 @@ export default function BoldProfessionalTemplate(props) {
               className="w-full text-slate-600"
               placeholder="Client Company"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerCompany}
             />
             <EditableField
               type="textarea"

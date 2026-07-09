@@ -1,5 +1,6 @@
 import { Icons } from "../components/Icons";
 import EditableField from "../components/EditableField";
+import { FIELD_LIMITS } from "../constants/fieldLimits";
 import InvoiceItemsTable from "../components/shared/InvoiceItemsTable";
 import RemittanceFooter from "../components/shared/RemittanceFooter";
 import TotalsSummary from "../components/shared/TotalsSummary";
@@ -71,6 +72,7 @@ export default function EmeraldPremiumTemplate(props) {
             className="text-center w-48"
             placeholder="Phone Number"
             isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessPhone}
           />
           <EditableField
             value={invoice.businessEmail}
@@ -78,6 +80,7 @@ export default function EmeraldPremiumTemplate(props) {
             className="text-center w-64"
             placeholder="Email"
             isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessEmail}
           />
         </div>
       </div>
@@ -96,6 +99,7 @@ export default function EmeraldPremiumTemplate(props) {
             className="w-full font-bold text-slate-900"
             placeholder="Client Name"
             isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerName}
           />
           <EditableField
             value={invoice.customerCompany}
@@ -103,6 +107,7 @@ export default function EmeraldPremiumTemplate(props) {
             className="w-full text-slate-600"
             placeholder="Client Company"
             isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerCompany}
           />
           <EditableField
             type="textarea"
@@ -112,6 +117,7 @@ export default function EmeraldPremiumTemplate(props) {
             className="w-full text-slate-500 mt-1"
             placeholder="Client's Address"
             isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerAddress}
           />
         </div>
         <div className="border-r border-slate-200/60 px-4 space-y-2">
@@ -129,6 +135,7 @@ export default function EmeraldPremiumTemplate(props) {
               className="w-full text-sm font-bold text-slate-900"
               placeholder="Invoice Number"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.invoiceNumber}
             />
           </div>
           <div>
@@ -169,6 +176,7 @@ export default function EmeraldPremiumTemplate(props) {
               className="font-semibold text-slate-900 w-full"
               placeholder="Tax ID"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerTaxId}
             />
           </div>
         </div>

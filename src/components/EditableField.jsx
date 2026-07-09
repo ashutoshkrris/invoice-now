@@ -7,6 +7,8 @@ export default function EditableField({
   type = "text",
   rows = 2,
   isExporting,
+  maxLength,
+  showCount = false,
 }) {
   if (isExporting) {
     const hasNoContent =
@@ -28,27 +30,51 @@ export default function EditableField({
     );
   }
 
+  const strValue = value ?? "";
+  const length = typeof strValue === "string" ? strValue.length : String(strValue).length;
+  const nearLimit = maxLength && length >= maxLength * 0.9;
+  const atLimit = maxLength && length >= maxLength;
+
+  const counter =
+    showCount && maxLength ? (
+      <span
+        className={`no-print block text-right text-[10px] mt-0.5 ${
+          atLimit ? "text-rose-500 font-semibold" : nearLimit ? "text-amber-500" : "text-slate-400"
+        }`}
+      >
+        {length}/{maxLength}
+      </span>
+    ) : null;
+
   if (type === "textarea") {
     return (
-      <textarea
-        value={value}
-        onChange={onChange}
-        rows={rows}
-        className={`wysiwyg-input resize-none ${className}`}
-        style={style}
-        placeholder={placeholder}
-      />
+      <div className="w-full">
+        <textarea
+          value={value}
+          onChange={onChange}
+          rows={rows}
+          maxLength={maxLength}
+          className={`wysiwyg-input resize-none ${className}`}
+          style={style}
+          placeholder={placeholder}
+        />
+        {counter}
+      </div>
     );
   }
 
   return (
-    <input
-      type={type}
-      value={value}
-      onChange={onChange}
-      className={`wysiwyg-input ${className}`}
-      style={style}
-      placeholder={placeholder}
-    />
+    <div className={type === "number" ? "contents" : "w-full"}>
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        maxLength={type === "number" ? undefined : maxLength}
+        className={`wysiwyg-input ${className}`}
+        style={style}
+        placeholder={placeholder}
+      />
+      {type !== "number" && counter}
+    </div>
   );
 }
