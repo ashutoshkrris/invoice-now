@@ -9,7 +9,7 @@ export default function TotalsSummary({
 }) {
   return (
     <div className="grid grid-cols-12 gap-6 mt-8 border-t border-slate-100 pt-6">
-      <div className="col-span-12 sm:col-span-7 space-y-4 text-xs">
+      <div className="col-span-12 sm:col-span-7 space-y-4 text-xs order-2 sm:order-1">
         <div>
           <p className="font-extrabold text-[9px] uppercase tracking-wider text-slate-400 mb-1">
             Additional Terms / Instructions
@@ -40,7 +40,7 @@ export default function TotalsSummary({
         </div>
       </div>
 
-      <div className="col-span-12 sm:col-span-5 text-xs text-slate-600 space-y-2 max-w-sm ml-auto w-full">
+      <div className="col-span-12 sm:col-span-5 text-xs text-slate-600 space-y-2 max-w-sm ml-auto w-full order-1 sm:order-2">
         <div className="flex justify-between items-center py-0.5">
           <span className="font-bold text-slate-400 uppercase text-[10px]">Gross Subtotal</span>
           <span className="font-bold text-slate-900">
