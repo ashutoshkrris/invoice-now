@@ -52,6 +52,7 @@ export default function RetailTemplate({
         </div>
         <EditableField
           value={invoice.businessName}
+          maxLength={80}
           onChange={(e) => onUpdateField("businessName", e.target.value)}
           className="w-full text-center text-base font-black uppercase tracking-wider block"
           placeholder="Your Name / Company Name"
@@ -60,6 +61,7 @@ export default function RetailTemplate({
         <EditableField
           type="textarea"
           value={invoice.businessAddress}
+          maxLength={300}
           onChange={(e) => onUpdateField("businessAddress", e.target.value)}
           rows="2"
           className="w-full text-center text-[10px] text-slate-600 leading-tight"
@@ -69,6 +71,7 @@ export default function RetailTemplate({
         <div className="flex flex-col items-center justify-center text-[10px] text-slate-500 mt-1">
           <EditableField
             value={invoice.businessPhone}
+          maxLength={40}
             onChange={(e) => onUpdateField("businessPhone", e.target.value)}
             className="text-center w-48"
             placeholder="Phone Number"
@@ -76,6 +79,7 @@ export default function RetailTemplate({
           />
           <EditableField
             value={invoice.businessEmail}
+          maxLength={120}
             onChange={(e) => onUpdateField("businessEmail", e.target.value)}
             className="text-center w-48"
             placeholder="Email"
@@ -92,6 +96,7 @@ export default function RetailTemplate({
             <span className="font-bold">INVOICE#: </span>
             <EditableField
               value={invoice.invoiceNumber}
+          maxLength={40}
               onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
               className="font-bold text-slate-900 inline-block w-24"
               placeholder="TRANS-001"
@@ -124,6 +129,7 @@ export default function RetailTemplate({
             <span>CLIENT: </span>
             <EditableField
               value={invoice.customerName}
+          maxLength={80}
               onChange={(e) => onUpdateField("customerName", e.target.value)}
               className="font-bold text-slate-900 text-right inline-block w-24"
               placeholder="Client Name"
@@ -325,6 +331,7 @@ export default function RetailTemplate({
           <EditableField
             type="textarea"
             value={invoice.paymentInstructions}
+          maxLength={500}
             onChange={(e) => onUpdateField("paymentInstructions", e.target.value)}
             rows="3"
             className="w-full text-center text-[10px] text-slate-500"
@@ -336,6 +343,7 @@ export default function RetailTemplate({
           <EditableField
             type="textarea"
             value={invoice.notes}
+          maxLength={500}
             onChange={(e) => onUpdateField("notes", e.target.value)}
             rows="2"
             className="w-full text-center text-slate-600 leading-tight font-semibold"

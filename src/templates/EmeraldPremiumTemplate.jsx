@@ -49,6 +49,7 @@ export default function EmeraldPremiumTemplate(props) {
         </div>
         <EditableField
           value={invoice.businessName}
+          maxLength={80}
           onChange={(e) => onUpdateField("businessName", e.target.value)}
           className="w-full text-center text-2xl font-black uppercase tracking-wide"
           style={{ color: invoice.brandColor }}
@@ -58,6 +59,7 @@ export default function EmeraldPremiumTemplate(props) {
         <EditableField
           type="textarea"
           value={invoice.businessAddress}
+          maxLength={300}
           onChange={(e) => onUpdateField("businessAddress", e.target.value)}
           rows="2"
           className="w-full text-center text-xs text-slate-500 mt-2"
@@ -67,6 +69,7 @@ export default function EmeraldPremiumTemplate(props) {
         <div className="flex flex-col items-center justify-center gap-1 text-xs text-slate-500 mt-2 font-sans">
           <EditableField
             value={invoice.businessPhone}
+          maxLength={40}
             onChange={(e) => onUpdateField("businessPhone", e.target.value)}
             className="text-center w-48"
             placeholder="Phone Number"
@@ -74,6 +77,7 @@ export default function EmeraldPremiumTemplate(props) {
           />
           <EditableField
             value={invoice.businessEmail}
+          maxLength={120}
             onChange={(e) => onUpdateField("businessEmail", e.target.value)}
             className="text-center w-64"
             placeholder="Email"
@@ -92,6 +96,7 @@ export default function EmeraldPremiumTemplate(props) {
           </p>
           <EditableField
             value={invoice.customerName}
+          maxLength={80}
             onChange={(e) => onUpdateField("customerName", e.target.value)}
             className="w-full font-bold text-slate-900"
             placeholder="Client Name"
@@ -99,6 +104,7 @@ export default function EmeraldPremiumTemplate(props) {
           />
           <EditableField
             value={invoice.customerCompany}
+          maxLength={80}
             onChange={(e) => onUpdateField("customerCompany", e.target.value)}
             className="w-full text-slate-600"
             placeholder="Client Company"
@@ -107,6 +113,7 @@ export default function EmeraldPremiumTemplate(props) {
           <EditableField
             type="textarea"
             value={invoice.customerAddress}
+          maxLength={300}
             onChange={(e) => onUpdateField("customerAddress", e.target.value)}
             rows="2"
             className="w-full text-slate-500 mt-1"
@@ -125,6 +132,7 @@ export default function EmeraldPremiumTemplate(props) {
             <span className="text-[8px] font-bold text-slate-400 block uppercase">Invoice #</span>
             <EditableField
               value={invoice.invoiceNumber}
+          maxLength={40}
               onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
               className="w-full text-sm font-bold text-slate-900"
               placeholder="Invoice Number"

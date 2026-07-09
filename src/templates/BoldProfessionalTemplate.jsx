@@ -51,6 +51,7 @@ export default function BoldProfessionalTemplate(props) {
             </div>
             <EditableField
               value={invoice.businessName}
+          maxLength={80}
               onChange={(e) => onUpdateField("businessName", e.target.value)}
               className="w-full text-lg font-black text-white"
               placeholder="Your Name / Company Name"
@@ -59,6 +60,7 @@ export default function BoldProfessionalTemplate(props) {
             <EditableField
               type="textarea"
               value={invoice.businessAddress}
+          maxLength={300}
               onChange={(e) => onUpdateField("businessAddress", e.target.value)}
               rows="2"
               className="w-full text-[11px] text-white/80 leading-relaxed"
@@ -68,6 +70,7 @@ export default function BoldProfessionalTemplate(props) {
             <div className="flex flex-col gap-0.5 text-xs text-white/80">
               <EditableField
                 value={invoice.businessPhone}
+          maxLength={40}
                 onChange={(e) => onUpdateField("businessPhone", e.target.value)}
                 className="w-full text-white"
                 placeholder="Phone Number"
@@ -75,6 +78,7 @@ export default function BoldProfessionalTemplate(props) {
               />
               <EditableField
                 value={invoice.businessEmail}
+          maxLength={120}
                 onChange={(e) => onUpdateField("businessEmail", e.target.value)}
                 className="w-full text-white"
                 placeholder="Email"
@@ -98,6 +102,7 @@ export default function BoldProfessionalTemplate(props) {
               </p>
               <EditableField
                 value={invoice.invoiceNumber}
+          maxLength={40}
                 onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
                 className="text-right font-black text-lg text-white"
                 placeholder="INV-2026-10"
@@ -138,6 +143,7 @@ export default function BoldProfessionalTemplate(props) {
           <div className="p-5 bg-slate-50 rounded-xl border border-slate-100">
             <EditableField
               value={invoice.customerName}
+          maxLength={80}
               onChange={(e) => onUpdateField("customerName", e.target.value)}
               className="w-full font-bold text-slate-900"
               placeholder="Client Name"
@@ -145,6 +151,7 @@ export default function BoldProfessionalTemplate(props) {
             />
             <EditableField
               value={invoice.customerCompany}
+          maxLength={80}
               onChange={(e) => onUpdateField("customerCompany", e.target.value)}
               className="w-full text-slate-600"
               placeholder="Client Company"
@@ -153,6 +160,7 @@ export default function BoldProfessionalTemplate(props) {
             <EditableField
               type="textarea"
               value={invoice.customerAddress}
+          maxLength={300}
               onChange={(e) => onUpdateField("customerAddress", e.target.value)}
               rows="2"
               className="w-full text-slate-500 mt-1"

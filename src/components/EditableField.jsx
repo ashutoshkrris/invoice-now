@@ -7,7 +7,10 @@ export default function EditableField({
   type = "text",
   rows = 2,
   isExporting,
+  maxLength,
 }) {
+  const length = typeof value === "string" ? value.length : 0;
+  const nearLimit = maxLength && length >= maxLength * 0.9;
   if (isExporting) {
     const hasNoContent =
       value === null || value === undefined || (typeof value === "string" && value.trim() === "");

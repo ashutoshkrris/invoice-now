@@ -50,6 +50,7 @@ export default function ClassicTemplate(props) {
           <div className="space-y-1">
             <EditableField
               value={invoice.businessName}
+          maxLength={80}
               onChange={(e) => onUpdateField("businessName", e.target.value)}
               className="w-full text-lg font-extrabold"
               style={{ color: invoice.brandColor }}
@@ -59,6 +60,7 @@ export default function ClassicTemplate(props) {
             <EditableField
               type="textarea"
               value={invoice.businessAddress}
+          maxLength={300}
               onChange={(e) => onUpdateField("businessAddress", e.target.value)}
               rows="2"
               className="w-full text-xs text-slate-500 leading-relaxed"
@@ -68,6 +70,7 @@ export default function ClassicTemplate(props) {
             <div className="flex flex-col gap-0.5 text-xs text-slate-500">
               <EditableField
                 value={invoice.businessPhone}
+          maxLength={40}
                 onChange={(e) => onUpdateField("businessPhone", e.target.value)}
                 className="w-full"
                 placeholder="Phone Number"
@@ -75,6 +78,7 @@ export default function ClassicTemplate(props) {
               />
               <EditableField
                 value={invoice.businessEmail}
+          maxLength={120}
                 onChange={(e) => onUpdateField("businessEmail", e.target.value)}
                 className="w-full"
                 placeholder="Email"
@@ -104,6 +108,7 @@ export default function ClassicTemplate(props) {
           <div className="space-y-1">
             <EditableField
               value={invoice.customerName}
+          maxLength={80}
               onChange={(e) => onUpdateField("customerName", e.target.value)}
               className="w-full font-bold text-sm"
               placeholder="Client Name"
@@ -111,6 +116,7 @@ export default function ClassicTemplate(props) {
             />
             <EditableField
               value={invoice.customerCompany}
+          maxLength={80}
               onChange={(e) => onUpdateField("customerCompany", e.target.value)}
               className="w-full text-slate-600 font-medium"
               placeholder="Client Company LLC"
@@ -119,6 +125,7 @@ export default function ClassicTemplate(props) {
             <EditableField
               type="textarea"
               value={invoice.customerAddress}
+          maxLength={300}
               onChange={(e) => onUpdateField("customerAddress", e.target.value)}
               rows="2"
               className="w-full text-slate-500 leading-relaxed"
@@ -143,6 +150,7 @@ export default function ClassicTemplate(props) {
               </p>
               <EditableField
                 value={invoice.invoiceNumber}
+          maxLength={40}
                 onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
                 className="w-full text-right font-extrabold text-sm"
                 placeholder="INV-2026-001"

@@ -47,6 +47,7 @@ export default function ModernMinimalistTemplate(props) {
           </div>
           <EditableField
             value={invoice.businessName}
+          maxLength={80}
             onChange={(e) => onUpdateField("businessName", e.target.value)}
             className="w-full text-lg font-black tracking-tight text-slate-900"
             placeholder="Your Name / Company Name"
@@ -55,6 +56,7 @@ export default function ModernMinimalistTemplate(props) {
           <EditableField
             type="textarea"
             value={invoice.businessAddress}
+          maxLength={300}
             onChange={(e) => onUpdateField("businessAddress", e.target.value)}
             rows="2"
             className="w-full text-[11px] text-slate-500 leading-relaxed"
@@ -64,6 +66,7 @@ export default function ModernMinimalistTemplate(props) {
           <div className="flex flex-col gap-0.5 text-xs text-slate-500">
             <EditableField
               value={invoice.businessPhone}
+          maxLength={40}
               onChange={(e) => onUpdateField("businessPhone", e.target.value)}
               className="w-full"
               placeholder="Phone Number"
@@ -71,6 +74,7 @@ export default function ModernMinimalistTemplate(props) {
             />
             <EditableField
               value={invoice.businessEmail}
+          maxLength={120}
               onChange={(e) => onUpdateField("businessEmail", e.target.value)}
               className="w-full"
               placeholder="Email"
@@ -94,6 +98,7 @@ export default function ModernMinimalistTemplate(props) {
               </span>
               <EditableField
                 value={invoice.invoiceNumber}
+          maxLength={40}
                 onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
                 className="text-right font-black text-slate-900"
                 placeholder="INV-001"
@@ -135,6 +140,7 @@ export default function ModernMinimalistTemplate(props) {
           </h3>
           <EditableField
             value={invoice.customerName}
+          maxLength={80}
             onChange={(e) => onUpdateField("customerName", e.target.value)}
             className="w-full font-bold text-slate-900"
             placeholder="Client Name"
@@ -142,6 +148,7 @@ export default function ModernMinimalistTemplate(props) {
           />
           <EditableField
             value={invoice.customerCompany}
+          maxLength={80}
             onChange={(e) => onUpdateField("customerCompany", e.target.value)}
             className="w-full text-slate-600"
             placeholder="Client Company"
@@ -150,6 +157,7 @@ export default function ModernMinimalistTemplate(props) {
           <EditableField
             type="textarea"
             value={invoice.customerAddress}
+          maxLength={300}
             onChange={(e) => onUpdateField("customerAddress", e.target.value)}
             rows="2"
             className="w-full text-slate-500 mt-1"
