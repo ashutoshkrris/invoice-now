@@ -164,10 +164,37 @@ export default function App() {
   };
 
   // --- EXPORT ENGINES ---
+  const prepareInvoiceForExport = (target) => {
+    const original = {
+      width: target.style.width,
+      minHeight: target.style.minHeight,
+    };
+
+    target.style.width = "794px";
+    target.style.minHeight = invoice.paperSize === "letter" ? "1050px" : "1120px";
+
+    return () => {
+      target.style.width = original.width;
+      target.style.minHeight = original.minHeight;
+    };
+  };
+
   const handlePrint = () => {
     setIsExporting(true);
+
+    const target = document.getElementById("printable-invoice-area");
+
+    if (!target) {
+      setIsExporting(false);
+      return;
+    }
+
+    const restore = prepareInvoiceForExport(target);
+
     setTimeout(() => {
       window.print();
+
+      restore();
       setIsExporting(false);
     }, 300);
   };
@@ -178,25 +205,25 @@ export default function App() {
 
     setTimeout(async () => {
       const target = document.getElementById("printable-invoice-area");
+
       if (!target) {
         setIsExporting(false);
         return;
       }
-      const originalStyle = target.getAttribute("style") || "";
+
+      const restore = prepareInvoiceForExport(target);
+
       try {
-        target.style.width = "794px"; // Standard crisp desktop width base for A4/Letter rendering
-        target.style.minHeight = invoice.paperSize === "letter" ? "1050px" : "1120px";
         await new Promise((resolve) => setTimeout(resolve, 50));
-        // html-to-image handles oklch/oklab perfectly out of the box!
+
         const dataUrl = await toPng(target, {
           quality: 0.95,
-          pixelRatio: 3, // Maintains sharp text matching previous scale
+          pixelRatio: 3,
           backgroundColor: "#ffffff",
-          // Skip external scripts or widgets that block style rule parsing
           filter: (node) => {
             if (node.tagName === "LINK" && node.getAttribute("rel") === "stylesheet") {
               const href = node.getAttribute("href");
-              // Allow relative local CSS, catch cross-origin blockers
+
               return (
                 href &&
                 (href.startsWith("/") ||
@@ -217,7 +244,7 @@ export default function App() {
         console.error("PNG render failed", err);
         triggerToast("PNG render failed", "error");
       } finally {
-        target.setAttribute("style", originalStyle);
+        restore();
         setIsExporting(false);
       }
     }, 400);
@@ -233,10 +260,10 @@ export default function App() {
         setIsExporting(false);
         return;
       }
-      const originalStyle = target.getAttribute("style") || "";
+
+      const restore = prepareInvoiceForExport(target);
+
       try {
-        target.style.width = "794px";
-        target.style.minHeight = invoice.paperSize === "letter" ? "1050px" : "1120px";
         await new Promise((resolve) => setTimeout(resolve, 50));
 
         const dataUrl = await toPng(target, {
@@ -265,20 +292,21 @@ export default function App() {
 
         const pdfWidth = pdf.internal.pageSize.getWidth();
 
-        // We can safely read target element sizes to maintain pixel-perfect height mappings
         const imgWidth = target.offsetWidth;
         const imgHeight = target.offsetHeight;
         const ratio = imgHeight / imgWidth;
         const pdfHeight = pdfWidth * ratio;
 
         pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
+
         pdf.save(`${invoice.invoiceNumber || "invoice"}.pdf`);
+
         triggerToast("PDF document download complete!");
       } catch (err) {
         console.error("PDF engine crash", err);
         triggerToast("PDF compilation failed", "error");
       } finally {
-        target.setAttribute("style", originalStyle);
+        restore();
         setIsExporting(false);
       }
     }, 400);
