@@ -1,6 +1,6 @@
 import { Icons } from "./Icons";
 
-export default function Footer() {
+export default function Footer({ onNavigate }) {
   const startYear = 2026;
   const currentYear = new Date().getFullYear();
 

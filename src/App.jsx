@@ -3,6 +3,8 @@ import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import AboutPage from "./components/AboutPage";
+import PrivacyPage from "./components/PrivacyPage";
 import Toast from "./components/Toast";
 import BoldProfessionalTemplate from "./templates/BoldProfessionalTemplate";
 import ClassicTemplate from "./templates/ClassicTemplate";
@@ -23,6 +25,7 @@ export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
   const [toast, setToast] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [view, setView] = useState("editor"); // editor | about | privacy
 
   // --- HISTORICAL UNDO / REDO ENGINE ---
   const [history, setHistory] = useState([JSON.stringify(INITIAL_INVOICE_STATE)]);
@@ -361,7 +364,7 @@ export default function App() {
         </div>
       </main>
 
-      <Footer />
+      <Footer onNavigate={setView} />
 
       {/* --- TOAST MESSENGER LAYOUT --- */}
       {toast && !isExporting && (
