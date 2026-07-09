@@ -53,7 +53,7 @@ export default function ClassicTemplate(props) {
               onChange={(e) => onUpdateField("businessName", e.target.value)}
               className="w-full text-lg font-extrabold"
               style={{ color: invoice.brandColor }}
-              placeholder="Your Name / Company Name"
+              placeholder="Your / Company Name"
               isExporting={isExporting}
             />
             <EditableField
@@ -62,7 +62,7 @@ export default function ClassicTemplate(props) {
               onChange={(e) => onUpdateField("businessAddress", e.target.value)}
               rows="2"
               className="w-full text-xs text-slate-500 leading-relaxed"
-              placeholder="Your / Your Company Address"
+              placeholder="Your / Company Address"
               isExporting={isExporting}
             />
             <div className="flex flex-col gap-0.5 text-xs text-slate-500">

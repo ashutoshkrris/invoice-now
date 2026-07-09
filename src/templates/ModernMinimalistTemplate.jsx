@@ -49,7 +49,7 @@ export default function ModernMinimalistTemplate(props) {
             value={invoice.businessName}
             onChange={(e) => onUpdateField("businessName", e.target.value)}
             className="w-full text-lg font-black tracking-tight text-slate-900"
-            placeholder="Your Name / Company Name"
+            placeholder="Your / Company Name"
             isExporting={isExporting}
           />
           <EditableField
@@ -58,7 +58,7 @@ export default function ModernMinimalistTemplate(props) {
             onChange={(e) => onUpdateField("businessAddress", e.target.value)}
             rows="2"
             className="w-full text-[11px] text-slate-500 leading-relaxed"
-            placeholder="Your / Your Company Address"
+            placeholder="Your / Company Address"
             isExporting={isExporting}
           />
           <div className="flex flex-col gap-0.5 text-xs text-slate-500">

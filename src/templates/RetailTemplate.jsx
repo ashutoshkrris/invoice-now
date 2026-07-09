@@ -54,7 +54,7 @@ export default function RetailTemplate({
           value={invoice.businessName}
           onChange={(e) => onUpdateField("businessName", e.target.value)}
           className="w-full text-center text-base font-black uppercase tracking-wider block"
-          placeholder="Your Name / Company Name"
+          placeholder="Your / Company Name"
           isExporting={isExporting}
         />
         <EditableField
@@ -63,7 +63,7 @@ export default function RetailTemplate({
           onChange={(e) => onUpdateField("businessAddress", e.target.value)}
           rows="2"
           className="w-full text-center text-[10px] text-slate-600 leading-tight"
-          placeholder="Your / Your Company Address"
+          placeholder="Your / Company Address"
           isExporting={isExporting}
         />
         <div className="flex flex-col items-center justify-center text-[10px] text-slate-500 mt-1">
