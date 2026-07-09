@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import { BRAND_COLORS, COUNTRIES } from "../constants/invoicePresets";
 import { Icons } from "./Icons";
 
@@ -50,28 +51,20 @@ export default function Header({
     <header className="no-print sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm px-4 md:px-6 py-3 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2 xl:gap-0 transition-all duration-300 w-full box-border">
       {/* Top Main Row */}
       <div className="flex items-center justify-between w-full xl:w-auto z-10">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 bg-gradient-to-tr from-brand-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md shrink-0">
-            <svg
-              className="w-4 h-4 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={3}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
+        <Link
+          to="/"
+          className="flex items-center gap-3 group cursor-pointer select-none"
+          title="Return to Invoice Editor"
+        >
+          <div className="h-9 w-9 bg-linear-to-tr from-brand-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md shrink-0">
+            <Icons.AppLogo />
           </div>
           <div>
             <h1 className="text-sm font-black tracking-tight text-slate-950 dark:text-white leading-none">
               Invoice Now
             </h1>
           </div>
-        </div>
+        </Link>
 
         {/* Mobile quick actions bar */}
         <div className="flex items-center gap-1.5 xl:hidden">
