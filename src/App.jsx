@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Toast from "./components/Toast";
-import AboutPage from "./components/AboutPage";
+import AboutPage from "./pages/AboutPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import TermsOfUsePage from "./pages/TermsOfUsePage";
 
 // Template Imports
 import BoldProfessionalTemplate from "./templates/BoldProfessionalTemplate";
@@ -23,8 +25,6 @@ import { loadCachedState, persistState } from "./utils/storage";
 // Bifurcated Template Formats
 
 export default function App() {
-  const navigate = useNavigate();
-
   const [invoice, setInvoice] = useState(loadCachedState);
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
   const [toast, setToast] = useState(null);
@@ -415,7 +415,13 @@ export default function App() {
         />
 
         {/* --- ABOUT PAGE --- */}
-        <Route path="/about" element={<AboutPage onNavigateBack={() => navigate("/")} />} />
+        <Route path="/about" element={<AboutPage />} />
+
+        {/* --- PRIVACY POLICY PAGE --- */}
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+
+        {/* --- TERMS OF USE PAGE --- */}
+        <Route path="/terms-of-use" element={<TermsOfUsePage />} />
       </Routes>
 
       <Footer />

@@ -73,40 +73,59 @@ export default function Footer() {
               </h4>
               <ul className="space-y-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/privacy-policy"
                     className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
                   >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/terms-of-use"
                     className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
                   >
                     Terms of Service
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Right Column: Code Repositories & Connections (Spans 3/12 columns) */}
+          {/* Right Column: Open Source Links Matrix */}
           <div className="md:col-span-3 space-y-3 text-left md:text-right flex flex-col md:items-end justify-start">
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500 w-full">
               Open Source
             </h4>
-            <div className="flex items-center gap-4 pt-1 w-full md:justify-end">
+            <div className="flex flex-col gap-3 pt-1 w-full md:items-end font-semibold text-xs">
+              {/* GitHub Repo Link */}
               <a
                 href="https://github.com/ashutoshkrris/invoice-now"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 font-semibold text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors w-max"
                 title="View source code on GitHub"
               >
                 <Icons.Github />
                 <span>GitHub Repository</span>
+              </a>
+
+              {/* Standalone Premium Sponsor Button Layout */}
+              <a
+                href="https://github.com/sponsors/ashutoshkrris"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800/80 text-rose-600 dark:text-rose-400 font-bold text-xs rounded-lg border border-slate-200 dark:border-slate-800 transition-all duration-200 shadow-xs hover:shadow-sm w-max group select-none"
+                title="Sponsor the project on GitHub"
+              >
+                {/* Heart Graphic with micro hover bounce */}
+                <svg
+                  className="w-3.5 h-3.5 fill-current transform group-hover:scale-110 transition-transform duration-200 shrink-0"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M4.25 2.5c-1.336 0-2.75 1.034-2.75 2.5 0 3.5 4.75 7.75 6.5 7.75s6.5-4.25 6.5-7.75c0-1.466-1.414-2.5-2.75-2.5-1.072 0-2.072.714-2.5 1.5-.428-.786-1.428-1.5-2.5-1.5z" />
+                </svg>
+                <span>Sponsor</span>
               </a>
             </div>
           </div>
