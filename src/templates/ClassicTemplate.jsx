@@ -51,7 +51,7 @@ export default function ClassicTemplate(props) {
             <EditableField
               value={invoice.businessName}
               onChange={(e) => onUpdateField("businessName", e.target.value)}
-              className="w-full text-lg font-extrabold"
+              className="w-full text-md font-extrabold"
               style={{ color: invoice.brandColor }}
               placeholder="Your / Company Name"
               isExporting={isExporting}
