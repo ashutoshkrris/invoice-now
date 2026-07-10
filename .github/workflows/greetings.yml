@@ -1,0 +1,49 @@
+name: Greetings
+
+on:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types:
+      - opened
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  greeting:
+    name: Greet First-Time Contributors
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Greet first-time contributors
+        uses: actions/first-interaction@v3
+        with:
+          issue_message: |
+            @${{ github.actor }} Welcome to Invoice Now! 🥳✨
+
+            Thank you for taking the time to open this issue. Your feedback, suggestions, and ideas help us make Invoice Now better for everyone! 💖
+
+            Our team will review it shortly. If you'd like to work on this issue, feel free to assign it to yourself and start contributing. 🚀
+
+            To self-assign, simply comment:
+            `/assign`
+
+            We appreciate your contribution and look forward to building Invoice Now together! 🙌
+
+          pr_message: |
+            @${{ github.actor }} Thank you for opening a pull request! 🥳🎉
+
+            We truly appreciate your effort and contribution to Invoice Now. Every improvement helps us create a better experience for our users. 💖
+
+            Our maintainers will review your changes as soon as possible. Thanks for your patience and for helping improve the project! 🚀
+
+            Before the review begins, please make sure:
+
+            ✅ The related issue is linked  
+            ✅ Tests (if applicable) are passing  
+            ✅ The PR description clearly explains your changes  
+
+            Happy coding, and thank you for being part of the Invoice Now community! 🙌

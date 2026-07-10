@@ -7,169 +7,6 @@ export const BRAND_COLORS = [
   { hex: "#1e293b", label: "Charcoal" },
 ];
 
-export const COUNTRIES = [
-  {
-    code: "US",
-    name: "United States",
-    currency: "USD",
-    symbol: "$",
-    taxName: "Sales Tax",
-    defaultTaxRate: 0,
-  },
-  {
-    code: "GB",
-    name: "United Kingdom",
-    currency: "GBP",
-    symbol: "£",
-    taxName: "VAT",
-    defaultTaxRate: 20,
-  },
-  {
-    code: "EU",
-    name: "European Union",
-    currency: "EUR",
-    symbol: "€",
-    taxName: "VAT",
-    defaultTaxRate: 21,
-  },
-  {
-    code: "DE",
-    name: "Germany",
-    currency: "EUR",
-    symbol: "€",
-    taxName: "MwSt",
-    defaultTaxRate: 19,
-  },
-  {
-    code: "FR",
-    name: "France",
-    currency: "EUR",
-    symbol: "€",
-    taxName: "TVA",
-    defaultTaxRate: 20,
-  },
-  {
-    code: "IN",
-    name: "India",
-    currency: "INR",
-    symbol: "₹",
-    taxName: "GST",
-    defaultTaxRate: 18,
-  },
-  {
-    code: "CA",
-    name: "Canada",
-    currency: "CAD",
-    symbol: "C$",
-    taxName: "GST/HST",
-    defaultTaxRate: 5,
-  },
-  {
-    code: "AU",
-    name: "Australia",
-    currency: "AUD",
-    symbol: "A$",
-    taxName: "GST",
-    defaultTaxRate: 10,
-  },
-  {
-    code: "JP",
-    name: "Japan",
-    currency: "JPY",
-    symbol: "¥",
-    taxName: "Consumption Tax",
-    defaultTaxRate: 10,
-  },
-  {
-    code: "SG",
-    name: "Singapore",
-    currency: "SGD",
-    symbol: "S$",
-    taxName: "GST",
-    defaultTaxRate: 9,
-  },
-  {
-    code: "NZ",
-    name: "New Zealand",
-    currency: "NZD",
-    symbol: "NZ$",
-    taxName: "GST",
-    defaultTaxRate: 15,
-  },
-  {
-    code: "BR",
-    name: "Brazil",
-    currency: "BRL",
-    symbol: "R$",
-    taxName: "ISS",
-    defaultTaxRate: 5,
-  },
-  {
-    code: "MX",
-    name: "Mexico",
-    currency: "MXN",
-    symbol: "MX$",
-    taxName: "IVA",
-    defaultTaxRate: 16,
-  },
-  {
-    code: "AE",
-    name: "United Arab Emirates",
-    currency: "AED",
-    symbol: "د.إ",
-    taxName: "VAT",
-    defaultTaxRate: 5,
-  },
-  {
-    code: "ZA",
-    name: "South Africa",
-    currency: "ZAR",
-    symbol: "R",
-    taxName: "VAT",
-    defaultTaxRate: 15,
-  },
-  {
-    code: "KR",
-    name: "South Korea",
-    currency: "KRW",
-    symbol: "₩",
-    taxName: "VAT",
-    defaultTaxRate: 10,
-  },
-  {
-    code: "CH",
-    name: "Switzerland",
-    currency: "CHF",
-    symbol: "CHF",
-    taxName: "VAT",
-    defaultTaxRate: 8.1,
-  },
-  {
-    code: "NL",
-    name: "Netherlands",
-    currency: "EUR",
-    symbol: "€",
-    taxName: "BTW",
-    defaultTaxRate: 21,
-  },
-  {
-    code: "SE",
-    name: "Sweden",
-    currency: "SEK",
-    symbol: "kr",
-    taxName: "Moms",
-    defaultTaxRate: 25,
-  },
-  {
-    code: "CUSTOM",
-    name: "Custom Setup",
-    currency: "USD",
-    symbol: "$",
-    taxName: "Tax",
-    defaultTaxRate: 0,
-  },
-];
-
 export const getTodayDateString = () => {
   return new Date().toISOString().split("T")[0];
 };
@@ -196,8 +33,7 @@ export const INITIAL_INVOICE_STATE = {
   dueDate: getDueDateString(),
   countryCode: "IN",
   currencyCode: "INR",
-  currencySymbol: "₹",
-  taxName: "Sales Tax",
+  currencySymbol: "Γé╣",
 
   customerName: "",
   customerCompany: "",
@@ -217,10 +53,7 @@ export const INITIAL_INVOICE_STATE = {
     },
   ],
 
-  discountValue: 0,
-  discountType: "percentage",
   shippingCharges: 0,
-  additionalCharges: 0,
   amountPaid: 0,
 
   paymentInstructions: "",
@@ -232,4 +65,13 @@ export const INITIAL_INVOICE_STATE = {
   typography: "font-sans",
   paperSize: "a4",
   watermarkText: "",
+
+  taxScope: "none", // "none" | "item" | "subtotal"
+  taxType: "percentage", // "percentage" | "flat"
+  discountScope: "none", // "none" | "item" | "subtotal"
+  discountType: "percentage", // "percentage" | "flat"
+
+  taxName: "Tax",
+  globalTaxRate: 0, // Handles both % or Flat depending on taxType
+  globalDiscount: 0, // Handles both % or Flat depending on discountType
 };

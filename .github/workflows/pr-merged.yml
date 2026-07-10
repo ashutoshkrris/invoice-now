@@ -1,0 +1,34 @@
+name: Celebrate PR Merge
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  congratulate:
+    name: Congratulate Contributors After Merge
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Comment on merged PR
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Congratulations @${{ github.event.pull_request.user.login }}! 🎉🚀
+
+            Your pull request has been successfully merged into Invoice Now!
+
+            Thank you for your time, effort, and contribution. 💖 Your work helps make Invoice Now more powerful and useful for everyone.
+
+            We're excited to have you as part of our community and would love to see more of your contributions in the future! 🙌
+
+            Feel free to pick another issue and keep building with us. ✨
+
+            If you enjoy using Invoice Now, consider giving the repository a ⭐ — it helps more people discover the project!
