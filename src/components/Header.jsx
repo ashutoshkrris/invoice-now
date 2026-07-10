@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import { BRAND_COLORS, COUNTRIES } from "../constants/invoicePresets";
+import { BRAND_COLORS } from "../constants/invoicePresets";
+import { COUNTRIES } from "../constants/countries";
 import { Icons } from "./Icons";
 
 export default function Header({

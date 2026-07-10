@@ -7,7 +7,6 @@ export const BRAND_COLORS = [
   { hex: "#1e293b", label: "Charcoal" },
 ];
 
-export { COUNTRIES } from './countries';
 
 export const getTodayDateString = () => {
   return new Date().toISOString().split("T")[0];
