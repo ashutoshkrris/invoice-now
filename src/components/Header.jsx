@@ -304,7 +304,7 @@ export default function Header({
             {/* Print Button */}
             <button
               onClick={onPrint}
-              className="flex-1 xl:flex-none justify-center flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50/50 cursor-pointer min-h-[38px]"
+              className="flex-1 xl:flex-none justify-center flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50/50 cursor-pointer min-h-[38px] hidden"
             >
               <Icons.Print /> Print
             </button>
