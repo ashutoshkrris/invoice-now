@@ -22,17 +22,26 @@ export default function Header({
   const [isOpen, setIsOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
 
+  // Searchable Country Dropdown States
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  const [countrySearchQuery, setCountrySearchQuery] = useState("");
+
   // Custom Modal States
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [customInput, setCustomInput] = useState("");
 
   const dropdownRef = useRef(null);
+  const countryDropdownRef = useRef(null);
 
-  // Close export dropdown if user clicks outside of it
+  // Close dropdowns if user clicks outside of them
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsExportOpen(false);
+      }
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target)) {
+        setIsCountryDropdownOpen(false);
+        setCountrySearchQuery("");
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -117,22 +126,75 @@ export default function Header({
 
           {/* Controls Config Row */}
           <div className="flex flex-wrap xl:flex-nowrap items-center gap-3 w-full xl:w-auto">
-            {/* Country Rules */}
-            <div className="flex flex-col flex-1 min-w-[140px] xl:flex-none xl:w-35">
+            {/* 1. Searchable Country Rules Preset Dropdown */}
+            <div
+              ref={countryDropdownRef}
+              className="flex flex-col flex-1 min-w-[140px] xl:flex-none xl:w-38 relative text-left"
+            >
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Country Rules Preset
               </label>
-              <select
-                value={invoice.countryCode}
-                onChange={(e) => onCountryChange(e.target.value)}
-                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer"
+
+              <button
+                type="button"
+                onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                className="w-full flex justify-between items-center px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer text-left h-[30px]"
               >
-                {COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                <span className="truncate">
+                  {COUNTRIES.find((c) => c.code === invoice.countryCode)?.name || "Select Country"}
+                </span>
+                <span
+                  className={`text-[9px] text-slate-400 transition-transform ml-1 ${isCountryDropdownOpen ? "rotate-180" : ""}`}
+                >
+                  ▼
+                </span>
+              </button>
+
+              {isCountryDropdownOpen && (
+                <div className="absolute top-full left-0 w-full md:w-56 mt-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg shadow-xl z-50 overflow-hidden flex flex-col max-h-60">
+                  <div className="p-1.5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30">
+                    <input
+                      type="text"
+                      autoFocus
+                      placeholder="Search country..."
+                      value={countrySearchQuery}
+                      onChange={(e) => setCountrySearchQuery(e.target.value)}
+                      className="w-full px-2 py-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md text-xs font-medium outline-none focus:border-brand-500 text-slate-700 dark:text-slate-300"
+                    />
+                  </div>
+
+                  <div className="overflow-y-auto flex-1 divide-y divide-slate-50 dark:divide-slate-900/40">
+                    {COUNTRIES.filter((c) =>
+                      c.name.toLowerCase().includes(countrySearchQuery.toLowerCase())
+                    ).length > 0 ? (
+                      COUNTRIES.filter((c) =>
+                        c.name.toLowerCase().includes(countrySearchQuery.toLowerCase())
+                      ).map((c) => (
+                        <button
+                          key={c.code}
+                          type="button"
+                          onClick={() => {
+                            onCountryChange(c.code);
+                            setIsCountryDropdownOpen(false);
+                            setCountrySearchQuery("");
+                          }}
+                          className={`w-full text-left px-3 py-2 text-xs transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 block truncate ${
+                            invoice.countryCode === c.code
+                              ? "bg-brand-50/40 dark:bg-brand-950/20 text-brand-600 dark:text-brand-400 font-bold"
+                              : "text-slate-700 dark:text-slate-300"
+                          }`}
+                        >
+                          {c.name}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-2 py-3 text-xs text-slate-400 text-center font-medium select-none">
+                        No matches
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Style Template */}
@@ -320,7 +382,7 @@ export default function Header({
                 <Icons.ChevronDown />
               </button>
 
-              {/* Dropdown Menu Overlay Card: Explicit positioning direction safely relative to active layouts */}
+              {/* Dropdown Menu Overlay Card */}
               {isExportOpen && (
                 <div className="absolute right-0 bottom-full mb-2 xl:bottom-auto xl:top-full xl:mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 p-1 flex flex-col gap-0.5 animate-in fade-in slide-in-from-top-1 duration-100">
                   <button

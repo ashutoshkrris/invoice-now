@@ -53,7 +53,7 @@ export default function TotalsSummary({
             Subtotal
           </span>
           <span className="font-bold text-slate-900 dark:text-white">
-            {activeCurrencySymbol}
+            {activeCurrencySymbol}{" "}
             {(
               totals.subtotal + (invoice.discountScope === "subtotal" ? totals.discount : 0)
             ).toFixed(2)}
@@ -100,8 +100,7 @@ export default function TotalsSummary({
                 </div>
               ) : (
                 <span>
-                  -{activeCurrencySymbol}
-                  {totals.discount.toFixed(2)}
+                  -{activeCurrencySymbol} {totals.discount.toFixed(2)}
                 </span>
               )}
             </div>
@@ -154,8 +153,7 @@ export default function TotalsSummary({
                 </div>
               ) : (
                 <span>
-                  {activeCurrencySymbol}
-                  {totals.tax.toFixed(2)}
+                  {activeCurrencySymbol} {totals.tax.toFixed(2)}
                 </span>
               )}
             </div>
@@ -216,8 +214,7 @@ export default function TotalsSummary({
             Total
           </span>
           <span className="text-sm">
-            {activeCurrencySymbol}
-            {totals.grandTotal.toFixed(2)}
+            {activeCurrencySymbol} {totals.grandTotal.toFixed(2)}
           </span>
         </div>
 
@@ -245,8 +242,7 @@ export default function TotalsSummary({
         <div className="flex justify-between items-center border-t-2 border-slate-200 dark:border-slate-800 pt-3 text-sm font-black text-slate-900 dark:text-white">
           <span>Balance Due</span>
           <span className="text-lg" style={{ color: invoice.brandColor || "inherit" }}>
-            {activeCurrencySymbol}
-            {totals.balanceDue.toFixed(2)}
+            {activeCurrencySymbol} {totals.balanceDue.toFixed(2)}
           </span>
         </div>
       </div>
