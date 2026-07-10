@@ -26,7 +26,7 @@ export default function InvoiceItemsTable({
                   key={type}
                   type="button"
                   onClick={() => onUpdateField("taxScope", type)}
-                  className={`flex-1 py-1 px-2.5 rounded-lg capitalize transition-all cursor-pointer ${
+                  className={`flex-1 py-1 px-2.5 rounded-lg capitalize transition-all cursor-pointer text-center ${
                     invoice.taxScope === type
                       ? "bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-xs font-extrabold"
                       : "hover:text-slate-900 dark:hover:text-slate-300 text-slate-400"
@@ -49,7 +49,7 @@ export default function InvoiceItemsTable({
                   key={type}
                   type="button"
                   onClick={() => onUpdateField("discountScope", type)}
-                  className={`flex-1 py-1 px-2.5 rounded-lg capitalize transition-all cursor-pointer ${
+                  className={`flex-1 py-1 px-2.5 rounded-lg capitalize transition-all cursor-pointer text-center ${
                     invoice.discountScope === type
                       ? "bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-xs font-extrabold"
                       : "hover:text-slate-900 dark:hover:text-slate-300 text-slate-400"
@@ -63,8 +63,188 @@ export default function InvoiceItemsTable({
         </div>
       )}
 
-      {/* --- TABLE LAYOUT STRUCTURAL WRAPPER --- */}
-      <div className="w-full overflow-x-auto select-none">
+      {/* ========================================================================= */}
+      {/* 1. MOBILE RESPONSIVE CARD VIEW (Below 768px, completely hidden in print)   */}
+      {/* ========================================================================= */}
+      <div className="block md:hidden space-y-4 no-print">
+        {invoice.items.map((item, idx) => {
+          const rawSub = (item.qty || 0) * (item.price || 0);
+          const itemDiscVal = invoice.discountScope === "item" ? item.discount || 0 : 0;
+          const rowDiscount =
+            invoice.discountType === "flat" ? itemDiscVal : (rawSub * itemDiscVal) / 100;
+          const rowSubtotal = rawSub - rowDiscount;
+
+          const itemTaxVal = invoice.taxScope === "item" ? item.taxRate || 0 : 0;
+          const rowTax = invoice.taxType === "flat" ? itemTaxVal : (rowSubtotal * itemTaxVal) / 100;
+          const lineTotal = rowSubtotal + rowTax;
+
+          return (
+            <div
+              key={idx}
+              className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800/80 space-y-3 relative group"
+            >
+              {/* Row Actions Header */}
+              <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/60 pb-2">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                  Line Item #{idx + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onRemoveLineItem(idx)}
+                  className="p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md transition-colors cursor-pointer"
+                  title="Delete Item"
+                >
+                  <Icons.Trash className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Title & Descriptions Inputs */}
+              <div className="space-y-1">
+                <EditableField
+                  value={item.name}
+                  onChange={(e) => onUpdateNestedItem(idx, "name", e.target.value)}
+                  className="w-full font-bold text-slate-800 dark:text-white text-[13px]"
+                  placeholder="Item Title / Name"
+                  isExporting={isExporting}
+                />
+                <EditableField
+                  value={item.description}
+                  onChange={(e) => onUpdateNestedItem(idx, "description", e.target.value)}
+                  className="w-full text-slate-500 dark:text-slate-400 text-[11px]"
+                  placeholder="Add specific description details..."
+                  isExporting={isExporting}
+                />
+              </div>
+
+              {/* Variable Quantities Matrix Grid */}
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
+                    Rate ({activeCurrencySymbol})
+                  </label>
+                  <EditableField
+                    type="number"
+                    step="0.01"
+                    value={item.price}
+                    onChange={(e) =>
+                      onUpdateNestedItem(idx, "price", parseFloat(e.target.value) || 0)
+                    }
+                    className="w-full font-bold text-slate-800 dark:text-white border border-slate-200/60 dark:border-slate-800 rounded-md px-2 py-1 bg-white dark:bg-slate-950"
+                    placeholder="0.00"
+                    isExporting={isExporting}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
+                    Qty
+                  </label>
+                  <EditableField
+                    type="number"
+                    value={item.qty}
+                    onChange={(e) => onUpdateNestedItem(idx, "qty", parseInt(e.target.value) || 0)}
+                    className="w-full font-bold text-slate-800 dark:text-white border border-slate-200/60 dark:border-slate-800 rounded-md px-2 py-1 bg-white dark:bg-slate-950 text-center"
+                    placeholder="1"
+                    isExporting={isExporting}
+                  />
+                </div>
+
+                {/* Conditional Field: Item Tax + Aligned Mobile Dropdown */}
+                {invoice.taxScope === "item" && (
+                  <div>
+                    <div className="flex items-center gap-1 mb-1">
+                      <EditableField
+                        value={invoice.taxName || "Tax"}
+                        onChange={(e) => onUpdateField("taxName", e.target.value)}
+                        className="font-bold text-slate-400 dark:text-slate-500 uppercase text-[10px] max-w-[50px] bg-transparent"
+                        placeholder="Tax"
+                        isExporting={isExporting}
+                      />
+                      {!isExporting && (
+                        <select
+                          value={invoice.taxType || "percentage"}
+                          onChange={(e) => onUpdateField("taxType", e.target.value)}
+                          className="bg-slate-100 dark:bg-slate-900 outline-none text-[8px] font-bold border border-slate-200 dark:border-slate-800 rounded px-1 py-0.5 cursor-pointer text-slate-500"
+                        >
+                          <option value="percentage">%</option>
+                          <option value="flat">Amt</option>
+                        </select>
+                      )}
+                    </div>
+                    <div className="flex items-center border border-slate-200/60 dark:border-slate-800 rounded-md px-2 py-1 bg-white dark:bg-slate-950">
+                      {invoice.taxType === "flat" && (
+                        <span className="text-[11px] text-slate-400 mr-1">
+                          {activeCurrencySymbol}
+                        </span>
+                      )}
+                      <EditableField
+                        type="number"
+                        value={item.taxRate}
+                        onChange={(e) =>
+                          onUpdateNestedItem(idx, "taxRate", parseFloat(e.target.value) || 0)
+                        }
+                        className="w-full font-semibold text-slate-700 dark:text-slate-300 text-center"
+                        placeholder="0"
+                        isExporting={isExporting}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Conditional Field: Item Discount + Aligned Mobile Dropdown */}
+                {invoice.discountScope === "item" && (
+                  <div>
+                    <div className="flex items-center gap-1 mb-1">
+                      <span className="text-[10px] font-bold uppercase text-slate-400">Disc</span>
+                      {!isExporting && (
+                        <select
+                          value={invoice.discountType || "percentage"}
+                          onChange={(e) => onUpdateField("discountType", e.target.value)}
+                          className="bg-slate-100 dark:bg-slate-900 outline-none text-[8px] font-bold border border-slate-200 dark:border-slate-800 rounded px-1 py-0.5 cursor-pointer text-slate-500"
+                        >
+                          <option value="percentage">%</option>
+                          <option value="flat">Amt</option>
+                        </select>
+                      )}
+                    </div>
+                    <div className="flex items-center border border-slate-200/60 dark:border-slate-800 rounded-md px-2 py-1 bg-white dark:bg-slate-950">
+                      {invoice.discountType === "flat" && (
+                        <span className="text-[11px] text-rose-400 mr-1">
+                          {activeCurrencySymbol}
+                        </span>
+                      )}
+                      <EditableField
+                        type="number"
+                        value={item.discount}
+                        onChange={(e) =>
+                          onUpdateNestedItem(idx, "discount", parseFloat(e.target.value) || 0)
+                        }
+                        className="w-full font-semibold text-rose-600 dark:text-rose-400 text-center"
+                        placeholder="0"
+                        isExporting={isExporting}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Individual Calculated Card Total Row */}
+              <div className="flex justify-between items-center bg-slate-100/50 dark:bg-slate-900 p-2 rounded-lg text-xs border border-slate-200/20 dark:border-slate-800/50">
+                <span className="font-bold text-slate-400 uppercase text-[10px]">Line Total:</span>
+                <span className="font-black text-slate-900 dark:text-white">
+                  {activeCurrencySymbol}
+                  {lineTotal.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. TRADITIONAL TABLE VIEW (Visible on tablet/desktop, used for print/exports) */}
+      {/* ========================================================================= */}
+      <div className="hidden md:block print:block w-full overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[600px]">
           <thead>
             <tr className="text-[10px] font-extrabold uppercase text-slate-400 border-b-2 border-slate-200 dark:border-slate-800 pb-2">
