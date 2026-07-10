@@ -17,7 +17,8 @@ import ModernMinimalistTemplate from "./templates/ModernMinimalistTemplate";
 import RetailTemplate from "./templates/RetailTemplate";
 
 // Preset Imports
-import { INITIAL_INVOICE_STATE, COUNTRIES } from "./constants/invoicePresets";
+import { INITIAL_INVOICE_STATE } from "./constants/invoicePresets";
+import { COUNTRIES } from "./constants/countries";
 import { loadCachedState, persistState } from "./utils/storage";
 
 // Generic Layout Nodes
