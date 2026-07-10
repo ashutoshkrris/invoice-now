@@ -52,7 +52,7 @@ export default function EmeraldPremiumTemplate(props) {
           onChange={(e) => onUpdateField("businessName", e.target.value)}
           className="w-full text-center text-2xl font-black uppercase tracking-wide"
           style={{ color: invoice.brandColor }}
-          placeholder="Your Name / Company Name"
+          placeholder="Your / Company Name"
           isExporting={isExporting}
         />
         <EditableField
@@ -61,7 +61,7 @@ export default function EmeraldPremiumTemplate(props) {
           onChange={(e) => onUpdateField("businessAddress", e.target.value)}
           rows="2"
           className="w-full text-center text-xs text-slate-500 mt-2"
-          placeholder="Your / Your Company Address"
+          placeholder="Your / Company Address"
           isExporting={isExporting}
         />
         <div className="flex flex-col items-center justify-center gap-1 text-xs text-slate-500 mt-2 font-sans">

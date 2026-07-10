@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import { BRAND_COLORS, COUNTRIES } from "../constants/invoicePresets";
 import { Icons } from "./Icons";
 
@@ -46,34 +47,27 @@ export default function Header({
   const isPresetWatermark = ["DRAFT", "PAID", "OVERDUE", ""].includes(invoice.watermarkText);
 
   return (
-    <header className="no-print sticky top-0 z-40 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm px-4 md:px-8 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between transition-all duration-300">
+    // Shifted from rigid lg layouts down to explicit responsive fluid structures (xl breakpoints)
+    <header className="no-print sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm px-4 md:px-6 py-3 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2 xl:gap-0 transition-all duration-300 w-full box-border">
       {/* Top Main Row */}
-      <div className="flex items-center justify-between w-full lg:w-auto z-10">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 bg-gradient-to-tr from-brand-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
-            <svg
-              className="w-4 h-4 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={3}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
+      <div className="flex items-center justify-between w-full xl:w-auto z-10">
+        <Link
+          to="/"
+          className="flex items-center gap-3 group cursor-pointer select-none"
+          title="Return to Invoice Editor"
+        >
+          <div className="h-9 w-9 bg-linear-to-tr from-brand-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md shrink-0">
+            <Icons.AppLogo />
           </div>
           <div>
             <h1 className="text-sm font-black tracking-tight text-slate-950 dark:text-white leading-none">
               Invoice Now
             </h1>
           </div>
-        </div>
+        </Link>
 
         {/* Mobile quick actions bar */}
-        <div className="flex items-center gap-1.5 lg:hidden">
+        <div className="flex items-center gap-1.5 xl:hidden">
           <button
             onClick={onUndo}
             disabled={historyIdx === 0}
@@ -97,7 +91,7 @@ export default function Header({
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`p-2 border rounded-lg active:scale-95 transition-all duration-200 flex items-center gap-1 text-xs font-bold ${
+            className={`p-2 border rounded-lg active:scale-95 transition-all duration-200 flex items-center gap-1 text-xs font-bold cursor-pointer ${
               isOpen
                 ? "bg-brand-600 border-brand-600 text-white shadow-sm"
                 : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
@@ -111,20 +105,19 @@ export default function Header({
 
       {/* Smooth Expanding Grid Wrapper */}
       <div
-        className={`grid transition-all duration-300 ease-in-out w-full lg:w-auto ${
+        className={`grid transition-all duration-300 ease-in-out w-full xl:w-auto ${
           isOpen
-            ? "grid-rows-[1fr] opacity-100 mt-3"
-            : "grid-rows-[0fr] opacity-0 lg:opacity-100 lg:grid-rows-[1fr]"
+            ? "grid-rows-[1fr] opacity-100 mt-3 xl:mt-0"
+            : "grid-rows-[0fr] opacity-0 xl:opacity-100 xl:grid-rows-1"
         }`}
       >
-        {/* Changed lg:items-center to lg:items-end here to drop action buttons flush with inputs */}
-        <div className="overflow-hidden lg:overflow-visible flex flex-col lg:flex-row items-stretch lg:items-end gap-4 w-full lg:w-auto">
-          <hr className="border-slate-100 dark:border-slate-900 lg:hidden" />
+        <div className="overflow-hidden xl:overflow-visible flex flex-col xl:flex-row items-stretch xl:items-end gap-4 w-full xl:w-auto">
+          <hr className="border-slate-100 dark:border-slate-900 xl:hidden" />
 
           {/* Controls Config Row */}
-          <div className="flex flex-wrap lg:flex-nowrap items-center gap-3 w-full lg:w-auto">
+          <div className="flex flex-wrap xl:flex-nowrap items-center gap-3 w-full xl:w-auto">
             {/* Country Rules */}
-            <div className="flex flex-col flex-1 min-w-32.5 lg:flex-none lg:w-35">
+            <div className="flex flex-col flex-1 min-w-[140px] xl:flex-none xl:w-35">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Country Rules Preset
               </label>
@@ -142,7 +135,7 @@ export default function Header({
             </div>
 
             {/* Style Template */}
-            <div className="flex flex-col flex-1 min-w-35 lg:flex-none lg:w-38.75">
+            <div className="flex flex-col flex-1 min-w-[150px] xl:flex-none xl:w-38.75">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Style Template
               </label>
@@ -160,39 +153,41 @@ export default function Header({
             </div>
 
             {/* Brand Colors */}
-            <div className="flex flex-col lg:flex-none shrink-0">
+            <div className="flex flex-col flex-1 min-w-[150px] xl:flex-none shrink-0">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Brand Color
               </label>
-              <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-1">
-                {BRAND_COLORS.map((color) => (
-                  <button
-                    key={color.hex}
-                    type="button"
-                    onClick={() => onUpdateField("brandColor", color.hex)}
-                    className="h-4.5 w-4.5 rounded-full border border-black/10 transition-transform active:scale-95 cursor-pointer"
-                    style={{ backgroundColor: color.hex }}
-                    title={color.label}
-                  />
-                ))}
+              <div className="flex items-center justify-between gap-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-1.5 min-h-[30px]">
+                <div className="flex items-center gap-1">
+                  {BRAND_COLORS.map((color) => (
+                    <button
+                      key={color.hex}
+                      type="button"
+                      onClick={() => onUpdateField("brandColor", color.hex)}
+                      className="h-4 w-4 rounded-full border border-black/10 transition-transform active:scale-95 cursor-pointer shrink-0"
+                      style={{ backgroundColor: color.hex }}
+                      title={color.label}
+                    />
+                  ))}
+                </div>
                 <input
                   type="color"
                   value={invoice.brandColor}
                   onChange={(e) => onUpdateField("brandColor", e.target.value)}
-                  className="h-5 w-5 p-0 border-0 cursor-pointer bg-transparent"
+                  className="h-5 w-5 p-0 border-0 cursor-pointer bg-transparent shrink-0"
                 />
               </div>
             </div>
 
             {/* Typography */}
-            <div className="flex flex-col flex-1 min-w-30 lg:flex-none lg:w-31.25">
+            <div className="flex flex-col flex-1 min-w-[130px] xl:flex-none xl:w-31.25">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Font Family
               </label>
               <select
                 value={invoice.typography}
                 onChange={(e) => onUpdateField("typography", e.target.value)}
-                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300"
+                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer"
               >
                 <option value="font-sans">Sans (Inter)</option>
                 <option value="font-serif">Serif (Playfair)</option>
@@ -201,7 +196,7 @@ export default function Header({
             </div>
 
             {/* Paper Sizes */}
-            <div className="flex flex-col flex-1 min-w-25 lg:flex-none lg:w-27.5">
+            <div className="flex flex-col flex-1 min-w-[110px] xl:flex-none xl:w-27.5">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Paper Format
               </label>
@@ -216,7 +211,7 @@ export default function Header({
             </div>
 
             {/* Watermark Section */}
-            <div className="flex flex-col flex-1 min-w-30 lg:flex-none lg:w-[140px]">
+            <div className="flex flex-col flex-1 min-w-32.5 xl:flex-none xl:w-35">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Watermark
               </label>
@@ -247,7 +242,6 @@ export default function Header({
                   <option value="custom">Custom</option>
                 </select>
 
-                {/* Elegant edit pen button: Only renders when a custom watermark text is active */}
                 {!isPresetWatermark && invoice.watermarkText && (
                   <button
                     type="button"
@@ -278,9 +272,9 @@ export default function Header({
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center gap-2 flex-wrap pb-2 lg:pb-0 relative">
+          <div className="flex items-center gap-2 flex-nowrap w-full xl:w-auto relative mt-2 xl:mt-0">
             {/* Desktop Only Controls */}
-            <div className="hidden lg:flex items-center gap-1.5 mr-2">
+            <div className="hidden xl:flex items-center gap-1.5 mr-1">
               <button
                 onClick={onUndo}
                 disabled={historyIdx === 0}
@@ -309,25 +303,25 @@ export default function Header({
             {/* Print Button */}
             <button
               onClick={onPrint}
-              className="flex-1 lg:flex-none justify-center flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50/50 cursor-pointer"
+              className="flex-1 xl:flex-none justify-center flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50/50 cursor-pointer min-h-[38px]"
             >
               <Icons.Print /> Print
             </button>
 
             {/* Unified Export Dropdown Button */}
-            <div className="relative flex-1 lg:flex-none" ref={dropdownRef}>
+            <div className="relative flex-1 xl:flex-none" ref={dropdownRef}>
               <button
                 onClick={() => setIsExportOpen(!isExportOpen)}
-                className="w-full lg:w-auto justify-center flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-500/10 transition-colors cursor-pointer"
+                className="w-full xl:w-auto justify-center flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-500/10 transition-colors cursor-pointer min-h-[38px]"
               >
                 <Icons.Download />
                 <span>Export As</span>
                 <Icons.ChevronDown />
               </button>
 
-              {/* Dropdown Menu Overlay Card */}
+              {/* Dropdown Menu Overlay Card: Explicit positioning direction safely relative to active layouts */}
               {isExportOpen && (
-                <div className="absolute right-0 bottom-full mb-2 lg:bottom-auto lg:top-full lg:mt-2 w-full lg:w-44 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 p-1 flex flex-col gap-0.5 animate-in fade-in slide-in-from-top-1 duration-100">
+                <div className="absolute right-0 bottom-full mb-2 xl:bottom-auto xl:top-full xl:mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 p-1 flex flex-col gap-0.5 animate-in fade-in slide-in-from-top-1 duration-100">
                   <button
                     onClick={() => {
                       onExportPDF();
@@ -404,7 +398,7 @@ export default function Header({
               </form>
             </div>
           </div>,
-          document.body // Injects the entire block straight into the <body> tag
+          document.body
         )}
     </header>
   );

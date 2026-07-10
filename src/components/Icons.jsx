@@ -187,4 +187,54 @@ export const Icons = {
       <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
     </svg>
   ),
+  AppLogo: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+      <defs>
+        <linearGradient id="appLogoGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#4f46e5" />
+          <stop offset="100%" stopColor="#6366f1" />
+        </linearGradient>
+
+        <filter id="appLogoShadow" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="8" stdDeviation="12" floodColor="#4f46e5" floodOpacity="0.15" />
+        </filter>
+      </defs>
+
+      <rect
+        width="512"
+        height="512"
+        rx="128"
+        fill="url(#appLogoGradient)"
+        filter="url(#appLogoShadow)"
+      />
+
+      <path
+        d="M160 140C160 128.954 168.954 120 180 120H292.686C298 120 303.07 122.112 306.828 125.872L346.142 165.186C349.902 168.944 352 174.014 352 179.328V372C352 383.046 343.046 392 332 392H180C168.954 392 160 383.046 160 372V140Z"
+        fill="#ffffff"
+      />
+
+      <path
+        d="M296 120V156C296 164.837 303.163 172 312 172H350"
+        fill="none"
+        stroke="#e2e8f0"
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+
+      <rect x="200" y="212" width="112" height="16" rx="8" fill="#cbd5e1" />
+
+      <rect x="200" y="252" width="80" height="16" rx="8" fill="#cbd5e1" />
+
+      <rect x="200" y="292" width="112" height="16" rx="8" fill="#cbd5e1" />
+
+      <path
+        d="M200 344L216 360L248 324"
+        fill="none"
+        stroke="#4f46e5"
+        strokeWidth="20"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
 };

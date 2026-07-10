@@ -1,0 +1,54 @@
+name: Feature Request
+description: Suggest an improvement or a new feature.
+title: "[Feature]: "
+labels:
+  - enhancement
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your suggestion!
+
+        Please search existing issues before creating a new feature request.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem does this solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe your proposed solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups / Examples
+      description: Screenshots, sketches, links, or references.
+
+  - type: dropdown
+    id: willing
+    attributes:
+      label: Would you like to work on this feature?
+      options:
+        - Yes
+        - No
+        - Maybe
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context

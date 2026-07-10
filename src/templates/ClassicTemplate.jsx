@@ -8,7 +8,11 @@ export default function ClassicTemplate(props) {
   const { invoice, onUpdateField, isExporting } = props;
   return (
     <div className="p-10 border-t-8" style={{ borderColor: invoice.brandColor }}>
-      <div className="flex justify-between items-start mb-10 pb-8 border-b border-slate-200">
+      <div
+        className={`flex ${
+          isExporting ? "flex-row" : "flex-col md:flex-row"
+        } justify-between items-start gap-6 mb-10 pb-8 border-b border-slate-200`}
+      >
         <div className="space-y-3">
           <div className="relative group/logo w-48 min-h-12.5 border border-dashed border-transparent hover:border-slate-300 rounded-lg flex items-center justify-center bg-slate-50/50 p-2 cursor-pointer">
             <input
@@ -51,9 +55,9 @@ export default function ClassicTemplate(props) {
             <EditableField
               value={invoice.businessName}
               onChange={(e) => onUpdateField("businessName", e.target.value)}
-              className="w-full text-lg font-extrabold"
+              className="w-full text-md font-extrabold"
               style={{ color: invoice.brandColor }}
-              placeholder="Your Name / Company Name"
+              placeholder="Your / Company Name"
               isExporting={isExporting}
             />
             <EditableField
@@ -62,7 +66,7 @@ export default function ClassicTemplate(props) {
               onChange={(e) => onUpdateField("businessAddress", e.target.value)}
               rows="2"
               className="w-full text-xs text-slate-500 leading-relaxed"
-              placeholder="Your / Your Company Address"
+              placeholder="Your / Company Address"
               isExporting={isExporting}
             />
             <div className="flex flex-col gap-0.5 text-xs text-slate-500">
@@ -84,11 +88,21 @@ export default function ClassicTemplate(props) {
           </div>
         </div>
 
-        <div className="text-right">
+        <div
+          className={`${
+            isExporting
+              ? "w-auto shrink-0 text-right"
+              : "w-full md:w-auto md:shrink-0 text-left md:text-right"
+          }`}
+        >
           <EditableField
             value={invoice.invoiceLabel}
             onChange={(e) => onUpdateField("invoiceLabel", e.target.value)}
-            className="text-3xl font-black tracking-wider uppercase mb-4 text-right block"
+            className={`${
+              isExporting
+                ? "w-auto text-3xl text-right"
+                : "w-full md:w-auto text-2xl sm:text-3xl text-left md:text-right"
+            } font-black tracking-wider uppercase mb-4 block wrap-break-word`}
             style={{ color: invoice.brandColor }}
             placeholder="INVOICE"
             isExporting={isExporting}
