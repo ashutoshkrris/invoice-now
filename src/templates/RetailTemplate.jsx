@@ -13,7 +13,8 @@ export default function RetailTemplate({
   isExporting,
 }) {
   return (
-    <div className="p-8 max-w-170 mx-auto text-slate-900 font-mono text-xs">
+    <div className="p-8 max-w-170 mx-auto text-slate-900 font-mono text-xs text-left">
+      {/* --- BUSINESS BRANDING HEADER --- */}
       <div className="text-center space-y-2 mb-6">
         <div className="relative group/logo w-48 min-h-10 mx-auto flex items-center justify-center">
           <input
@@ -36,7 +37,7 @@ export default function RetailTemplate({
                   e.stopPropagation();
                   onUpdateField("businessLogo", "");
                 }}
-                className="no-print absolute -top-2 -right-2 h-4 w-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[8px] font-bold"
+                className="no-print absolute -top-2 -right-2 h-4 w-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[8px] font-bold cursor-pointer"
               >
                 ✕
               </button>
@@ -44,7 +45,7 @@ export default function RetailTemplate({
           ) : !isExporting ? (
             <label
               htmlFor="logo-uploader-retail"
-              className="text-[10px] text-slate-400 hover:text-brand-500 flex items-center gap-1 cursor-pointer"
+              className="text-[10px] text-slate-400 hover:text-brand-500 flex items-center gap-1 cursor-pointer select-none"
             >
               <Icons.Upload /> Upload Logo
             </label>
@@ -53,7 +54,7 @@ export default function RetailTemplate({
         <EditableField
           value={invoice.businessName}
           onChange={(e) => onUpdateField("businessName", e.target.value)}
-          className="w-full text-center text-base font-black uppercase tracking-wider block"
+          className="w-full text-center text-base font-black uppercase tracking-wider block bg-transparent"
           placeholder="Your / Company Name"
           isExporting={isExporting}
         />
@@ -62,7 +63,7 @@ export default function RetailTemplate({
           value={invoice.businessAddress}
           onChange={(e) => onUpdateField("businessAddress", e.target.value)}
           rows="2"
-          className="w-full text-center text-[10px] text-slate-600 leading-tight"
+          className="w-full text-center text-[10px] text-slate-600 leading-tight bg-transparent"
           placeholder="Your / Company Address"
           isExporting={isExporting}
         />
@@ -70,14 +71,14 @@ export default function RetailTemplate({
           <EditableField
             value={invoice.businessPhone}
             onChange={(e) => onUpdateField("businessPhone", e.target.value)}
-            className="text-center w-48"
+            className="text-center w-48 bg-transparent"
             placeholder="Phone Number"
             isExporting={isExporting}
           />
           <EditableField
             value={invoice.businessEmail}
             onChange={(e) => onUpdateField("businessEmail", e.target.value)}
-            className="text-center w-48"
+            className="text-center w-48 bg-transparent"
             placeholder="Email"
             isExporting={isExporting}
           />
@@ -86,6 +87,7 @@ export default function RetailTemplate({
 
       <div className="border-t border-dashed border-slate-300 my-4"></div>
 
+      {/* --- INVOICE & CLIENT META RECORD DATA --- */}
       <div className="grid grid-cols-2 gap-4 text-[11px] text-slate-700 leading-relaxed mb-4">
         <div className="space-y-1">
           <div>
@@ -93,7 +95,7 @@ export default function RetailTemplate({
             <EditableField
               value={invoice.invoiceNumber}
               onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
-              className="font-bold text-slate-900 inline-block w-24"
+              className="font-bold text-slate-900 inline-block w-24 bg-transparent"
               placeholder="TRANS-001"
               isExporting={isExporting}
             />
@@ -104,7 +106,7 @@ export default function RetailTemplate({
               type="date"
               value={invoice.issueDate}
               onChange={(e) => onUpdateField("issueDate", e.target.value)}
-              className="inline-block w-24 text-slate-900"
+              className="inline-block w-24 text-slate-900 bg-transparent"
               isExporting={isExporting}
             />
           </div>
@@ -114,7 +116,7 @@ export default function RetailTemplate({
               type="date"
               value={invoice.dueDate}
               onChange={(e) => onUpdateField("dueDate", e.target.value)}
-              className="inline-block w-24 text-slate-900"
+              className="inline-block w-24 text-slate-900 bg-transparent"
               isExporting={isExporting}
             />
           </div>
@@ -125,7 +127,7 @@ export default function RetailTemplate({
             <EditableField
               value={invoice.customerName}
               onChange={(e) => onUpdateField("customerName", e.target.value)}
-              className="font-bold text-slate-900 text-right inline-block w-24"
+              className="font-bold text-slate-900 text-right inline-block w-24 bg-transparent"
               placeholder="Client Name"
               isExporting={isExporting}
             />
@@ -135,7 +137,7 @@ export default function RetailTemplate({
             <EditableField
               value={invoice.businessTaxId}
               onChange={(e) => onUpdateField("businessTaxId", e.target.value)}
-              className="text-right inline-block w-24"
+              className="text-right inline-block w-24 bg-transparent"
               placeholder="Tax ID"
               isExporting={isExporting}
             />
@@ -145,43 +147,143 @@ export default function RetailTemplate({
 
       <div className="border-t border-dashed border-slate-300 my-4"></div>
 
+      {/* --- SEGMENTED SCOPE CONTROLS PANEL (HIDDEN IN EXPORTS) --- */}
+      {!isExporting && (
+        <div className="no-print flex flex-col sm:flex-row gap-4 mb-6 pb-4 border-b border-dashed border-slate-300 text-[10px] font-bold text-slate-500 font-sans">
+          {/* Tax Scope Segments */}
+          <div className="space-y-1.5 flex-1">
+            <span className="text-slate-400 uppercase tracking-wider text-[9px]">
+              Tax Configuration
+            </span>
+            <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+              {["none", "item", "subtotal"].map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => onUpdateField("taxScope", type)}
+                  className={`flex-1 py-1 px-2 rounded font-mono capitalize transition-all cursor-pointer text-center text-[10px] ${
+                    invoice.taxScope === type
+                      ? "bg-white text-slate-950 shadow-xs font-black"
+                      : "hover:text-slate-900 text-slate-400"
+                  }`}
+                >
+                  {type === "none" ? "Off" : type === "item" ? "Per Item" : "Subtotal"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Discount Scope Segments */}
+          <div className="space-y-1.5 flex-1">
+            <span className="text-slate-400 uppercase tracking-wider text-[9px]">
+              Discount Configuration
+            </span>
+            <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+              {["none", "item", "subtotal"].map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => onUpdateField("discountScope", type)}
+                  className={`flex-1 py-1 px-2 rounded font-mono capitalize transition-all cursor-pointer text-center text-[10px] ${
+                    invoice.discountScope === type
+                      ? "bg-white text-slate-950 shadow-xs font-black"
+                      : "hover:text-slate-900 text-slate-400"
+                  }`}
+                >
+                  {type === "none" ? "Off" : type === "item" ? "Per Item" : "Subtotal"}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- RETAIL RECEIPT TABLE INTERFACE --- */}
       <div className="mb-4">
         <table className="w-full text-left border-collapse text-[11px]">
           <thead>
-            <tr className="border-b border-dashed border-slate-300">
+            <tr className="border-b border-dashed border-slate-300 text-slate-500 font-bold">
               <th className="py-2">ITEM DESCRIPTION</th>
               <th className="py-2 text-center w-12">QTY</th>
               <th className="py-2 text-right w-20">RATE</th>
-              <th className="py-2 text-right w-20">TOTAL</th>
+
+              {/* Dynamic Column Header: Per-Item Tax */}
+              {invoice.taxScope === "item" && (
+                <th className="py-2 text-center w-20">
+                  <div className="flex items-center justify-center gap-0.5">
+                    <EditableField
+                      value={invoice.taxName || "Tax"}
+                      onChange={(e) => onUpdateField("taxName", e.target.value)}
+                      className="text-center font-bold text-slate-500 uppercase max-w-[40px] bg-transparent"
+                      isExporting={isExporting}
+                    />
+                    {!isExporting && (
+                      <select
+                        value={invoice.taxType || "percentage"}
+                        onChange={(e) => onUpdateField("taxType", e.target.value)}
+                        className="no-print bg-transparent outline-none text-[8px] font-bold border border-slate-200 rounded cursor-pointer text-slate-400"
+                      >
+                        <option value="percentage">%</option>
+                        <option value="flat">Amt</option>
+                      </select>
+                    )}
+                  </div>
+                </th>
+              )}
+
+              {/* Dynamic Column Header: Per-Item Discount */}
+              {invoice.discountScope === "item" && (
+                <th className="py-2 text-center w-20">
+                  <div className="flex items-center justify-center gap-0.5">
+                    <span>DISC</span>
+                    {!isExporting && (
+                      <select
+                        value={invoice.discountType || "percentage"}
+                        onChange={(e) => onUpdateField("discountType", e.target.value)}
+                        className="no-print bg-transparent outline-none text-[8px] font-bold border border-slate-200 rounded cursor-pointer text-slate-400"
+                      >
+                        <option value="percentage">%</option>
+                        <option value="flat">Amt</option>
+                      </select>
+                    )}
+                  </div>
+                </th>
+              )}
+
+              <th className="py-2 text-right w-24">TOTAL</th>
+              <th className="no-print w-6"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-dashed divide-slate-200">
             {invoice.items.map((item, idx) => {
               const rawSub = (item.qty || 0) * (item.price || 0);
-              const rowDisc = (rawSub * (item.discount || 0)) / 100;
-              const rowSubtotal = rawSub - rowDisc;
-              const rowTax = (rowSubtotal * (item.taxRate || 0)) / 100;
+              const itemDiscVal = invoice.discountScope === "item" ? item.discount || 0 : 0;
+              const rowDiscount =
+                invoice.discountType === "flat" ? itemDiscVal : (rawSub * itemDiscVal) / 100;
+              const rowSubtotal = rawSub - rowDiscount;
+
+              const itemTaxVal = invoice.taxScope === "item" ? item.taxRate || 0 : 0;
+              const rowTax =
+                invoice.taxType === "flat" ? itemTaxVal : (rowSubtotal * itemTaxVal) / 100;
               const lineTotal = rowSubtotal + rowTax;
 
               return (
-                <tr key={idx} className="group/item">
+                <tr key={idx} className="group/item align-top">
                   <td className="py-2 pr-2">
                     <EditableField
                       value={item.name}
                       onChange={(e) => onUpdateNestedItem(idx, "name", e.target.value)}
-                      className="w-full font-bold text-slate-900 text-[11px]"
+                      className="w-full font-bold text-slate-900 text-[11px] bg-transparent"
                       placeholder="Item Title"
                       isExporting={isExporting}
                     />
-                    {item.description && (
-                      <EditableField
-                        value={item.description}
-                        onChange={(e) => onUpdateNestedItem(idx, "description", e.target.value)}
-                        className="w-full text-slate-500 text-[9px]"
-                        placeholder="Description"
-                        isExporting={isExporting}
-                      />
-                    )}
+                    <EditableField
+                      value={item.description}
+                      onChange={(e) => onUpdateNestedItem(idx, "description", e.target.value)}
+                      className="w-full text-slate-500 text-[9px] bg-transparent block mt-0.5"
+                      placeholder="Description"
+                      isExporting={isExporting}
+                    />
                   </td>
                   <td className="py-2 text-center">
                     <EditableField
@@ -190,7 +292,7 @@ export default function RetailTemplate({
                       onChange={(e) =>
                         onUpdateNestedItem(idx, "qty", parseInt(e.target.value) || 0)
                       }
-                      className="w-full text-center font-bold text-slate-800"
+                      className="w-full text-center font-bold text-slate-800 bg-transparent"
                       placeholder="1"
                       isExporting={isExporting}
                     />
@@ -203,20 +305,73 @@ export default function RetailTemplate({
                       onChange={(e) =>
                         onUpdateNestedItem(idx, "price", parseFloat(e.target.value) || 0)
                       }
-                      className="w-full text-right font-bold text-slate-800"
+                      className="w-full text-right font-bold text-slate-800 bg-transparent"
                       placeholder="0.00"
                       isExporting={isExporting}
                     />
                   </td>
+
+                  {/* Dynamic Column Data: Per-Item Tax */}
+                  {invoice.taxScope === "item" && (
+                    <td className="py-2 text-center font-bold text-slate-800">
+                      <div className="flex items-center justify-center">
+                        {invoice.taxType === "flat" && (
+                          <span className="text-[9px] text-slate-400 mr-0.5">
+                            {activeCurrencySymbol}
+                          </span>
+                        )}
+                        <EditableField
+                          type="number"
+                          value={item.taxRate}
+                          onChange={(e) =>
+                            onUpdateNestedItem(idx, "taxRate", parseFloat(e.target.value) || 0)
+                          }
+                          className="w-10 text-center bg-transparent font-bold"
+                          placeholder="0"
+                          isExporting={isExporting}
+                        />
+                        {invoice.taxType === "percentage" && (
+                          <span className="text-[9px] text-slate-400 ml-0.5">%</span>
+                        )}
+                      </div>
+                    </td>
+                  )}
+
+                  {/* Dynamic Column Data: Per-Item Discount */}
+                  {invoice.discountScope === "item" && (
+                    <td className="py-2 text-center font-bold text-rose-600">
+                      <div className="flex items-center justify-center">
+                        {invoice.discountType === "flat" && (
+                          <span className="text-[9px] text-rose-400 mr-0.5">
+                            {activeCurrencySymbol}
+                          </span>
+                        )}
+                        <EditableField
+                          type="number"
+                          value={item.discount}
+                          onChange={(e) =>
+                            onUpdateNestedItem(idx, "discount", parseFloat(e.target.value) || 0)
+                          }
+                          className="w-10 text-center bg-transparent font-bold text-rose-600"
+                          placeholder="0"
+                          isExporting={isExporting}
+                        />
+                        {invoice.discountType === "percentage" && (
+                          <span className="text-[9px] text-rose-400 ml-0.5">%</span>
+                        )}
+                      </div>
+                    </td>
+                  )}
+
                   <td className="py-2 text-right font-bold text-slate-900">
                     {activeCurrencySymbol}
                     {lineTotal.toFixed(2)}
                   </td>
                   <td className="no-print py-2 text-center w-6">
                     <button
+                      type="button"
                       onClick={() => onRemoveLineItem(idx)}
-                      className="opacity-0 group-hover/item:opacity-100 p-1 text-rose-500 hover:bg-rose-50 rounded cursor-pointer"
-                      title="Delete"
+                      className="opacity-0 group-hover/item:opacity-100 p-1 text-rose-500 hover:bg-rose-50 rounded cursor-pointer transition-opacity"
                     >
                       <Icons.Trash />
                     </button>
@@ -228,8 +383,9 @@ export default function RetailTemplate({
         </table>
         {!isExporting && (
           <button
+            type="button"
             onClick={onAddLineItem}
-            className="no-print mt-3 flex items-center gap-1 px-2 py-1 bg-slate-50 border border-slate-200 rounded text-[10px] font-bold text-slate-600 cursor-pointer"
+            className="no-print mt-3 inline-flex items-center gap-1 px-2 py-1 bg-slate-50 border border-slate-200 rounded text-[10px] font-bold text-slate-600 cursor-pointer"
           >
             <Icons.Plus /> ADD RECEIPT LINE
           </button>
@@ -238,74 +394,187 @@ export default function RetailTemplate({
 
       <div className="border-t border-dashed border-slate-300 my-4"></div>
 
-      <div className="w-full text-[11px] text-slate-800 space-y-1 max-w-[280px] ml-auto">
-        <div className="flex justify-between items-center">
-          <span className="font-bold">GROSS TOTAL:</span>
-          <span className="font-bold">
+      {/* --- RE-ARCHITECTED SUMMARY STACK MATRIX --- */}
+      <div className="w-full text-[11px] text-slate-800 space-y-1.5 max-w-[280px] ml-auto select-none">
+        {/* 1. Gross Subtotal */}
+        <div className="flex justify-between items-center font-bold">
+          <span>GROSS TOTAL:</span>
+          <span>
             {activeCurrencySymbol}
-            {totals.subtotal.toFixed(2)}
+            {(
+              totals.subtotal + (invoice.discountScope === "subtotal" ? totals.discount : 0)
+            ).toFixed(2)}
           </span>
         </div>
-        {(!isExporting || invoice.discountValue > 0) && (
-          <div className="flex justify-between items-center">
-            <span className="text-slate-500">DISCOUNT:</span>
+
+        {/* 2. Unified Discount Row */}
+        {invoice.discountScope === "subtotal" && (
+          <div className="flex justify-between items-center min-h-[22px]">
             <div className="flex items-center gap-1">
-              <EditableField
-                type="number"
-                value={invoice.discountValue}
-                onChange={(e) => onUpdateField("discountValue", parseFloat(e.target.value) || 0)}
-                className="w-12 text-right text-rose-600"
-                isExporting={isExporting}
-              />
-              {!isExporting && <span className="text-[10px] text-slate-400">%</span>}
+              <span className="text-slate-500">DISCOUNT:</span>
+              {!isExporting && (
+                <select
+                  value={invoice.discountType || "percentage"}
+                  onChange={(e) => onUpdateField("discountType", e.target.value)}
+                  className="no-print bg-transparent outline-none text-[9px] font-bold border border-slate-200 rounded px-0.5 cursor-pointer text-slate-500"
+                >
+                  <option value="percentage">%</option>
+                  <option value="flat">Amt</option>
+                </select>
+              )}
+            </div>
+            <div className="flex items-center justify-end text-right font-bold text-rose-600">
+              <div className="flex items-center justify-end">
+                {invoice.discountType === "flat" && (
+                  <span className="text-[10px] mr-0.5">{activeCurrencySymbol}</span>
+                )}
+                <EditableField
+                  type="number"
+                  value={invoice.globalDiscount || 0}
+                  onChange={(e) => onUpdateField("globalDiscount", parseFloat(e.target.value) || 0)}
+                  className="w-12 text-right text-rose-600 font-bold bg-transparent"
+                  placeholder="0"
+                  isExporting={isExporting}
+                />
+                {invoice.discountType === "percentage" && (
+                  <span className="text-[10px] ml-0.5">%</span>
+                )}
+              </div>
             </div>
           </div>
         )}
-        {(!isExporting || totals.tax > 0) && (
-          <div className="flex justify-between items-center">
-            <span className="text-slate-500">{invoice.taxName.toUpperCase()} CHARGES:</span>
-            <span className="font-semibold">
+
+        {/* 2.5 Read-Only Display for Item-Level Discounts Sum */}
+        {invoice.discountScope === "item" && (totals.discount > 0 || isExporting) && (
+          <div className="flex justify-between items-center min-h-[22px]">
+            <span className="text-slate-500">ITEM DISCOUNTS:</span>
+            <span className="font-bold text-rose-600">
+              -{activeCurrencySymbol}
+              {totals.discount.toFixed(2)}
+            </span>
+          </div>
+        )}
+
+        {/* 3. Unified Tax Row */}
+        {invoice.taxScope === "subtotal" && (
+          <div className="flex justify-between items-center min-h-[22px]">
+            <div className="flex items-center gap-1">
+              <span className="text-slate-500 uppercase">
+                {!isExporting ? (
+                  <EditableField
+                    value={invoice.taxName || "Tax"}
+                    onChange={(e) => onUpdateField("taxName", e.target.value)}
+                    className="font-bold text-slate-500 uppercase bg-transparent inline max-w-[55px]"
+                    placeholder="Tax"
+                    isExporting={isExporting}
+                  />
+                ) : (
+                  invoice.taxName || "TAX"
+                )}
+              </span>
+              {!isExporting && (
+                <select
+                  value={invoice.taxType || "percentage"}
+                  onChange={(e) => onUpdateField("taxType", e.target.value)}
+                  className="no-print bg-transparent outline-none text-[9px] font-bold border border-slate-200 rounded px-0.5 cursor-pointer text-slate-500"
+                >
+                  <option value="percentage">%</option>
+                  <option value="flat">Amt</option>
+                </select>
+              )}
+              <span className="text-slate-500">:</span>
+            </div>
+            <div className="flex items-center justify-end text-right font-bold">
+              <div className="flex items-center justify-end">
+                {invoice.taxType === "flat" && (
+                  <span className="text-[10px] text-slate-400 mr-0.5">{activeCurrencySymbol}</span>
+                )}
+                <EditableField
+                  type="number"
+                  value={invoice.globalTaxRate || 0}
+                  onChange={(e) => onUpdateField("globalTaxRate", parseFloat(e.target.value) || 0)}
+                  className="w-12 text-right font-bold bg-transparent"
+                  placeholder="0"
+                  isExporting={isExporting}
+                />
+                {invoice.taxType === "percentage" && (
+                  <span className="text-[10px] text-slate-400 ml-0.5">%</span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 3.5 Read-Only Display for Item-Level Taxes Sum */}
+        {invoice.taxScope === "item" && (totals.tax > 0 || isExporting) && (
+          <div className="flex justify-between items-center min-h-[22px]">
+            <span className="text-slate-500 uppercase">{invoice.taxName || "TAX"} TOTAL:</span>
+            <span className="font-bold">
               {activeCurrencySymbol}
               {totals.tax.toFixed(2)}
             </span>
           </div>
         )}
-        {(!isExporting || invoice.shippingCharges > 0) && (
+
+        {/* 4. Left-Pinned Optional Shipping Row */}
+        {invoice.shippingCharges > 0 || isExporting ? (
           <div className="flex justify-between items-center">
             <span className="text-slate-500">SHIPPING/HANDLING:</span>
-            <EditableField
-              type="number"
-              value={invoice.shippingCharges}
-              onChange={(e) => onUpdateField("shippingCharges", parseFloat(e.target.value) || 0)}
-              className="w-16 text-right text-slate-800"
-              isExporting={isExporting}
-            />
+            <div className="flex items-center justify-end text-right">
+              <span className="text-[10px] text-slate-400 mr-0.5">{activeCurrencySymbol}</span>
+              <EditableField
+                type="number"
+                value={invoice.shippingCharges || 0}
+                onChange={(e) => onUpdateField("shippingCharges", parseFloat(e.target.value) || 0)}
+                className="w-16 text-right text-slate-800 bg-transparent font-semibold"
+                placeholder="0.00"
+                isExporting={isExporting}
+              />
+              {!isExporting && invoice.shippingCharges > 0 && (
+                <button
+                  type="button"
+                  onClick={() => onUpdateField("shippingCharges", 0)}
+                  className="no-print ml-1 text-slate-300 hover:text-rose-500 text-[9px] font-bold cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
+        ) : (
+          !isExporting && (
+            <div className="no-print flex justify-between items-center py-0.5">
+              <button
+                type="button"
+                onClick={() => onUpdateField("shippingCharges", 0.01)}
+                className="text-[10px] font-extrabold text-brand-600 dark:text-brand-400 hover:underline cursor-pointer"
+              >
+                + Add Shipping
+              </button>
+              <span className="text-slate-300 font-medium select-none">—</span>
+            </div>
+          )
         )}
-        {(!isExporting || invoice.additionalCharges !== 0) && (
-          <div className="flex justify-between items-center">
-            <span className="text-slate-500">ROUNDING/ADJUST:</span>
-            <EditableField
-              type="number"
-              value={invoice.additionalCharges}
-              onChange={(e) => onUpdateField("additionalCharges", parseFloat(e.target.value) || 0)}
-              className="w-16 text-right text-slate-800"
-              isExporting={isExporting}
-            />
-          </div>
-        )}
+
+        {/* 5. Amount Tendered */}
         {(!isExporting || invoice.amountPaid > 0) && (
           <div className="flex justify-between items-center">
             <span className="text-slate-500">AMOUNT TENDERED:</span>
-            <EditableField
-              type="number"
-              value={invoice.amountPaid}
-              onChange={(e) => onUpdateField("amountPaid", parseFloat(e.target.value) || 0)}
-              className="w-16 text-right text-slate-800"
-              isExporting={isExporting}
-            />
+            <div className="flex items-center justify-end text-right">
+              <span className="text-[10px] text-slate-400 mr-0.5">{activeCurrencySymbol}</span>
+              <EditableField
+                type="number"
+                value={invoice.amountPaid || 0}
+                onChange={(e) => onUpdateField("amountPaid", parseFloat(e.target.value) || 0)}
+                className="w-16 text-right text-slate-800 bg-transparent font-semibold"
+                placeholder="0.00"
+                isExporting={isExporting}
+              />
+            </div>
           </div>
         )}
+
+        {/* 6. Balance Due Grand Display */}
         <div className="border-t border-dashed border-slate-300 pt-2 flex justify-between items-center font-black text-xs text-slate-900">
           <span>BALANCE DUE:</span>
           <span className="text-sm" style={{ color: invoice.brandColor }}>
@@ -317,6 +586,7 @@ export default function RetailTemplate({
 
       <div className="border-t border-dashed border-slate-300 my-4"></div>
 
+      {/* --- FOOTER DIRECTIONS & BRANDING --- */}
       <div className="text-center space-y-4">
         <div>
           <span className="font-bold block uppercase tracking-wider text-[9px] text-slate-500 mb-1">
@@ -327,7 +597,7 @@ export default function RetailTemplate({
             value={invoice.paymentInstructions}
             onChange={(e) => onUpdateField("paymentInstructions", e.target.value)}
             rows="3"
-            className="w-full text-center text-[10px] text-slate-500"
+            className="w-full text-center text-[10px] text-slate-500 bg-transparent"
             placeholder="Add bank accounts, wire transfer instructions, check details or digital payment links here..."
             isExporting={isExporting}
           />
@@ -338,7 +608,7 @@ export default function RetailTemplate({
             value={invoice.notes}
             onChange={(e) => onUpdateField("notes", e.target.value)}
             rows="2"
-            className="w-full text-center text-slate-600 leading-tight font-semibold"
+            className="w-full text-center text-slate-600 leading-tight font-semibold bg-transparent"
             placeholder="Thank you notes"
             isExporting={isExporting}
           />

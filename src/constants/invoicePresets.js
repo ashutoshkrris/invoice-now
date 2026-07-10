@@ -7,7 +7,6 @@ export const BRAND_COLORS = [
   { hex: "#1e293b", label: "Charcoal" },
 ];
 
-
 export const getTodayDateString = () => {
   return new Date().toISOString().split("T")[0];
 };
@@ -35,7 +34,6 @@ export const INITIAL_INVOICE_STATE = {
   countryCode: "IN",
   currencyCode: "INR",
   currencySymbol: "₹",
-  taxName: "Sales Tax",
 
   customerName: "",
   customerCompany: "",
@@ -55,10 +53,7 @@ export const INITIAL_INVOICE_STATE = {
     },
   ],
 
-  discountValue: 0,
-  discountType: "percentage",
   shippingCharges: 0,
-  additionalCharges: 0,
   amountPaid: 0,
 
   paymentInstructions: "",
@@ -70,4 +65,13 @@ export const INITIAL_INVOICE_STATE = {
   typography: "font-sans",
   paperSize: "a4",
   watermarkText: "",
+
+  taxScope: "none", // "none" | "item" | "subtotal"
+  taxType: "percentage", // "percentage" | "flat"
+  discountScope: "none", // "none" | "item" | "subtotal"
+  discountType: "percentage", // "percentage" | "flat"
+
+  taxName: "Tax",
+  globalTaxRate: 0, // Handles both % or Flat depending on taxType
+  globalDiscount: 0, // Handles both % or Flat depending on discountType
 };

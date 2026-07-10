@@ -95,38 +95,57 @@ export default function App() {
 
   // --- LIVE INVOICE CALCULATORS ---
   const calculatedTotals = useMemo(() => {
-    let itemSubtotal = 0;
-    let itemTax = 0;
+    let subtotal = 0;
+    let totalTax = 0;
+    let totalDiscount = 0;
 
+    // 1. Calculate Line Items
     invoice.items.forEach((item) => {
-      const rowBase = (item.qty || 0) * (item.price || 0);
-      const rowDiscount = (rowBase * (item.discount || 0)) / 100;
-      const rowSub = rowBase - rowDiscount;
-      const rowTax = (rowSub * (item.taxRate || 0)) / 100;
+      const rawSub = (item.qty || 0) * (item.price || 0);
 
-      itemSubtotal += rowSub;
-      itemTax += rowTax;
+      // Line Item Discount Calculation
+      let rowDiscount = 0;
+      if (invoice.discountScope === "item") {
+        rowDiscount =
+          invoice.discountType === "percentage"
+            ? (rawSub * (item.discount || 0)) / 100
+            : item.discount || 0; // Absolute Flat reduction
+      }
+      const runningSubtotal = rawSub - rowDiscount;
+
+      // Line Item Tax Calculation
+      let rowTax = 0;
+      if (invoice.taxScope === "item") {
+        rowTax =
+          invoice.taxType === "percentage"
+            ? (runningSubtotal * (item.taxRate || 0)) / 100
+            : item.taxRate || 0; // Absolute Flat addition
+      }
+
+      subtotal += runningSubtotal;
+      totalTax += rowTax;
     });
 
-    let overallDiscount = 0;
-    if (invoice.discountType === "percentage") {
-      overallDiscount = (itemSubtotal * (invoice.discountValue || 0)) / 100;
-    } else {
-      overallDiscount = invoice.discountValue || 0;
+    // 2. Apply Subtotal-level Updates
+    if (invoice.discountScope === "subtotal") {
+      totalDiscount =
+        invoice.discountType === "percentage"
+          ? (subtotal * (invoice.globalDiscount || 0)) / 100
+          : invoice.globalDiscount || 0;
+      subtotal -= totalDiscount;
     }
 
-    const shipping = parseFloat(invoice.shippingCharges) || 0;
-    const adjustments = parseFloat(invoice.additionalCharges) || 0;
-    const totalDue = itemSubtotal - overallDiscount + itemTax + shipping + adjustments;
-    const balanceDue = totalDue - (parseFloat(invoice.amountPaid) || 0);
+    if (invoice.taxScope === "subtotal") {
+      totalTax =
+        invoice.taxType === "percentage"
+          ? (subtotal * (invoice.globalTaxRate || 0)) / 100
+          : invoice.globalTaxRate || 0;
+    }
 
-    return {
-      subtotal: itemSubtotal,
-      overallDiscount,
-      tax: itemTax,
-      grandTotal: totalDue,
-      balanceDue,
-    };
+    const grandTotal = subtotal + totalTax;
+    const balanceDue = grandTotal - (invoice.amountPaid || 0);
+
+    return { subtotal, tax: totalTax, discount: totalDiscount, grandTotal, balanceDue };
   }, [invoice]);
 
   // --- INLINE ITEM MANAGEMENT ---
