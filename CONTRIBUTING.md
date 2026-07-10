@@ -351,3 +351,7 @@ Open source succeeds because people choose to share their time, knowledge, and i
 Whether you're fixing a typo, reporting a bug, improving documentation, or building a new feature, your contribution helps make **Invoice Now** better for everyone.
 
 Thank you for contributing!
+
+## Field limits
+
+See [docs/field-limits.md](docs/field-limits.md) when editing invoice text inputs.
