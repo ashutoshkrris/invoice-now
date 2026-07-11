@@ -25,6 +25,7 @@ export default function Header({
   // Searchable Country Dropdown States
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
   const [countrySearchQuery, setCountrySearchQuery] = useState("");
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
 
   // Custom Modal States
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
@@ -33,6 +34,30 @@ export default function Header({
   const dropdownRef = useRef(null);
   const countryDropdownRef = useRef(null);
 
+  // Position updates for portal positioning alignment parameters
+  const updateDropdownCoords = () => {
+    if (countryDropdownRef.current) {
+      const rect = countryDropdownRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isCountryDropdownOpen) {
+      updateDropdownCoords();
+      window.addEventListener("resize", updateDropdownCoords);
+      window.addEventListener("scroll", updateDropdownCoords);
+    }
+    return () => {
+      window.removeEventListener("resize", updateDropdownCoords);
+      window.removeEventListener("scroll", updateDropdownCoords);
+    };
+  }, [isCountryDropdownOpen]);
+
   // Close dropdowns if user clicks outside of them
   useEffect(() => {
     function handleClickOutside(event) {
@@ -40,6 +65,10 @@ export default function Header({
         setIsExportOpen(false);
       }
       if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target)) {
+        // Only close if click is not inside the portal overlay frame
+        const portalNode = document.getElementById("portal-country-dropdown");
+        if (portalNode && portalNode.contains(event.target)) return;
+
         setIsCountryDropdownOpen(false);
         setCountrySearchQuery("");
       }
@@ -57,7 +86,6 @@ export default function Header({
   const isPresetWatermark = ["DRAFT", "PAID", "OVERDUE", ""].includes(invoice.watermarkText);
 
   return (
-    // Shifted from rigid lg layouts down to explicit responsive fluid structures (xl breakpoints)
     <header className="no-print sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm px-4 md:px-6 py-3 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2 xl:gap-0 transition-all duration-300 w-full box-border">
       {/* Top Main Row */}
       <div className="flex items-center justify-between w-full xl:w-auto z-10">
@@ -126,7 +154,7 @@ export default function Header({
 
           {/* Controls Config Row */}
           <div className="flex flex-wrap xl:flex-nowrap items-center gap-3 w-full xl:w-auto">
-            {/* 1. Searchable Country Rules Preset Dropdown */}
+            {/* 1. Searchable Country Rules Preset Dropdown Anchor */}
             <div
               ref={countryDropdownRef}
               className="flex flex-col flex-1 min-w-[140px] xl:flex-none xl:w-38 relative text-left"
@@ -141,7 +169,8 @@ export default function Header({
                 className="w-full flex justify-between items-center px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer text-left h-[30px]"
               >
                 <span className="truncate">
-                  {COUNTRIES.find((c) => c.code === invoice.countryCode)?.name || "Select Country"}
+                  {COUNTRIES.find((c) => c.code === (invoice.countryCode || "IN"))?.name ||
+                    "India (₹)"}
                 </span>
                 <span
                   className={`text-[9px] text-slate-400 transition-transform ml-1 ${isCountryDropdownOpen ? "rotate-180" : ""}`}
@@ -150,51 +179,63 @@ export default function Header({
                 </span>
               </button>
 
-              {isCountryDropdownOpen && (
-                <div className="absolute top-full left-0 w-full md:w-56 mt-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg shadow-xl z-50 overflow-hidden flex flex-col max-h-60">
-                  <div className="p-1.5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30">
-                    <input
-                      type="text"
-                      autoFocus
-                      placeholder="Search country..."
-                      value={countrySearchQuery}
-                      onChange={(e) => setCountrySearchQuery(e.target.value)}
-                      className="w-full px-2 py-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md text-xs font-medium outline-none focus:border-brand-500 text-slate-700 dark:text-slate-300"
-                    />
-                  </div>
+              {/* RENDER POPAL OUTSIDE COMPONENT TREE TO BYPASS CONTAINER CLIPPING OVERFLOW */}
+              {isCountryDropdownOpen &&
+                createPortal(
+                  <div
+                    id="portal-country-dropdown"
+                    style={{
+                      position: "absolute",
+                      top: `${coords.top}px`,
+                      left: `${coords.left}px`,
+                      width: `${Math.max(coords.width, 210)}px`,
+                    }}
+                    className="mt-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg shadow-xl z-9999 overflow-hidden flex flex-col max-h-60"
+                  >
+                    <div className="p-1.5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30">
+                      <input
+                        type="text"
+                        autoFocus
+                        placeholder="Search country..."
+                        value={countrySearchQuery}
+                        onChange={(e) => setCountrySearchQuery(e.target.value)}
+                        className="w-full px-2 py-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md text-xs font-medium outline-none focus:border-brand-500 text-slate-700 dark:text-slate-300"
+                      />
+                    </div>
 
-                  <div className="overflow-y-auto flex-1 divide-y divide-slate-50 dark:divide-slate-900/40">
-                    {COUNTRIES.filter((c) =>
-                      c.name.toLowerCase().includes(countrySearchQuery.toLowerCase())
-                    ).length > 0 ? (
-                      COUNTRIES.filter((c) =>
+                    <div className="overflow-y-auto flex-1 divide-y divide-slate-50 dark:divide-slate-900/40">
+                      {COUNTRIES.filter((c) =>
                         c.name.toLowerCase().includes(countrySearchQuery.toLowerCase())
-                      ).map((c) => (
-                        <button
-                          key={c.code}
-                          type="button"
-                          onClick={() => {
-                            onCountryChange(c.code);
-                            setIsCountryDropdownOpen(false);
-                            setCountrySearchQuery("");
-                          }}
-                          className={`w-full text-left px-3 py-2 text-xs transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 block truncate ${
-                            invoice.countryCode === c.code
-                              ? "bg-brand-50/40 dark:bg-brand-950/20 text-brand-600 dark:text-brand-400 font-bold"
-                              : "text-slate-700 dark:text-slate-300"
-                          }`}
-                        >
-                          {c.name}
-                        </button>
-                      ))
-                    ) : (
-                      <div className="px-2 py-3 text-xs text-slate-400 text-center font-medium select-none">
-                        No matches
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                      ).length > 0 ? (
+                        COUNTRIES.filter((c) =>
+                          c.name.toLowerCase().includes(countrySearchQuery.toLowerCase())
+                        ).map((c) => (
+                          <button
+                            key={c.code}
+                            type="button"
+                            onClick={() => {
+                              onCountryChange(c.code);
+                              setIsCountryDropdownOpen(false);
+                              setCountrySearchQuery("");
+                            }}
+                            className={`w-full text-left px-3 py-2 text-xs transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 block truncate ${
+                              invoice.countryCode === c.code
+                                ? "bg-brand-50/40 dark:bg-brand-950/20 text-brand-600 dark:text-brand-400 font-bold"
+                                : "text-slate-700 dark:text-slate-300"
+                            }`}
+                          >
+                            {c.name}
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-2 py-3 text-xs text-slate-400 text-center font-medium select-none">
+                          No matches
+                        </div>
+                      )}
+                    </div>
+                  </div>,
+                  document.body
+                )}
             </div>
 
             {/* Style Template */}
@@ -422,7 +463,6 @@ export default function Header({
               className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-200"
             />
 
-            {/* 2. Dead-Centered Modal Card */}
             <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl animate-in scale-in duration-200 z-10">
               <h3 className="text-sm font-black text-slate-900 dark:text-white mb-1">
                 Custom Watermark
