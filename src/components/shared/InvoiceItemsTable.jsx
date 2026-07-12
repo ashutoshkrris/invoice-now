@@ -1,4 +1,5 @@
 import EditableField from "../EditableField";
+import { FIELD_LIMITS } from "../../constants/fieldLimits";
 import { Icons } from "../Icons";
 
 export default function InvoiceItemsTable({

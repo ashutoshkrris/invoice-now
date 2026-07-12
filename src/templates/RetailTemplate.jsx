@@ -1,5 +1,6 @@
 import { Icons } from "../components/Icons";
 import EditableField from "../components/EditableField";
+import { FIELD_LIMITS } from "../constants/fieldLimits";
 
 export default function RetailTemplate({
   invoice,
@@ -74,6 +75,7 @@ export default function RetailTemplate({
             className="text-center w-48 bg-transparent"
             placeholder="Phone Number"
             isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessPhone}
           />
           <EditableField
             value={invoice.businessEmail}
@@ -81,6 +83,7 @@ export default function RetailTemplate({
             className="text-center w-48 bg-transparent"
             placeholder="Email"
             isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessEmail}
           />
         </div>
       </div>
@@ -98,6 +101,7 @@ export default function RetailTemplate({
               className="font-bold text-slate-900 inline-block w-24 bg-transparent"
               placeholder="TRANS-001"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.invoiceNumber}
             />
           </div>
           <div>
@@ -140,6 +144,7 @@ export default function RetailTemplate({
               className="text-right inline-block w-24 bg-transparent"
               placeholder="Tax ID"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessTaxId}
             />
           </div>
         </div>

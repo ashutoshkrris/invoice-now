@@ -1,5 +1,6 @@
 import { Icons } from "../components/Icons";
 import EditableField from "../components/EditableField";
+import { FIELD_LIMITS } from "../constants/fieldLimits";
 import InvoiceItemsTable from "../components/shared/InvoiceItemsTable";
 import RemittanceFooter from "../components/shared/RemittanceFooter";
 import TotalsSummary from "../components/shared/TotalsSummary";
@@ -68,6 +69,7 @@ export default function ModernMinimalistTemplate(props) {
               className="w-full"
               placeholder="Phone Number"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessPhone}
             />
             <EditableField
               value={invoice.businessEmail}
@@ -75,6 +77,7 @@ export default function ModernMinimalistTemplate(props) {
               className="w-full"
               placeholder="Email"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.businessEmail}
             />
           </div>
         </div>
@@ -98,6 +101,7 @@ export default function ModernMinimalistTemplate(props) {
                 className="text-right font-black text-slate-900"
                 placeholder="INV-001"
                 isExporting={isExporting}
+            maxLength={FIELD_LIMITS.invoiceNumber}
               />
             </div>
             <div>
@@ -139,6 +143,7 @@ export default function ModernMinimalistTemplate(props) {
             className="w-full font-bold text-slate-900"
             placeholder="Client Name"
             isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerName}
           />
           <EditableField
             value={invoice.customerCompany}
@@ -146,6 +151,7 @@ export default function ModernMinimalistTemplate(props) {
             className="w-full text-slate-600"
             placeholder="Client Company"
             isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerCompany}
           />
           <EditableField
             type="textarea"
@@ -155,6 +161,7 @@ export default function ModernMinimalistTemplate(props) {
             className="w-full text-slate-500 mt-1"
             placeholder="Client's Address"
             isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerAddress}
           />
         </div>
         <div className="flex flex-col justify-end items-end text-right">
@@ -166,6 +173,7 @@ export default function ModernMinimalistTemplate(props) {
               className="text-right font-semibold text-slate-900"
               placeholder="US-999888"
               isExporting={isExporting}
+            maxLength={FIELD_LIMITS.customerTaxId}
             />
           </div>
         </div>
