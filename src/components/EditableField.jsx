@@ -8,7 +8,7 @@ export default function EditableField({
   rows = 2,
   isExporting,
   maxLength,
-  showCount = false,
+  showCount = true,
 }) {
   if (isExporting) {
     const hasNoContent =
@@ -35,11 +35,19 @@ export default function EditableField({
   const nearLimit = maxLength && length >= maxLength * 0.9;
   const atLimit = maxLength && length >= maxLength;
 
+  // Visual outline status injections for error cues
+  const limitStatusClasses = atLimit
+    ? "focus:ring-rose-500 border-rose-500 dark:border-rose-500 focus:border-rose-500!"
+    : nearLimit
+      ? "focus:ring-amber-500 border-amber-500 dark:border-amber-500 focus:border-amber-500!"
+      : "";
+
+  // The counter will now ONLY render when showCount is true AND the length hits >= 90% of maxLength
   const counter =
-    showCount && maxLength ? (
+    showCount && maxLength && nearLimit ? (
       <span
-        className={`no-print block text-right text-[10px] mt-0.5 ${
-          atLimit ? "text-rose-500 font-semibold" : nearLimit ? "text-amber-500" : "text-slate-400"
+        className={`no-print block text-right text-[9px] mt-0.5 select-none font-sans ${
+          atLimit ? "text-rose-500 font-bold" : "text-amber-500 font-semibold"
         }`}
       >
         {length}/{maxLength}
@@ -48,13 +56,13 @@ export default function EditableField({
 
   if (type === "textarea") {
     return (
-      <div className="w-full">
+      <div className="w-full block">
         <textarea
           value={value}
           onChange={onChange}
           rows={rows}
           maxLength={maxLength}
-          className={`wysiwyg-input resize-none ${className}`}
+          className={`wysiwyg-input resize-none ${limitStatusClasses} ${className}`}
           style={style}
           placeholder={placeholder}
         />
@@ -64,13 +72,22 @@ export default function EditableField({
   }
 
   return (
-    <div className={type === "number" ? "contents" : "w-full"}>
+    <div
+      className={
+        type === "number" ||
+        className.includes("inline") ||
+        className.includes("w-10") ||
+        className.includes("w-14")
+          ? "contents"
+          : "w-full"
+      }
+    >
       <input
         type={type}
         value={value}
         onChange={onChange}
         maxLength={type === "number" ? undefined : maxLength}
-        className={`wysiwyg-input ${className}`}
+        className={`wysiwyg-input ${limitStatusClasses} ${className}`}
         style={style}
         placeholder={placeholder}
       />

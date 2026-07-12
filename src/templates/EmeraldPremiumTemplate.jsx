@@ -51,6 +51,7 @@ export default function EmeraldPremiumTemplate(props) {
         <EditableField
           value={invoice.businessName}
           onChange={(e) => onUpdateField("businessName", e.target.value)}
+          maxLength={FIELD_LIMITS.businessName}
           className="w-full text-center text-2xl font-black uppercase tracking-wide"
           style={{ color: invoice.brandColor }}
           placeholder="Your / Company Name"
@@ -60,6 +61,7 @@ export default function EmeraldPremiumTemplate(props) {
           type="textarea"
           value={invoice.businessAddress}
           onChange={(e) => onUpdateField("businessAddress", e.target.value)}
+          maxLength={FIELD_LIMITS.businessAddress}
           rows="2"
           className="w-full text-center text-xs text-slate-500 mt-2"
           placeholder="Your / Company Address"
@@ -69,18 +71,18 @@ export default function EmeraldPremiumTemplate(props) {
           <EditableField
             value={invoice.businessPhone}
             onChange={(e) => onUpdateField("businessPhone", e.target.value)}
+            maxLength={FIELD_LIMITS.businessPhone}
             className="text-center w-48"
             placeholder="Phone Number"
             isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessPhone}
           />
           <EditableField
             value={invoice.businessEmail}
             onChange={(e) => onUpdateField("businessEmail", e.target.value)}
+            maxLength={FIELD_LIMITS.businessEmail}
             className="text-center w-64"
             placeholder="Email"
             isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessEmail}
           />
         </div>
       </div>
@@ -96,28 +98,28 @@ export default function EmeraldPremiumTemplate(props) {
           <EditableField
             value={invoice.customerName}
             onChange={(e) => onUpdateField("customerName", e.target.value)}
+            maxLength={FIELD_LIMITS.customerName}
             className="w-full font-bold text-slate-900"
             placeholder="Client Name"
             isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerName}
           />
           <EditableField
             value={invoice.customerCompany}
             onChange={(e) => onUpdateField("customerCompany", e.target.value)}
+            maxLength={FIELD_LIMITS.customerCompany}
             className="w-full text-slate-600"
             placeholder="Client Company"
             isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerCompany}
           />
           <EditableField
             type="textarea"
             value={invoice.customerAddress}
             onChange={(e) => onUpdateField("customerAddress", e.target.value)}
+            maxLength={FIELD_LIMITS.customerAddress}
             rows="2"
             className="w-full text-slate-500 mt-1"
             placeholder="Client's Address"
             isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerAddress}
           />
         </div>
         <div className="border-r border-slate-200/60 px-4 space-y-2">
@@ -132,10 +134,10 @@ export default function EmeraldPremiumTemplate(props) {
             <EditableField
               value={invoice.invoiceNumber}
               onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
+              maxLength={FIELD_LIMITS.invoiceNumber}
               className="w-full text-sm font-bold text-slate-900"
               placeholder="Invoice Number"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.invoiceNumber}
             />
           </div>
           <div>
@@ -166,17 +168,17 @@ export default function EmeraldPremiumTemplate(props) {
             className="font-extrabold tracking-widest text-[9px] uppercase"
             style={{ color: invoice.brandColor }}
           >
-            Tax Registry
+            Tax Registration
           </p>
           <div>
             <p className="text-slate-400 text-[10px]">Client Tax ID</p>
             <EditableField
               value={invoice.customerTaxId}
               onChange={(e) => onUpdateField("customerTaxId", e.target.value)}
+              maxLength={FIELD_LIMITS.customerTaxId}
               className="font-semibold text-slate-900 w-full"
               placeholder="Tax ID"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerTaxId}
             />
           </div>
         </div>

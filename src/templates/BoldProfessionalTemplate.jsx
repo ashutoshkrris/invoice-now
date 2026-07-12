@@ -53,15 +53,18 @@ export default function BoldProfessionalTemplate(props) {
             <EditableField
               value={invoice.businessName}
               onChange={(e) => onUpdateField("businessName", e.target.value)}
+              maxLength={FIELD_LIMITS.businessName}
+
               className="w-full text-lg font-black text-white"
               placeholder="Your / Company Name"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessName}
             />
             <EditableField
               type="textarea"
               value={invoice.businessAddress}
               onChange={(e) => onUpdateField("businessAddress", e.target.value)}
+              maxLength={FIELD_LIMITS.businessAddress}
+
               rows="2"
               className="w-full text-[11px] text-white/80 leading-relaxed"
               placeholder="Your / Company Address"
@@ -71,18 +74,18 @@ export default function BoldProfessionalTemplate(props) {
               <EditableField
                 value={invoice.businessPhone}
                 onChange={(e) => onUpdateField("businessPhone", e.target.value)}
+                maxLength={FIELD_LIMITS.businessPhone}
                 className="w-full text-white"
                 placeholder="Phone Number"
                 isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessPhone}
               />
               <EditableField
                 value={invoice.businessEmail}
                 onChange={(e) => onUpdateField("businessEmail", e.target.value)}
+                maxLength={FIELD_LIMITS.businessEmail}
                 className="w-full text-white"
                 placeholder="Email"
                 isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessEmail}
               />
             </div>
           </div>
@@ -92,6 +95,7 @@ export default function BoldProfessionalTemplate(props) {
             <EditableField
               value={invoice.invoiceLabel}
               onChange={(e) => onUpdateField("invoiceLabel", e.target.value)}
+              maxLength={FIELD_LIMITS.invoiceLabel}
               className="text-xl font-black text-white text-right uppercase block"
               placeholder="INVOICE"
               isExporting={isExporting}
@@ -103,10 +107,10 @@ export default function BoldProfessionalTemplate(props) {
               <EditableField
                 value={invoice.invoiceNumber}
                 onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
+                maxLength={FIELD_LIMITS.invoiceNumber}
                 className="text-right font-black text-lg text-white"
                 placeholder="INV-2026-10"
                 isExporting={isExporting}
-            maxLength={FIELD_LIMITS.invoiceNumber}
               />
             </div>
           </div>
@@ -144,23 +148,27 @@ export default function BoldProfessionalTemplate(props) {
             <EditableField
               value={invoice.customerName}
               onChange={(e) => onUpdateField("customerName", e.target.value)}
+              maxLength={FIELD_LIMITS.customerName}
+
               className="w-full font-bold text-slate-900"
               placeholder="Client Name"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerName}
             />
             <EditableField
               value={invoice.customerCompany}
               onChange={(e) => onUpdateField("customerCompany", e.target.value)}
+              maxLength={FIELD_LIMITS.customerName}
+
               className="w-full text-slate-600"
               placeholder="Client Company"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerCompany}
             />
             <EditableField
               type="textarea"
               value={invoice.customerAddress}
               onChange={(e) => onUpdateField("customerAddress", e.target.value)}
+              maxLength={FIELD_LIMITS.customerAddress}
+
               rows="2"
               className="w-full text-slate-500 mt-1"
               placeholder="Client's Address"
@@ -175,6 +183,7 @@ export default function BoldProfessionalTemplate(props) {
               <EditableField
                 value={invoice.businessTaxId}
                 onChange={(e) => onUpdateField("businessTaxId", e.target.value)}
+                maxLength={FIELD_LIMITS.businessTaxId}
                 className="text-right font-bold text-slate-900 w-32 inline-block"
                 placeholder="Tax ID"
                 isExporting={isExporting}
@@ -185,6 +194,7 @@ export default function BoldProfessionalTemplate(props) {
               <EditableField
                 value={invoice.businessRegId}
                 onChange={(e) => onUpdateField("businessRegId", e.target.value)}
+                maxLength={FIELD_LIMITS.businessRegId}
                 className="text-right font-bold text-slate-900 w-32 inline-block"
                 placeholder="REG ID"
                 isExporting={isExporting}

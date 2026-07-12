@@ -55,6 +55,8 @@ export default function RetailTemplate({
         <EditableField
           value={invoice.businessName}
           onChange={(e) => onUpdateField("businessName", e.target.value)}
+          maxLength={FIELD_LIMITS.businessName}
+
           className="w-full text-center text-base font-black uppercase tracking-wider block bg-transparent"
           placeholder="Your / Company Name"
           isExporting={isExporting}
@@ -63,6 +65,8 @@ export default function RetailTemplate({
           type="textarea"
           value={invoice.businessAddress}
           onChange={(e) => onUpdateField("businessAddress", e.target.value)}
+          maxLength={FIELD_LIMITS.businessAddress}
+
           rows="2"
           className="w-full text-center text-[10px] text-slate-600 leading-tight bg-transparent"
           placeholder="Your / Company Address"
@@ -72,18 +76,18 @@ export default function RetailTemplate({
           <EditableField
             value={invoice.businessPhone}
             onChange={(e) => onUpdateField("businessPhone", e.target.value)}
+            maxLength={FIELD_LIMITS.businessPhone}
             className="text-center w-48 bg-transparent"
             placeholder="Phone Number"
             isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessPhone}
           />
           <EditableField
             value={invoice.businessEmail}
             onChange={(e) => onUpdateField("businessEmail", e.target.value)}
+            maxLength={FIELD_LIMITS.businessEmail}
             className="text-center w-48 bg-transparent"
             placeholder="Email"
             isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessEmail}
           />
         </div>
       </div>
@@ -98,10 +102,10 @@ export default function RetailTemplate({
             <EditableField
               value={invoice.invoiceNumber}
               onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
+              maxLength={FIELD_LIMITS.invoiceNumber}
               className="font-bold text-slate-900 inline-block w-24 bg-transparent"
               placeholder="TRANS-001"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.invoiceNumber}
             />
           </div>
           <div>
@@ -131,6 +135,8 @@ export default function RetailTemplate({
             <EditableField
               value={invoice.customerName}
               onChange={(e) => onUpdateField("customerName", e.target.value)}
+              maxLength={FIELD_LIMITS.customerName}
+
               className="font-bold text-slate-900 text-right inline-block w-24 bg-transparent"
               placeholder="Client Name"
               isExporting={isExporting}
@@ -141,10 +147,10 @@ export default function RetailTemplate({
             <EditableField
               value={invoice.businessTaxId}
               onChange={(e) => onUpdateField("businessTaxId", e.target.value)}
+              maxLength={FIELD_LIMITS.businessTaxId}
               className="text-right inline-block w-24 bg-transparent"
               placeholder="Tax ID"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessTaxId}
             />
           </div>
         </div>
@@ -219,6 +225,7 @@ export default function RetailTemplate({
                     <EditableField
                       value={invoice.taxName || "Tax"}
                       onChange={(e) => onUpdateField("taxName", e.target.value)}
+                      maxLength={FIELD_LIMITS.taxName}
                       className="text-center font-bold text-slate-500 uppercase max-w-[40px] bg-transparent"
                       isExporting={isExporting}
                     />
@@ -278,6 +285,7 @@ export default function RetailTemplate({
                     <EditableField
                       value={item.name}
                       onChange={(e) => onUpdateNestedItem(idx, "name", e.target.value)}
+                      maxLength={FIELD_LIMITS.itemName}
                       className="w-full font-bold text-slate-900 text-[11px] bg-transparent"
                       placeholder="Item Title"
                       isExporting={isExporting}
@@ -285,6 +293,7 @@ export default function RetailTemplate({
                     <EditableField
                       value={item.description}
                       onChange={(e) => onUpdateNestedItem(idx, "description", e.target.value)}
+                      maxLength={FIELD_LIMITS.itemDescription}
                       className="w-full text-slate-500 text-[9px] bg-transparent block mt-0.5"
                       placeholder="Description"
                       isExporting={isExporting}
@@ -469,6 +478,7 @@ export default function RetailTemplate({
                   <EditableField
                     value={invoice.taxName || "Tax"}
                     onChange={(e) => onUpdateField("taxName", e.target.value)}
+                    maxLength={FIELD_LIMITS.taxName}
                     className="font-bold text-slate-500 uppercase bg-transparent inline max-w-[55px]"
                     placeholder="Tax"
                     isExporting={isExporting}
@@ -601,6 +611,8 @@ export default function RetailTemplate({
             type="textarea"
             value={invoice.paymentInstructions}
             onChange={(e) => onUpdateField("paymentInstructions", e.target.value)}
+            maxLength={FIELD_LIMITS.paymentInstructions}
+
             rows="3"
             className="w-full text-center text-[10px] text-slate-500 bg-transparent"
             placeholder="Add bank accounts, wire transfer instructions, check details or digital payment links here..."
@@ -612,6 +624,8 @@ export default function RetailTemplate({
             type="textarea"
             value={invoice.notes}
             onChange={(e) => onUpdateField("notes", e.target.value)}
+            maxLength={FIELD_LIMITS.notes}
+
             rows="2"
             className="w-full text-center text-slate-600 leading-tight font-semibold bg-transparent"
             placeholder="Thank you notes"

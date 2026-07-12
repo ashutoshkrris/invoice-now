@@ -56,6 +56,8 @@ export default function ClassicTemplate(props) {
             <EditableField
               value={invoice.businessName}
               onChange={(e) => onUpdateField("businessName", e.target.value)}
+              maxLength={FIELD_LIMITS.businessName}
+
               className="w-full text-md font-extrabold"
               style={{ color: invoice.brandColor }}
               placeholder="Your / Company Name"
@@ -65,6 +67,8 @@ export default function ClassicTemplate(props) {
               type="textarea"
               value={invoice.businessAddress}
               onChange={(e) => onUpdateField("businessAddress", e.target.value)}
+              maxLength={FIELD_LIMITS.businessAddress}
+
               rows="2"
               className="w-full text-xs text-slate-500 leading-relaxed"
               placeholder="Your / Company Address"
@@ -74,18 +78,18 @@ export default function ClassicTemplate(props) {
               <EditableField
                 value={invoice.businessPhone}
                 onChange={(e) => onUpdateField("businessPhone", e.target.value)}
+                maxLength={FIELD_LIMITS.businessPhone}
                 className="w-full"
                 placeholder="Phone Number"
                 isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessPhone}
               />
               <EditableField
                 value={invoice.businessEmail}
                 onChange={(e) => onUpdateField("businessEmail", e.target.value)}
+                maxLength={FIELD_LIMITS.businessEmail}
                 className="w-full"
                 placeholder="Email"
                 isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessEmail}
               />
             </div>
           </div>
@@ -101,6 +105,7 @@ export default function ClassicTemplate(props) {
           <EditableField
             value={invoice.invoiceLabel}
             onChange={(e) => onUpdateField("invoiceLabel", e.target.value)}
+            maxLength={FIELD_LIMITS.invoiceLabel}
             className={`${
               isExporting
                 ? "w-auto text-3xl text-right"
@@ -122,23 +127,27 @@ export default function ClassicTemplate(props) {
             <EditableField
               value={invoice.customerName}
               onChange={(e) => onUpdateField("customerName", e.target.value)}
+              maxLength={FIELD_LIMITS.customerName}
+
               className="w-full font-bold text-sm"
               placeholder="Client Name"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerName}
             />
             <EditableField
               value={invoice.customerCompany}
               onChange={(e) => onUpdateField("customerCompany", e.target.value)}
+              maxLength={FIELD_LIMITS.customerName}
+
               className="w-full text-slate-600 font-medium"
               placeholder="Client Company LLC"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerCompany}
             />
             <EditableField
               type="textarea"
               value={invoice.customerAddress}
               onChange={(e) => onUpdateField("customerAddress", e.target.value)}
+              maxLength={FIELD_LIMITS.customerAddress}
+
               rows="2"
               className="w-full text-slate-500 leading-relaxed"
               placeholder="Client's Address"
@@ -147,10 +156,10 @@ export default function ClassicTemplate(props) {
             <EditableField
               value={invoice.customerTaxId}
               onChange={(e) => onUpdateField("customerTaxId", e.target.value)}
+              maxLength={FIELD_LIMITS.customerTaxId}
               className="w-full text-[11px] text-slate-500"
               placeholder="Client Tax / VAT ID"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerTaxId}
             />
           </div>
         </div>
@@ -164,10 +173,10 @@ export default function ClassicTemplate(props) {
               <EditableField
                 value={invoice.invoiceNumber}
                 onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
+                maxLength={FIELD_LIMITS.invoiceNumber}
                 className="w-full text-right font-extrabold text-sm"
                 placeholder="INV-2026-001"
                 isExporting={isExporting}
-            maxLength={FIELD_LIMITS.invoiceNumber}
               />
             </div>
             <div>
@@ -196,11 +205,12 @@ export default function ClassicTemplate(props) {
             </div>
             <div>
               <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">
-                {invoice.taxName} ID
+                {invoice.taxName || "Tax"} ID
               </p>
               <EditableField
                 value={invoice.businessTaxId}
                 onChange={(e) => onUpdateField("businessTaxId", e.target.value)}
+                maxLength={FIELD_LIMITS.businessTaxId}
                 className="w-full text-right text-xs font-semibold text-slate-900"
                 placeholder="US-111222333"
                 isExporting={isExporting}

@@ -92,7 +92,7 @@ export default function InvoiceItemsTable({
                 <button
                   type="button"
                   onClick={() => onRemoveLineItem(idx)}
-                  className="p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md transition-colors cursor-pointer"
+                  className="p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-955/30 rounded-md transition-colors cursor-pointer"
                   title="Delete Item"
                 >
                   <Icons.Trash className="h-4 w-4" />
@@ -104,6 +104,7 @@ export default function InvoiceItemsTable({
                 <EditableField
                   value={item.name}
                   onChange={(e) => onUpdateNestedItem(idx, "name", e.target.value)}
+                  maxLength={FIELD_LIMITS.itemName}
                   className="w-full font-bold text-slate-800 dark:text-white text-[13px]"
                   placeholder="Item Title / Name"
                   isExporting={isExporting}
@@ -111,6 +112,7 @@ export default function InvoiceItemsTable({
                 <EditableField
                   value={item.description}
                   onChange={(e) => onUpdateNestedItem(idx, "description", e.target.value)}
+                  maxLength={FIELD_LIMITS.itemDescription}
                   className="w-full text-slate-500 dark:text-slate-400 text-[11px]"
                   placeholder="Add specific description details..."
                   isExporting={isExporting}
@@ -157,6 +159,7 @@ export default function InvoiceItemsTable({
                       <EditableField
                         value={invoice.taxName || "Tax"}
                         onChange={(e) => onUpdateField("taxName", e.target.value)}
+                        maxLength={FIELD_LIMITS.taxName}
                         className="font-bold text-slate-400 dark:text-slate-500 uppercase text-[10px] max-w-[50px] bg-transparent"
                         placeholder="Tax"
                         isExporting={isExporting}
@@ -260,6 +263,7 @@ export default function InvoiceItemsTable({
                     <EditableField
                       value={invoice.taxName || "Tax"}
                       onChange={(e) => onUpdateField("taxName", e.target.value)}
+                      maxLength={FIELD_LIMITS.taxName}
                       className="text-center font-extrabold text-slate-400 uppercase max-w-[50px] bg-transparent"
                       isExporting={isExporting}
                       placeholder="Tax"
@@ -324,6 +328,7 @@ export default function InvoiceItemsTable({
                     <EditableField
                       value={item.name}
                       onChange={(e) => onUpdateNestedItem(idx, "name", e.target.value)}
+                      maxLength={FIELD_LIMITS.itemName}
                       className="w-full font-bold text-slate-800 dark:text-white text-[13px]"
                       placeholder="Item Title / Name"
                       isExporting={isExporting}
@@ -331,6 +336,7 @@ export default function InvoiceItemsTable({
                     <EditableField
                       value={item.description}
                       onChange={(e) => onUpdateNestedItem(idx, "description", e.target.value)}
+                      maxLength={FIELD_LIMITS.itemDescription}
                       className="w-full text-slate-500 dark:text-slate-400 text-[11px]"
                       placeholder="Add specific description details..."
                       isExporting={isExporting}
@@ -425,7 +431,7 @@ export default function InvoiceItemsTable({
                     <button
                       type="button"
                       onClick={() => onRemoveLineItem(idx)}
-                      className="opacity-0 group-hover/item:opacity-100 p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-all cursor-pointer"
+                      className="opacity-0 group-hover/item:opacity-100 p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-955/30 rounded-lg transition-all cursor-pointer"
                       title="Delete Row Item"
                     >
                       <Icons.Trash />

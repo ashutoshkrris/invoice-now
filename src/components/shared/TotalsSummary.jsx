@@ -24,6 +24,8 @@ export default function TotalsSummary({
             type="textarea"
             value={invoice.terms}
             onChange={(e) => onUpdateField("terms", e.target.value)}
+            maxLength={FIELD_LIMITS.terms}
+            showCount={true}
             rows="3"
             className="w-full text-slate-500 dark:text-slate-400 leading-relaxed bg-transparent"
             placeholder="Please make the payment by the due date."
@@ -38,6 +40,8 @@ export default function TotalsSummary({
             type="textarea"
             value={invoice.notes}
             onChange={(e) => onUpdateField("notes", e.target.value)}
+            maxLength={FIELD_LIMITS.notes}
+            showCount={true}
             rows="2"
             className="w-full text-slate-500 dark:text-slate-400 leading-relaxed bg-transparent"
             placeholder="It was great doing business with you."
@@ -115,6 +119,7 @@ export default function TotalsSummary({
               <EditableField
                 value={invoice.taxName || "Tax"}
                 onChange={(e) => onUpdateField("taxName", e.target.value)}
+                maxLength={FIELD_LIMITS.taxName}
                 className="font-bold text-slate-400 dark:text-slate-500 uppercase text-[10px] max-w-[65px] bg-transparent"
                 placeholder="Tax"
                 isExporting={isExporting}

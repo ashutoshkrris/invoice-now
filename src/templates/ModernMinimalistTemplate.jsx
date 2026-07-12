@@ -49,6 +49,8 @@ export default function ModernMinimalistTemplate(props) {
           <EditableField
             value={invoice.businessName}
             onChange={(e) => onUpdateField("businessName", e.target.value)}
+            maxLength={FIELD_LIMITS.businessName}
+
             className="w-full text-lg font-black tracking-tight text-slate-900"
             placeholder="Your / Company Name"
             isExporting={isExporting}
@@ -57,6 +59,8 @@ export default function ModernMinimalistTemplate(props) {
             type="textarea"
             value={invoice.businessAddress}
             onChange={(e) => onUpdateField("businessAddress", e.target.value)}
+            maxLength={FIELD_LIMITS.businessAddress}
+
             rows="2"
             className="w-full text-[11px] text-slate-500 leading-relaxed"
             placeholder="Your / Company Address"
@@ -66,18 +70,18 @@ export default function ModernMinimalistTemplate(props) {
             <EditableField
               value={invoice.businessPhone}
               onChange={(e) => onUpdateField("businessPhone", e.target.value)}
+              maxLength={FIELD_LIMITS.businessPhone}
               className="w-full"
               placeholder="Phone Number"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessPhone}
             />
             <EditableField
               value={invoice.businessEmail}
               onChange={(e) => onUpdateField("businessEmail", e.target.value)}
+              maxLength={FIELD_LIMITS.businessEmail}
               className="w-full"
               placeholder="Email"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.businessEmail}
             />
           </div>
         </div>
@@ -85,6 +89,7 @@ export default function ModernMinimalistTemplate(props) {
           <EditableField
             value={invoice.invoiceLabel}
             onChange={(e) => onUpdateField("invoiceLabel", e.target.value)}
+            maxLength={FIELD_LIMITS.invoiceLabel}
             className="text-2xl font-black text-right uppercase block"
             style={{ color: invoice.brandColor }}
             placeholder="INVOICE"
@@ -98,10 +103,10 @@ export default function ModernMinimalistTemplate(props) {
               <EditableField
                 value={invoice.invoiceNumber}
                 onChange={(e) => onUpdateField("invoiceNumber", e.target.value)}
+                maxLength={FIELD_LIMITS.invoiceNumber}
                 className="text-right font-black text-slate-900"
                 placeholder="INV-001"
                 isExporting={isExporting}
-            maxLength={FIELD_LIMITS.invoiceNumber}
               />
             </div>
             <div>
@@ -140,28 +145,31 @@ export default function ModernMinimalistTemplate(props) {
           <EditableField
             value={invoice.customerName}
             onChange={(e) => onUpdateField("customerName", e.target.value)}
+            maxLength={FIELD_LIMITS.customerName}
+
             className="w-full font-bold text-slate-900"
             placeholder="Client Name"
             isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerName}
           />
           <EditableField
             value={invoice.customerCompany}
             onChange={(e) => onUpdateField("customerCompany", e.target.value)}
+            maxLength={FIELD_LIMITS.customerName}
+
             className="w-full text-slate-600"
             placeholder="Client Company"
             isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerCompany}
           />
           <EditableField
             type="textarea"
             value={invoice.customerAddress}
             onChange={(e) => onUpdateField("customerAddress", e.target.value)}
+            maxLength={FIELD_LIMITS.customerAddress}
+
             rows="2"
             className="w-full text-slate-500 mt-1"
             placeholder="Client's Address"
             isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerAddress}
           />
         </div>
         <div className="flex flex-col justify-end items-end text-right">
@@ -170,10 +178,10 @@ export default function ModernMinimalistTemplate(props) {
             <EditableField
               value={invoice.customerTaxId}
               onChange={(e) => onUpdateField("customerTaxId", e.target.value)}
+              maxLength={FIELD_LIMITS.customerTaxId}
               className="text-right font-semibold text-slate-900"
               placeholder="US-999888"
               isExporting={isExporting}
-            maxLength={FIELD_LIMITS.customerTaxId}
             />
           </div>
         </div>
