@@ -18,8 +18,11 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: Bug description
-      description: Clearly describe what happened.
+      label: What happened?
+      description: Describe the bug clearly.
+      placeholder: |
+        Example:
+        When I click "Generate Invoice", the page freezes and no invoice is created.
     validations:
       required: true
 
@@ -27,59 +30,33 @@ body:
     id: reproduce
     attributes:
       label: Steps to reproduce
+      description: Tell us how we can reproduce the issue.
       placeholder: |
-        1.
-        2.
-        3.
+        1. Go to ...
+        2. Click ...
+        3. Enter ...
+        4. See the error
     validations:
       required: true
 
   - type: textarea
     id: expected
     attributes:
-      label: Expected behavior
+      label: What did you expect to happen?
+      placeholder: |
+        Example:
+        The invoice should be generated successfully.
     validations:
       required: true
-
-  - type: textarea
-    id: actual
-    attributes:
-      label: Actual behavior
-      description: What actually happened instead?
-    validations:
-      required: true
-
-  - type: dropdown
-    id: browser
-    attributes:
-      label: Browser
-      options:
-        - Chrome
-        - Firefox
-        - Edge
-        - Safari
-        - Brave
-        - Other
-
-  - type: input
-    id: browser-version
-    attributes:
-      label: Browser version
-      placeholder: "138"
-
-  - type: input
-    id: os
-    attributes:
-      label: Operating System
-      placeholder: Windows 11, macOS 15, Ubuntu 24.04...
-
-  - type: textarea
-    id: screenshots
-    attributes:
-      label: Screenshots / Screen recordings
-      description: Drag and drop images or videos here.
 
   - type: textarea
     id: additional
     attributes:
       label: Additional context
+      description: Optional.
+      placeholder: |
+        You can include:
+        - Error messages
+        - Screenshots or screen recordings
+        - Browser or operating system (if you think it's relevant)
+        - Anything else that might help us investigate

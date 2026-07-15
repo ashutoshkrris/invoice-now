@@ -1,5 +1,5 @@
 name: Feature Request
-description: Suggest an improvement or a new feature.
+description: Suggest an improvement or a new feature for Invoice Now.
 title: "[Feature]: "
 labels:
   - enhancement
@@ -10,45 +10,59 @@ body:
       value: |
         Thanks for your suggestion!
 
-        Please search existing issues before creating a new feature request.
+        Before submitting:
+        - Search existing issues to avoid duplicates.
+        - Explain the problem you're trying to solve, not just the solution.
 
   - type: textarea
     id: problem
     attributes:
-      label: Problem statement
-      description: What problem does this solve?
+      label: What problem are you trying to solve?
+      description: Tell us what is difficult, confusing, or missing today.
+      placeholder: |
+        Example:
+        I create invoices for recurring clients every month, but I have to manually recreate them each time.
     validations:
       required: true
 
   - type: textarea
     id: solution
     attributes:
-      label: Proposed solution
-      description: Describe your proposed solution.
+      label: What would you like to see?
+      description: Describe your ideal solution.
+      placeholder: |
+        Example:
+        Add invoice templates or recurring invoices so I can generate them with one click.
     validations:
       required: true
 
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives considered
-
-  - type: textarea
-    id: mockups
-    attributes:
-      label: Mockups / Examples
-      description: Screenshots, sketches, links, or references.
-
-  - type: dropdown
-    id: willing
-    attributes:
-      label: Would you like to work on this feature?
-      options:
-        - Yes
-        - No
-        - Maybe
+      label: Have you considered any alternatives?
+      description: Optional.
+      placeholder: |
+        Example:
+        I currently duplicate old invoices, but it's time-consuming and easy to miss changes.
 
   - type: textarea
     id: additional
     attributes:
       label: Additional context
+      description: Optional.
+      placeholder: |
+        You can include:
+        - Mockups or sketches
+        - Screenshots
+        - Links to similar implementations
+        - Anything else that helps explain the idea
+
+  - type: dropdown
+    id: willing
+    attributes:
+      label: Interested in contributing?
+      description: Would you like to work on this feature?
+      options:
+        - "Yes"
+        - "Maybe"
+        - "No"
