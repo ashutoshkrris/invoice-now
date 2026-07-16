@@ -8,6 +8,7 @@ import Navbar from "./components/Navbar";
 import InvoiceToolbar from "./components/InvoiceToolbar";
 import Footer from "./components/Footer";
 import Toast from "./components/Toast";
+import ExportMenu from "./components/ExportMenu";
 
 // Pages Layer Imports
 import AboutPage from "./pages/AboutPage";
@@ -364,9 +365,6 @@ export default function App() {
                 onCountryChange={handleCountryChange}
                 onUndo={handleUndo}
                 onRedo={handleRedo}
-                onPrint={handlePrint}
-                onExportPNG={handleExportPNG}
-                onExportPDF={handleExportPDF}
               />
 
               <main className="flex-1 overflow-y-auto bg-slate-100 dark:bg-slate-900/60 bg-grid py-8 px-4 flex justify-center items-start">
@@ -410,6 +408,24 @@ export default function App() {
                       <EmeraldPremiumTemplate {...templateProps} />
                     )}
                     {invoice.templateId === "retail" && <RetailTemplate {...templateProps} />}
+                  </div>
+
+                  <div className="no-print mt-6 w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-md select-none">
+                    <div className="text-left">
+                      <h4 className="text-sm font-black text-slate-900 dark:text-white mb-0.5">
+                        Finished reviewing your invoice?
+                      </h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Download your copy immediately or generate a print system request.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
+                      <ExportMenu
+                        onPrint={handlePrint}
+                        onExportPNG={handleExportPNG}
+                        onExportPDF={handleExportPDF}
+                      />
+                    </div>
                   </div>
                 </div>
               </main>
