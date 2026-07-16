@@ -7,7 +7,7 @@ export default function Navbar({ theme, onThemeToggle }) {
   const location = useLocation();
 
   const routesList = [
-    { path: "/", label: "Editor Workspace" },
+    { path: "/", label: "Invoice Editor" },
     { path: "/about", label: "About" },
     { path: "/privacy-policy", label: "Privacy Policy" },
     { path: "/terms-of-use", label: "Terms of Use" },

@@ -12,12 +12,8 @@ export default function InvoiceToolbar({
   onCountryChange,
   onUndo,
   onRedo,
-  onPrint,
-  onExportPNG,
-  onExportPDF,
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isExportOpen, setIsExportOpen] = useState(false);
 
   // Searchable Country Dropdown States
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
@@ -28,7 +24,6 @@ export default function InvoiceToolbar({
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [customInput, setCustomInput] = useState("");
 
-  const dropdownRef = useRef(null);
   const countryDropdownRef = useRef(null);
 
   const updateDropdownCoords = () => {
@@ -56,9 +51,6 @@ export default function InvoiceToolbar({
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsExportOpen(false);
-      }
       if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target)) {
         const portalNode = document.getElementById("portal-country-dropdown");
         if (portalNode && portalNode.contains(event.target)) return;
@@ -80,14 +72,13 @@ export default function InvoiceToolbar({
   const isPresetWatermark = ["DRAFT", "PAID", "OVERDUE", ""].includes(invoice.watermarkText);
 
   return (
-    <div className="no-print w-full bg-white/95 dark:bg-slate-950/95 border-b border-slate-200 dark:border-slate-800 shadow-xs px-4 md:px-6 py-2 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2 xl:gap-0 transition-all box-border">
-      {/* Undo/Redo & Quick Control Panels Row */}
-      <div className="flex items-center justify-between w-full xl:w-auto">
+    <div className="no-print w-full bg-white/95 dark:bg-slate-950/95 border-b border-slate-200 dark:border-slate-800 px-4 md:px-6 py-2 flex flex-col xl:flex-row xl:items-center xl:justify-center gap-4 transition-all box-border">
+      <div className="flex items-center justify-between xl:justify-center gap-3 w-full xl:w-auto">
         <div className="flex items-center gap-1.5">
           <button
             onClick={onUndo}
             disabled={historyIdx === 0}
-            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 disabled:opacity-40 hover:text-slate-950 dark:hover:text-white transition-transform active:scale-95 cursor-pointer"
+            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 disabled:opacity-40 hover:text-slate-950 dark:hover:text-white transition-all active:scale-95 cursor-pointer"
             title="Undo"
           >
             <Icons.Undo className="h-4 w-4" />
@@ -95,7 +86,7 @@ export default function InvoiceToolbar({
           <button
             onClick={onRedo}
             disabled={historyIdx >= historyLength - 1}
-            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 disabled:opacity-40 hover:text-slate-950 dark:hover:text-white transition-transform active:scale-95 cursor-pointer"
+            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 disabled:opacity-40 hover:text-slate-950 dark:hover:text-white transition-all active:scale-95 cursor-pointer"
             title="Redo"
           >
             <Icons.Redo className="h-4 w-4" />
@@ -116,7 +107,6 @@ export default function InvoiceToolbar({
         </button>
       </div>
 
-      {/* Configuration Grid Panel wrapper element */}
       <div
         className={`grid transition-all duration-300 ease-in-out w-full xl:w-auto ${
           isOpen
@@ -126,7 +116,7 @@ export default function InvoiceToolbar({
       >
         <div className="overflow-hidden xl:overflow-visible flex flex-col xl:flex-row items-stretch xl:items-end gap-4 w-full xl:w-auto">
           <div className="flex flex-wrap xl:flex-nowrap items-center gap-3 w-full xl:w-auto">
-            {/* Country Dropdown selection */}
+            {/* Country Dropdown */}
             <div
               ref={countryDropdownRef}
               className="flex flex-col flex-1 min-w-[140px] xl:flex-none xl:w-38 relative text-left"
@@ -225,7 +215,7 @@ export default function InvoiceToolbar({
               </select>
             </div>
 
-            {/* Brand Colors configuration slider */}
+            {/* Brand Colors */}
             <div className="flex flex-col flex-1 min-w-[150px] xl:flex-none shrink-0">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Brand Color
@@ -252,7 +242,7 @@ export default function InvoiceToolbar({
               </div>
             </div>
 
-            {/* Typography fonts mapping option group */}
+            {/* Typography */}
             <div className="flex flex-col flex-1 min-w-[130px] xl:flex-none xl:w-31.25">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Font Family
@@ -268,7 +258,7 @@ export default function InvoiceToolbar({
               </select>
             </div>
 
-            {/* Canvas structural paper sizing parameter logic */}
+            {/* Paper Format */}
             <div className="flex flex-col flex-1 min-w-[110px] xl:flex-none xl:w-27.5">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Paper Format
@@ -283,7 +273,7 @@ export default function InvoiceToolbar({
               </select>
             </div>
 
-            {/* Watermark Selector element */}
+            {/* Watermark Selector */}
             <div className="flex flex-col flex-1 min-w-32.5 xl:flex-none xl:w-35">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Watermark
@@ -340,48 +330,6 @@ export default function InvoiceToolbar({
                   </button>
                 )}
               </div>
-            </div>
-          </div>
-
-          {/* Core App Export triggers row layout */}
-          <div className="flex items-center gap-2 relative mt-2 xl:mt-0">
-            <button
-              onClick={onPrint}
-              className="flex-1 xl:flex-none px-4 py-1.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 cursor-pointer h-[34px] flex items-center justify-center gap-1 hidden"
-            >
-              <Icons.Print className="h-3.5 w-3.5" /> Print
-            </button>
-
-            <div className="relative flex-1 xl:flex-none" ref={dropdownRef}>
-              <button
-                onClick={() => setIsExportOpen(!isExportOpen)}
-                className="w-full xl:w-auto flex items-center justify-center gap-1.5 px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md cursor-pointer h-[34px]"
-              >
-                <Icons.Download className="h-3.5 w-3.5" /> Export As <Icons.ChevronDown />
-              </button>
-
-              {isExportOpen && (
-                <div className="absolute right-0 bottom-full mb-2 xl:bottom-auto xl:top-full xl:mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 p-1 flex flex-col gap-0.5">
-                  <button
-                    onClick={() => {
-                      onExportPDF();
-                      setIsExportOpen(false);
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer w-full"
-                  >
-                    <Icons.FileText /> Download PDF Document
-                  </button>
-                  <button
-                    onClick={() => {
-                      onExportPNG();
-                      setIsExportOpen(false);
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer w-full"
-                  >
-                    <Icons.Image /> Download PNG Image
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>
