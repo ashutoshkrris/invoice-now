@@ -366,7 +366,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-100 dark:bg-slate-900 transition-colors duration-200">
+    <div data-testid="invoice-app-root" className="min-h-screen flex flex-col bg-slate-100 dark:bg-slate-900 transition-colors duration-200">
       <Header
         invoice={invoice}
         theme={theme}
