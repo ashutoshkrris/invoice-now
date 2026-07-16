@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Routes, Route } from "react-router-dom";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
@@ -32,6 +32,8 @@ export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
   const [toast, setToast] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [showFloatingButton, setShowFloatingButton] = useState(true);
+  const footerCardRef = useRef(null);
 
   // --- HISTORICAL UNDO / REDO ENGINE ---
   const [history, setHistory] = useState([JSON.stringify(INITIAL_INVOICE_STATE)]);
@@ -46,6 +48,31 @@ export default function App() {
     }
     localStorage.setItem("theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // If the stationary bottom footer card is visible in the viewport, hide the floating button
+        setShowFloatingButton(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0.1, // Triggers as soon as 10% of the footer card shows up
+        rootMargin: "0px 0px 50px 0px", // Slight buffer to hide it just before impact
+      }
+    );
+
+    const currentRef = footerCardRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, []);
 
   const triggerToast = (message, type = "success") => {
     setToast({ message, type });
@@ -410,7 +437,10 @@ export default function App() {
                     {invoice.templateId === "retail" && <RetailTemplate {...templateProps} />}
                   </div>
 
-                  <div className="no-print mt-6 w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-md select-none">
+                  <div
+                    ref={footerCardRef}
+                    className="no-print mt-6 w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-md select-none"
+                  >
                     <div className="text-left">
                       <h4 className="text-sm font-black text-slate-900 dark:text-white mb-0.5">
                         Finished reviewing your invoice?
@@ -426,6 +456,24 @@ export default function App() {
                         onExportPDF={handleExportPDF}
                       />
                     </div>
+                  </div>
+                </div>
+
+                {/* SMART FLOATING ACTION BUTTON CONTAINER */}
+                <div
+                  className={`fixed bottom-6 right-6 z-40 transition-all duration-300 transform no-print ${
+                    showFloatingButton
+                      ? "opacity-100 translate-y-0 scale-100"
+                      : "opacity-0 translate-y-4 scale-90 pointer-events-none"
+                  }`}
+                >
+                  <div className="shadow-2xl rounded-xl">
+                    <ExportMenu
+                      onPrint={handlePrint}
+                      onExportPNG={handleExportPNG}
+                      onExportPDF={handleExportPDF}
+                      isFloating={true}
+                    />
                   </div>
                 </div>
               </main>
