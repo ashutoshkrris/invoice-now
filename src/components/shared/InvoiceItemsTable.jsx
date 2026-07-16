@@ -129,7 +129,8 @@ export default function InvoiceItemsTable({
                   <EditableField
                     type="number"
                     step="0.01"
-                    value={item.price}
+                    value={item.price === 0 ? "" : item.price}
+                    min={0}
                     onChange={(e) =>
                       onUpdateNestedItem(idx, "price", parseFloat(e.target.value) || 0)
                     }
@@ -145,7 +146,8 @@ export default function InvoiceItemsTable({
                   </label>
                   <EditableField
                     type="number"
-                    value={item.qty}
+                    value={item.qty === 0 ? "" : item.qty}
+                    min={1}
                     onChange={(e) => onUpdateNestedItem(idx, "qty", parseInt(e.target.value) || 0)}
                     className="w-full font-bold text-slate-800 border border-slate-200/60 rounded-md px-2 py-1 bg-white text-center"
                     placeholder="1"
@@ -184,7 +186,7 @@ export default function InvoiceItemsTable({
                       )}
                       <EditableField
                         type="number"
-                        value={item.taxRate}
+                        value={item.taxRate === 0 ? "" : item.taxRate}
                         onChange={(e) =>
                           onUpdateNestedItem(idx, "taxRate", parseFloat(e.target.value) || 0)
                         }
@@ -220,7 +222,7 @@ export default function InvoiceItemsTable({
                       )}
                       <EditableField
                         type="number"
-                        value={item.discount}
+                        value={item.discount === 0 ? "" : item.discount}
                         onChange={(e) =>
                           onUpdateNestedItem(idx, "discount", parseFloat(e.target.value) || 0)
                         }
@@ -343,7 +345,8 @@ export default function InvoiceItemsTable({
                     <EditableField
                       type="number"
                       step="0.01"
-                      value={item.price}
+                      value={item.price === 0 ? "" : item.price}
+                      min={0}
                       onChange={(e) =>
                         onUpdateNestedItem(idx, "price", parseFloat(e.target.value) || 0)
                       }
@@ -355,10 +358,12 @@ export default function InvoiceItemsTable({
                   <td className="py-3 text-center">
                     <EditableField
                       type="number"
-                      value={item.qty}
+                      value={item.qty === 0 ? "" : item.qty}
                       onChange={(e) =>
                         onUpdateNestedItem(idx, "qty", parseInt(e.target.value) || 0)
                       }
+                      min={1}
+
                       className="w-full text-center font-bold text-slate-800"
                       placeholder="1"
                       isExporting={isExporting}
@@ -376,7 +381,7 @@ export default function InvoiceItemsTable({
                         )}
                         <EditableField
                           type="number"
-                          value={item.taxRate}
+                          value={item.taxRate === 0 ? "" : item.taxRate}
                           onChange={(e) =>
                             onUpdateNestedItem(idx, "taxRate", parseFloat(e.target.value) || 0)
                           }
@@ -402,7 +407,7 @@ export default function InvoiceItemsTable({
                         )}
                         <EditableField
                           type="number"
-                          value={item.discount}
+                          value={item.discount === 0 ? "" : item.discount}
                           onChange={(e) =>
                             onUpdateNestedItem(idx, "discount", parseFloat(e.target.value) || 0)
                           }
