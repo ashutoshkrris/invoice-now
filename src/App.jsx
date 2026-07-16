@@ -2,28 +2,29 @@ import { useState, useEffect, useMemo } from "react";
 import { Routes, Route } from "react-router-dom";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
-import Header from "./components/Header";
+
+// Navigation & Layout Structure Components
+import Navbar from "./components/Navbar";
+import InvoiceToolbar from "./components/InvoiceToolbar";
 import Footer from "./components/Footer";
 import Toast from "./components/Toast";
+
+// Pages Layer Imports
 import AboutPage from "./pages/AboutPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfUsePage from "./pages/TermsOfUsePage";
 
-// Template Imports
+// Template Layout Forms Imports
 import BoldProfessionalTemplate from "./templates/BoldProfessionalTemplate";
 import ClassicTemplate from "./templates/ClassicTemplate";
 import EmeraldPremiumTemplate from "./templates/EmeraldPremiumTemplate";
 import ModernMinimalistTemplate from "./templates/ModernMinimalistTemplate";
 import RetailTemplate from "./templates/RetailTemplate";
 
-// Preset Imports
+// Core Business Presets Imports
 import { INITIAL_INVOICE_STATE } from "./constants/invoicePresets";
 import { COUNTRIES } from "./constants/countries";
 import { loadCachedState, persistState } from "./utils/storage";
-
-// Generic Layout Nodes
-
-// Bifurcated Template Formats
 
 export default function App() {
   const [invoice, setInvoice] = useState(loadCachedState);
@@ -99,34 +100,29 @@ export default function App() {
     let totalTax = 0;
     let totalDiscount = 0;
 
-    // 1. Calculate Line Items
     invoice.items.forEach((item) => {
       const rawSub = (item.qty || 0) * (item.price || 0);
-
-      // Line Item Discount Calculation
       let rowDiscount = 0;
       if (invoice.discountScope === "item") {
         rowDiscount =
           invoice.discountType === "percentage"
             ? (rawSub * (item.discount || 0)) / 100
-            : item.discount || 0; // Absolute Flat reduction
+            : item.discount || 0;
       }
       const runningSubtotal = rawSub - rowDiscount;
 
-      // Line Item Tax Calculation
       let rowTax = 0;
       if (invoice.taxScope === "item") {
         rowTax =
           invoice.taxType === "percentage"
             ? (runningSubtotal * (item.taxRate || 0)) / 100
-            : item.taxRate || 0; // Absolute Flat addition
+            : item.taxRate || 0;
       }
 
       subtotal += runningSubtotal;
       totalTax += rowTax;
     });
 
-    // 2. Apply Subtotal-level Updates
     if (invoice.discountScope === "subtotal") {
       totalDiscount =
         invoice.discountType === "percentage"
@@ -148,7 +144,6 @@ export default function App() {
     return { subtotal, tax: totalTax, discount: totalDiscount, grandTotal, balanceDue };
   }, [invoice]);
 
-  // --- INLINE ITEM MANAGEMENT ---
   const addLineItem = () => {
     const newItem = { name: "", description: "", qty: 1, price: 0, taxRate: 0, discount: 0 };
     const updated = { ...invoice, items: [...invoice.items, newItem] };
@@ -207,19 +202,14 @@ export default function App() {
 
   const handlePrint = () => {
     setIsExporting(true);
-
     const target = document.getElementById("printable-invoice-area");
-
     if (!target) {
       setIsExporting(false);
       return;
     }
-
     const restore = prepareInvoiceForExport(target);
-
     setTimeout(() => {
       window.print();
-
       restore();
       setIsExporting(false);
     }, 300);
@@ -231,17 +221,14 @@ export default function App() {
 
     setTimeout(async () => {
       const target = document.getElementById("printable-invoice-area");
-
       if (!target) {
         setIsExporting(false);
         return;
       }
-
       const restore = prepareInvoiceForExport(target);
 
       try {
         await new Promise((resolve) => setTimeout(resolve, 50));
-
         const dataUrl = await toPng(target, {
           quality: 0.95,
           pixelRatio: 3,
@@ -249,7 +236,6 @@ export default function App() {
           filter: (node) => {
             if (node.tagName === "LINK" && node.getAttribute("rel") === "stylesheet") {
               const href = node.getAttribute("href");
-
               return (
                 href &&
                 (href.startsWith("/") ||
@@ -269,7 +255,8 @@ export default function App() {
       } catch (err) {
         console.error("PNG render failed", err);
         triggerToast("PNG render failed", "error");
-      } finally {
+      }
+      {
         restore();
         setIsExporting(false);
       }
@@ -286,12 +273,10 @@ export default function App() {
         setIsExporting(false);
         return;
       }
-
       const restore = prepareInvoiceForExport(target);
 
       try {
         await new Promise((resolve) => setTimeout(resolve, 50));
-
         const dataUrl = await toPng(target, {
           quality: 0.95,
           pixelRatio: 2.5,
@@ -317,16 +302,13 @@ export default function App() {
         });
 
         const pdfWidth = pdf.internal.pageSize.getWidth();
-
         const imgWidth = target.offsetWidth;
         const imgHeight = target.offsetHeight;
         const ratio = imgHeight / imgWidth;
         const pdfHeight = pdfWidth * ratio;
 
         pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
-
         pdf.save(`${invoice.invoiceNumber || "invoice"}.pdf`);
-
         triggerToast("PDF document download complete!");
       } catch (err) {
         console.error("PDF engine crash", err);
@@ -352,7 +334,6 @@ export default function App() {
 
   const activeCurrencySymbol = invoice.currencySymbol || "$";
 
-  // Shared props object passed down via clean structural patterns
   const templateProps = {
     invoice,
     totals: calculatedTotals,
@@ -367,80 +348,80 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-100 dark:bg-slate-900 transition-colors duration-200">
-      <Header
-        invoice={invoice}
-        theme={theme}
-        historyIdx={historyIdx}
-        historyLength={history.length}
-        onUpdateField={updateField}
-        onCountryChange={handleCountryChange}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        onPrint={handlePrint}
-        onExportPNG={handleExportPNG}
-        onExportPDF={handleExportPDF}
-        onThemeToggle={() => setTheme(theme === "dark" ? "light" : "dark")}
-      />
+      {/* 1. Global Navigation Bar handles routing actions and dark theme values */}
+      <Navbar theme={theme} onThemeToggle={() => setTheme(theme === "dark" ? "light" : "dark")} />
 
       <Routes>
         {/* --- WORKSPACE EDITOR --- */}
         <Route
           path="/"
           element={
-            <main className="flex-1 overflow-y-auto bg-slate-100 dark:bg-slate-900/60 bg-grid py-8 px-4 flex justify-center items-start">
-              <div className="w-full max-w-210 relative">
-                <div className="no-print mb-4 flex items-center justify-between text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-2">
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>{" "}
-                    Click any field below to rewrite details
-                  </span>
-                  <span>
-                    {invoice.paperSize === "letter"
-                      ? "8.5in x 11in (Letter)"
-                      : "210mm x 297mm (A4)"}
-                  </span>
-                </div>
+            <>
+              {/* 2. Focused Toolbar managing local preset parameters strictly inside workspace contexts */}
+              <InvoiceToolbar
+                invoice={invoice}
+                historyIdx={historyIdx}
+                historyLength={history.length}
+                onUpdateField={updateField}
+                onCountryChange={handleCountryChange}
+                onUndo={handleUndo}
+                onRedo={handleRedo}
+                onPrint={handlePrint}
+                onExportPNG={handleExportPNG}
+                onExportPDF={handleExportPDF}
+              />
 
-                {/* Interactive WYSIWYG Paper Layer */}
-                <div
-                  id="printable-invoice-area"
-                  className={`w-full bg-white text-slate-950 shadow-2xl md:rounded-2xl overflow-hidden relative ${invoice.typography || "font-sans"}`}
-                  style={{ minHeight: invoice.paperSize === "letter" ? "1050px" : "1120px" }}
-                >
-                  {/* Watermark Overlay */}
-                  {invoice.watermarkText && (
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10 select-none overflow-hidden">
-                      <span className="text-7xl md:text-8xl font-black text-slate-700/20 dark:text-slate-500/15 uppercase tracking-widest -rotate-45 leading-none text-center whitespace-normal break-normal px-4">
-                        {invoice.watermarkText}
-                      </span>
-                    </div>
-                  )}
+              <main className="flex-1 overflow-y-auto bg-slate-100 dark:bg-slate-900/60 bg-grid py-8 px-4 flex justify-center items-start">
+                <div className="w-full max-w-210 relative">
+                  <div className="no-print mb-4 flex items-center justify-between text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-2">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>{" "}
+                      Click any field below to rewrite details
+                    </span>
+                    <span>
+                      {invoice.paperSize === "letter"
+                        ? "8.5in x 11in (Letter)"
+                        : "210mm x 297mm (A4)"}
+                    </span>
+                  </div>
 
-                  {/* Template Router Switch */}
-                  {invoice.templateId === "classic" && <ClassicTemplate {...templateProps} />}
-                  {invoice.templateId === "modern-minimalist" && (
-                    <ModernMinimalistTemplate {...templateProps} />
-                  )}
-                  {invoice.templateId === "bold-professional" && (
-                    <BoldProfessionalTemplate {...templateProps} />
-                  )}
-                  {invoice.templateId === "emerald-premium" && (
-                    <EmeraldPremiumTemplate {...templateProps} />
-                  )}
-                  {invoice.templateId === "retail" && <RetailTemplate {...templateProps} />}
+                  {/* Interactive WYSIWYG Paper Layer */}
+                  <div
+                    id="printable-invoice-area"
+                    className={`w-full bg-white text-slate-950 shadow-2xl md:rounded-2xl overflow-hidden relative ${invoice.typography || "font-sans"}`}
+                    style={{ minHeight: invoice.paperSize === "letter" ? "1050px" : "1120px" }}
+                  >
+                    {/* Watermark Overlay */}
+                    {invoice.watermarkText && (
+                      <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10 select-none overflow-hidden">
+                        <span className="text-7xl md:text-8xl font-black text-slate-700/20 dark:text-slate-500/15 uppercase tracking-widest -rotate-45 leading-none text-center whitespace-normal break-normal px-4">
+                          {invoice.watermarkText}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Template Switcher */}
+                    {invoice.templateId === "classic" && <ClassicTemplate {...templateProps} />}
+                    {invoice.templateId === "modern-minimalist" && (
+                      <ModernMinimalistTemplate {...templateProps} />
+                    )}
+                    {invoice.templateId === "bold-professional" && (
+                      <BoldProfessionalTemplate {...templateProps} />
+                    )}
+                    {invoice.templateId === "emerald-premium" && (
+                      <EmeraldPremiumTemplate {...templateProps} />
+                    )}
+                    {invoice.templateId === "retail" && <RetailTemplate {...templateProps} />}
+                  </div>
                 </div>
-              </div>
-            </main>
+              </main>
+            </>
           }
         />
 
-        {/* --- ABOUT PAGE --- */}
+        {/* --- INFORMATION SUB-PAGES ROUTER NODES --- */}
         <Route path="/about" element={<AboutPage />} />
-
-        {/* --- PRIVACY POLICY PAGE --- */}
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-
-        {/* --- TERMS OF USE PAGE --- */}
         <Route path="/terms-of-use" element={<TermsOfUsePage />} />
       </Routes>
 
