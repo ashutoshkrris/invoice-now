@@ -162,26 +162,43 @@ export default function TotalsSummary({
           </div>
         )}
 
-        {/* 4. Shipping */}
-        {invoice.shippingCharges > 0 || isExporting ? (
+        {/* 4. Shipping Charges */}
+        {invoice.shippingCharges !== null &&
+        invoice.shippingCharges !== undefined &&
+        (invoice.shippingCharges > 0 ||
+          typeof invoice.shippingCharges === "number" ||
+          isExporting) ? (
           <div className="flex justify-between items-center py-0.5">
             <span className="font-bold text-slate-400 uppercase text-[10px]">Shipping</span>
             <div className="flex items-center justify-end text-right group/shipping">
               <span className="text-[10px] text-slate-400 mr-0.5">{activeCurrencySymbol}</span>
-              <EditableField
+              <input
                 type="number"
-                value={invoice.shippingCharges}
-                onChange={(e) => onUpdateField("shippingCharges", parseFloat(e.target.value) || 0)}
-                className="w-20 text-right font-semibold text-slate-900 bg-transparent"
+                // Ensure that backspacing empty doesn't pass undefined values to uncontrolled inputs
+                value={
+                  Number.isNaN(invoice.shippingCharges) || invoice.shippingCharges === 0
+                    ? ""
+                    : invoice.shippingCharges
+                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  // Allows input to be completely blank while typing without snapping shut
+                  if (val === "") {
+                    onUpdateField("shippingCharges", 0);
+                  } else {
+                    onUpdateField("shippingCharges", parseFloat(val) || 0);
+                  }
+                }}
+                className="w-20 text-right font-semibold text-slate-900 bg-transparent outline-none focus:ring-1 focus:ring-brand-500 rounded px-1"
                 placeholder="0.00"
-                isExporting={isExporting}
               />
-              {!isExporting && invoice.shippingCharges > 0 && (
+              {!isExporting && (
                 <button
                   type="button"
-                  onClick={() => onUpdateField("shippingCharges", 0)}
+                  // Explicitly sets it to null or undefined to clear it out and bring back the button selector
+                  onClick={() => onUpdateField("shippingCharges", null)}
                   className="no-print ml-1 text-slate-300 hover:text-rose-500 text-[10px] font-bold transition-colors cursor-pointer"
-                  title="Remove shipping"
+                  title="Remove shipping charges panel"
                 >
                   ✕
                 </button>
@@ -193,7 +210,8 @@ export default function TotalsSummary({
             <div className="no-print flex justify-between items-center py-0.5">
               <button
                 type="button"
-                onClick={() => onUpdateField("shippingCharges", 1)}
+                // Initializes with exactly 0 so the input stays visible, rather than forcing a value of 1
+                onClick={() => onUpdateField("shippingCharges", 0)}
                 className="text-[10px] font-extrabold text-brand-600 hover:underline transition-all cursor-pointer"
               >
                 + Add Shipping Charges
