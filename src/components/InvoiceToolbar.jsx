@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
 import { BRAND_COLORS } from "../constants/invoicePresets";
 import { COUNTRIES } from "../constants/countries";
 import { Icons } from "./Icons";
 
-export default function Header({
+export default function InvoiceToolbar({
   invoice,
-  theme,
   historyIdx,
   historyLength,
   onUpdateField,
@@ -17,7 +15,6 @@ export default function Header({
   onPrint,
   onExportPNG,
   onExportPDF,
-  onThemeToggle,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -27,14 +24,13 @@ export default function Header({
   const [countrySearchQuery, setCountrySearchQuery] = useState("");
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
 
-  // Custom Modal States
+  // Custom Watermark Modal States
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [customInput, setCustomInput] = useState("");
 
   const dropdownRef = useRef(null);
   const countryDropdownRef = useRef(null);
 
-  // Position updates for portal positioning alignment parameters
   const updateDropdownCoords = () => {
     if (countryDropdownRef.current) {
       const rect = countryDropdownRef.current.getBoundingClientRect();
@@ -58,14 +54,12 @@ export default function Header({
     };
   }, [isCountryDropdownOpen]);
 
-  // Close dropdowns if user clicks outside of them
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsExportOpen(false);
       }
       if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target)) {
-        // Only close if click is not inside the portal overlay frame
         const portalNode = document.getElementById("portal-country-dropdown");
         if (portalNode && portalNode.contains(event.target)) return;
 
@@ -86,75 +80,53 @@ export default function Header({
   const isPresetWatermark = ["DRAFT", "PAID", "OVERDUE", ""].includes(invoice.watermarkText);
 
   return (
-    <header className="no-print sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm px-4 md:px-6 py-3 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2 xl:gap-0 transition-all duration-300 w-full box-border">
-      {/* Top Main Row */}
-      <div className="flex items-center justify-between w-full xl:w-auto z-10">
-        <Link
-          to="/"
-          className="flex items-center gap-3 group cursor-pointer select-none"
-          title="Return to Invoice Editor"
-        >
-          <div className="h-9 w-9 bg-linear-to-tr from-brand-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md shrink-0">
-            <Icons.AppLogo />
-          </div>
-          <div>
-            <h1 className="text-sm font-black tracking-tight text-slate-950 dark:text-white leading-none">
-              Invoice Now
-            </h1>
-          </div>
-        </Link>
-
-        {/* Mobile quick actions bar */}
-        <div className="flex items-center gap-1.5 xl:hidden">
+    <div className="no-print w-full bg-white/95 dark:bg-slate-950/95 border-b border-slate-200 dark:border-slate-800 shadow-xs px-4 md:px-6 py-2 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2 xl:gap-0 transition-all box-border">
+      {/* Undo/Redo & Quick Control Panels Row */}
+      <div className="flex items-center justify-between w-full xl:w-auto">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={onUndo}
             disabled={historyIdx === 0}
-            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 disabled:opacity-40 active:scale-95 transition-transform"
+            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 disabled:opacity-40 hover:text-slate-950 dark:hover:text-white transition-transform active:scale-95 cursor-pointer"
+            title="Undo"
           >
-            <Icons.Undo />
+            <Icons.Undo className="h-4 w-4" />
           </button>
           <button
             onClick={onRedo}
             disabled={historyIdx >= historyLength - 1}
-            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 disabled:opacity-40 active:scale-95 transition-transform"
+            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 disabled:opacity-40 hover:text-slate-950 dark:hover:text-white transition-transform active:scale-95 cursor-pointer"
+            title="Redo"
           >
-            <Icons.Redo />
-          </button>
-          <button
-            onClick={onThemeToggle}
-            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 active:scale-95 transition-transform"
-          >
-            {theme === "dark" ? <Icons.Sun /> : <Icons.Moon />}
-          </button>
-
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={`p-2 border rounded-lg active:scale-95 transition-all duration-200 flex items-center gap-1 text-xs font-bold cursor-pointer ${
-              isOpen
-                ? "bg-brand-600 border-brand-600 text-white shadow-sm"
-                : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
-            }`}
-          >
-            <Icons.Settings />
-            <span>{isOpen ? "Close" : "Config"}</span>
+            <Icons.Redo className="h-4 w-4" />
           </button>
         </div>
+
+        {/* Dynamic configuration menu triggers */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`p-2 border rounded-lg active:scale-95 transition-all flex items-center gap-1 text-xs font-bold cursor-pointer xl:hidden ${
+            isOpen
+              ? "bg-brand-600 border-brand-600 text-white"
+              : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
+          }`}
+        >
+          <Icons.Settings />
+          <span>{isOpen ? "Hide" : "Config"}</span>
+        </button>
       </div>
 
-      {/* Smooth Expanding Grid Wrapper */}
+      {/* Configuration Grid Panel wrapper element */}
       <div
         className={`grid transition-all duration-300 ease-in-out w-full xl:w-auto ${
           isOpen
-            ? "grid-rows-[1fr] opacity-100 mt-3 xl:mt-0"
+            ? "grid-rows-[1fr] opacity-100 mt-2 xl:mt-0"
             : "grid-rows-[0fr] opacity-0 xl:opacity-100 xl:grid-rows-1"
         }`}
       >
         <div className="overflow-hidden xl:overflow-visible flex flex-col xl:flex-row items-stretch xl:items-end gap-4 w-full xl:w-auto">
-          <hr className="border-slate-100 dark:border-slate-900 xl:hidden" />
-
-          {/* Controls Config Row */}
           <div className="flex flex-wrap xl:flex-nowrap items-center gap-3 w-full xl:w-auto">
-            {/* 1. Searchable Country Rules Preset Dropdown Anchor */}
+            {/* Country Dropdown selection */}
             <div
               ref={countryDropdownRef}
               className="flex flex-col flex-1 min-w-[140px] xl:flex-none xl:w-38 relative text-left"
@@ -162,24 +134,22 @@ export default function Header({
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Country Rules Preset
               </label>
-
               <button
                 type="button"
                 onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                className="w-full flex justify-between items-center px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer text-left h-[30px]"
+                className="w-full flex justify-between items-center px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 h-[30px] cursor-pointer text-left"
               >
                 <span className="truncate">
                   {COUNTRIES.find((c) => c.code === (invoice.countryCode || "IN"))?.name ||
                     "India (₹)"}
                 </span>
                 <span
-                  className={`text-[9px] text-slate-400 transition-transform ml-1 ${isCountryDropdownOpen ? "rotate-180" : ""}`}
+                  className={`text-[9px] text-slate-400 transition-transform ${isCountryDropdownOpen ? "rotate-180" : ""}`}
                 >
                   ▼
                 </span>
               </button>
 
-              {/* RENDER POPAL OUTSIDE COMPONENT TREE TO BYPASS CONTAINER CLIPPING OVERFLOW */}
               {isCountryDropdownOpen &&
                 createPortal(
                   <div
@@ -199,10 +169,9 @@ export default function Header({
                         placeholder="Search country..."
                         value={countrySearchQuery}
                         onChange={(e) => setCountrySearchQuery(e.target.value)}
-                        className="w-full px-2 py-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md text-xs font-medium outline-none focus:border-brand-500 text-slate-700 dark:text-slate-300"
+                        className="w-full px-2 py-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md text-xs font-medium outline-none text-slate-700 dark:text-slate-300"
                       />
                     </div>
-
                     <div className="overflow-y-auto flex-1 divide-y divide-slate-50 dark:divide-slate-900/40">
                       {COUNTRIES.filter((c) =>
                         c.name.toLowerCase().includes(countrySearchQuery.toLowerCase())
@@ -218,7 +187,7 @@ export default function Header({
                               setIsCountryDropdownOpen(false);
                               setCountrySearchQuery("");
                             }}
-                            className={`w-full text-left px-3 py-2 text-xs transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 block truncate ${
+                            className={`w-full text-left px-3 py-2 text-xs cursor-pointer block truncate ${
                               invoice.countryCode === c.code
                                 ? "bg-brand-50/40 dark:bg-brand-950/20 text-brand-600 dark:text-brand-400 font-bold"
                                 : "text-slate-700 dark:text-slate-300"
@@ -228,7 +197,7 @@ export default function Header({
                           </button>
                         ))
                       ) : (
-                        <div className="px-2 py-3 text-xs text-slate-400 text-center font-medium select-none">
+                        <div className="px-2 py-3 text-xs text-slate-400 text-center select-none">
                           No matches
                         </div>
                       )}
@@ -238,7 +207,7 @@ export default function Header({
                 )}
             </div>
 
-            {/* Style Template */}
+            {/* Template Selector */}
             <div className="flex flex-col flex-1 min-w-[150px] xl:flex-none xl:w-38.75">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Style Template
@@ -246,7 +215,7 @@ export default function Header({
               <select
                 value={invoice.templateId}
                 onChange={(e) => onUpdateField("templateId", e.target.value)}
-                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer"
+                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer h-[30px]"
               >
                 <option value="classic">Classic Corporate</option>
                 <option value="modern-minimalist">Modern Minimalist</option>
@@ -256,19 +225,19 @@ export default function Header({
               </select>
             </div>
 
-            {/* Brand Colors */}
+            {/* Brand Colors configuration slider */}
             <div className="flex flex-col flex-1 min-w-[150px] xl:flex-none shrink-0">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Brand Color
               </label>
-              <div className="flex items-center justify-between gap-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-1.5 min-h-[30px]">
+              <div className="flex items-center justify-between gap-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-1.5 h-[30px] box-border">
                 <div className="flex items-center gap-1">
                   {BRAND_COLORS.map((color) => (
                     <button
                       key={color.hex}
                       type="button"
                       onClick={() => onUpdateField("brandColor", color.hex)}
-                      className="h-4 w-4 rounded-full border border-black/10 transition-transform active:scale-95 cursor-pointer shrink-0"
+                      className="h-4 w-4 rounded-full border border-black/10 active:scale-95 cursor-pointer shrink-0"
                       style={{ backgroundColor: color.hex }}
                       title={color.label}
                     />
@@ -278,12 +247,12 @@ export default function Header({
                   type="color"
                   value={invoice.brandColor}
                   onChange={(e) => onUpdateField("brandColor", e.target.value)}
-                  className="h-5 w-5 p-0 border-0 cursor-pointer bg-transparent shrink-0"
+                  className="h-4 w-4 p-0 border-0 cursor-pointer bg-transparent shrink-0"
                 />
               </div>
             </div>
 
-            {/* Typography */}
+            {/* Typography fonts mapping option group */}
             <div className="flex flex-col flex-1 min-w-[130px] xl:flex-none xl:w-31.25">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Font Family
@@ -291,7 +260,7 @@ export default function Header({
               <select
                 value={invoice.typography}
                 onChange={(e) => onUpdateField("typography", e.target.value)}
-                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer"
+                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 text-slate-700 dark:text-slate-300 h-[30px] cursor-pointer"
               >
                 <option value="font-sans">Sans (Inter)</option>
                 <option value="font-serif">Serif (Playfair)</option>
@@ -299,7 +268,7 @@ export default function Header({
               </select>
             </div>
 
-            {/* Paper Sizes */}
+            {/* Canvas structural paper sizing parameter logic */}
             <div className="flex flex-col flex-1 min-w-[110px] xl:flex-none xl:w-27.5">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Paper Format
@@ -307,19 +276,19 @@ export default function Header({
               <select
                 value={invoice.paperSize}
                 onChange={(e) => onUpdateField("paperSize", e.target.value)}
-                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer"
+                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 text-slate-700 dark:text-slate-300 h-[30px] cursor-pointer"
               >
                 <option value="a4">A4 Standard</option>
                 <option value="letter">Letter Size</option>
               </select>
             </div>
 
-            {/* Watermark Section */}
+            {/* Watermark Selector element */}
             <div className="flex flex-col flex-1 min-w-32.5 xl:flex-none xl:w-35">
               <label className="text-[9px] font-extrabold uppercase text-slate-400 dark:text-slate-500 mb-1">
                 Watermark
               </label>
-              <div className="flex items-center gap-1.5 relative w-full">
+              <div className="flex items-center gap-1.5 relative w-full h-[30px]">
                 <select
                   value={
                     !invoice.watermarkText
@@ -337,7 +306,7 @@ export default function Header({
                       onUpdateField("watermarkText", val);
                     }
                   }}
-                  className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 outline-none text-slate-700 dark:text-slate-300 cursor-pointer"
+                  className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-brand-500 text-slate-700 dark:text-slate-300 h-full cursor-pointer"
                 >
                   <option value="">None</option>
                   <option value="DRAFT">Draft</option>
@@ -353,8 +322,7 @@ export default function Header({
                       setCustomInput(invoice.watermarkText);
                       setIsCustomModalOpen(true);
                     }}
-                    title="Edit custom watermark text"
-                    className="p-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer shrink-0"
+                    className="p-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-500 shrink-0 cursor-pointer"
                   >
                     <svg
                       className="w-3.5 h-3.5"
@@ -375,77 +343,42 @@ export default function Header({
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex items-center gap-2 flex-nowrap w-full xl:w-auto relative mt-2 xl:mt-0">
-            {/* Desktop Only Controls */}
-            <div className="hidden xl:flex items-center gap-1.5 mr-1">
-              <button
-                onClick={onUndo}
-                disabled={historyIdx === 0}
-                className="p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-45 shadow-sm transition-all cursor-pointer"
-                title="Undo"
-              >
-                <Icons.Undo />
-              </button>
-              <button
-                onClick={onRedo}
-                disabled={historyIdx >= historyLength - 1}
-                className="p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-45 shadow-sm transition-all cursor-pointer"
-                title="Redo"
-              >
-                <Icons.Redo />
-              </button>
-              <button
-                onClick={onThemeToggle}
-                className="p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white shadow-sm cursor-pointer transition-all"
-                title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              >
-                {theme === "dark" ? <Icons.Sun /> : <Icons.Moon />}
-              </button>
-            </div>
-
-            {/* Print Button */}
+          {/* Core App Export triggers row layout */}
+          <div className="flex items-center gap-2 relative mt-2 xl:mt-0">
             <button
               onClick={onPrint}
-              className="flex-1 xl:flex-none justify-center flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50/50 cursor-pointer min-h-[38px] hidden"
+              className="flex-1 xl:flex-none px-4 py-1.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 cursor-pointer h-[34px] flex items-center justify-center gap-1 hidden"
             >
-              <Icons.Print /> Print
+              <Icons.Print className="h-3.5 w-3.5" /> Print
             </button>
 
-            {/* Unified Export Dropdown Button */}
             <div className="relative flex-1 xl:flex-none" ref={dropdownRef}>
               <button
                 onClick={() => setIsExportOpen(!isExportOpen)}
-                className="w-full xl:w-auto justify-center flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-500/10 transition-colors cursor-pointer min-h-[38px]"
+                className="w-full xl:w-auto flex items-center justify-center gap-1.5 px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md cursor-pointer h-[34px]"
               >
-                <Icons.Download />
-                <span>Export As</span>
-                <Icons.ChevronDown />
+                <Icons.Download className="h-3.5 w-3.5" /> Export As <Icons.ChevronDown />
               </button>
 
-              {/* Dropdown Menu Overlay Card */}
               {isExportOpen && (
-                <div className="absolute right-0 bottom-full mb-2 xl:bottom-auto xl:top-full xl:mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 p-1 flex flex-col gap-0.5 animate-in fade-in slide-in-from-top-1 duration-100">
+                <div className="absolute right-0 bottom-full mb-2 xl:bottom-auto xl:top-full xl:mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 p-1 flex flex-col gap-0.5">
                   <button
                     onClick={() => {
                       onExportPDF();
                       setIsExportOpen(false);
                     }}
-                    className="group flex items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-lg transition-colors cursor-pointer"
+                    className="flex items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer w-full"
                   >
-                    <Icons.FileText />
-                    <span>Download PDF Document</span>
+                    <Icons.FileText /> Download PDF Document
                   </button>
-
                   <button
                     onClick={() => {
                       onExportPNG();
                       setIsExportOpen(false);
                     }}
-                    className="group flex items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-lg transition-colors cursor-pointer"
+                    className="flex items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer w-full"
                   >
-                    <Icons.Image />
-                    <span>Download PNG Image</span>
+                    <Icons.Image /> Download PNG Image
                   </button>
                 </div>
               )}
@@ -454,23 +387,21 @@ export default function Header({
         </div>
       </div>
 
-      {/* Custom Watermark Modal (React Portal) */}
+      {/* Watermark Modal Render portal anchor node */}
       {isCustomModalOpen &&
         createPortal(
           <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 isolate">
             <div
               onClick={() => setIsCustomModalOpen(false)}
-              className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-200"
+              className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs"
             />
-
-            <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl animate-in scale-in duration-200 z-10">
+            <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl z-10">
               <h3 className="text-sm font-black text-slate-900 dark:text-white mb-1">
                 Custom Watermark
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-                Enter the label you want stamped across the background.
+                Enter the label stamp across background layout sheets.
               </p>
-
               <form onSubmit={handleCustomModalSubmit} className="flex flex-col gap-4">
                 <input
                   type="text"
@@ -479,21 +410,20 @@ export default function Header({
                   onChange={(e) => setCustomInput(e.target.value)}
                   placeholder="e.g. INTERNAL USE ONLY"
                   maxLength={25}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-slate-800 dark:text-slate-200"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold outline-none text-slate-800 dark:text-slate-200"
                 />
-
                 <div className="flex items-center justify-end gap-2 text-xs font-bold">
                   <button
                     type="button"
                     onClick={() => setIsCustomModalOpen(false)}
-                    className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/70 dark:hover:bg-slate-700/70 text-slate-600 dark:text-slate-300 rounded-xl cursor-pointer transition-colors"
+                    className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={!customInput.trim()}
-                    className="px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:pointer-events-none text-white rounded-xl shadow-md shadow-brand-500/10 cursor-pointer transition-colors"
+                    className="px-4 py-2 bg-brand-600 text-white rounded-xl disabled:opacity-50 cursor-pointer"
                   >
                     Apply Watermark
                   </button>
@@ -503,6 +433,6 @@ export default function Header({
           </div>,
           document.body
         )}
-    </header>
+    </div>
   );
 }
