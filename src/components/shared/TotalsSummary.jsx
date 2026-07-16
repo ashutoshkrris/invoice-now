@@ -176,10 +176,11 @@ export default function TotalsSummary({
                 type="number"
                 // Ensure that backspacing empty doesn't pass undefined values to uncontrolled inputs
                 value={
-                  Number.isNaN(invoice.shippingCharges) || invoice.shippingCharges === 0
+                  invoice.shippingCharges === 0 || !invoice.shippingCharges
                     ? ""
                     : invoice.shippingCharges
                 }
+                min={0}
                 onChange={(e) => {
                   const val = e.target.value;
                   // Allows input to be completely blank while typing without snapping shut
@@ -237,7 +238,8 @@ export default function TotalsSummary({
               <span className="text-[10px] text-slate-400 mr-0.5">{activeCurrencySymbol}</span>
               <EditableField
                 type="number"
-                value={invoice.amountPaid}
+                value={invoice.amountPaid === 0 || !invoice.amountPaid ? "" : invoice.amountPaid}
+                min={0}
                 onChange={(e) => onUpdateField("amountPaid", parseFloat(e.target.value) || 0)}
                 className="w-20 text-right font-semibold text-slate-900 bg-transparent"
                 placeholder="0.00"

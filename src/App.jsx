@@ -101,22 +101,20 @@ export default function App() {
     let totalDiscount = 0;
 
     invoice.items.forEach((item) => {
-      const rawSub = (item.qty || 0) * (item.price || 0);
+      const qty = parseInt(item.qty, 10) || 0;
+      const price = parseFloat(item.price) || 0;
+      const rawSub = qty * price;
       let rowDiscount = 0;
       if (invoice.discountScope === "item") {
-        rowDiscount =
-          invoice.discountType === "percentage"
-            ? (rawSub * (item.discount || 0)) / 100
-            : item.discount || 0;
+        const discount = parseFloat(item.discount) || 0;
+        rowDiscount = invoice.discountType === "percentage" ? (rawSub * discount) / 100 : discount;
       }
       const runningSubtotal = rawSub - rowDiscount;
 
       let rowTax = 0;
       if (invoice.taxScope === "item") {
-        rowTax =
-          invoice.taxType === "percentage"
-            ? (runningSubtotal * (item.taxRate || 0)) / 100
-            : item.taxRate || 0;
+        const taxRate = parseFloat(item.taxRate) || 0;
+        rowTax = invoice.taxType === "percentage" ? (runningSubtotal * taxRate) / 100 : taxRate;
       }
 
       subtotal += runningSubtotal;
@@ -217,7 +215,7 @@ export default function App() {
 
   const handleExportPNG = () => {
     setIsExporting(true);
-    triggerToast("Rendering high-res PNG image...", "info");
+    triggerToast("Generating high-res PNG image...", "info");
 
     setTimeout(async () => {
       const target = document.getElementById("printable-invoice-area");
@@ -253,8 +251,8 @@ export default function App() {
         link.click();
         triggerToast("PNG Image download complete!");
       } catch (err) {
-        console.error("PNG render failed", err);
-        triggerToast("PNG render failed", "error");
+        console.error("PNG generation failed", err);
+        triggerToast("PNG generation failed", "error");
       }
       {
         restore();
@@ -265,7 +263,7 @@ export default function App() {
 
   const handleExportPDF = () => {
     setIsExporting(true);
-    triggerToast("Compiling print-quality Vector PDF...", "info");
+    triggerToast("Generating print-quality PDF...", "info");
 
     setTimeout(async () => {
       const target = document.getElementById("printable-invoice-area");
@@ -312,7 +310,7 @@ export default function App() {
         triggerToast("PDF document download complete!");
       } catch (err) {
         console.error("PDF engine crash", err);
-        triggerToast("PDF compilation failed", "error");
+        triggerToast("PDF generation failed", "error");
       } finally {
         restore();
         setIsExporting(false);

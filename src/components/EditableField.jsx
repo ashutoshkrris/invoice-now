@@ -9,6 +9,8 @@ export default function EditableField({
   isExporting,
   maxLength,
   showCount = true,
+  min,
+  max,
 }) {
   if (isExporting) {
     const hasNoContent =
@@ -87,6 +89,8 @@ export default function EditableField({
         value={value}
         onChange={onChange}
         maxLength={type === "number" ? undefined : maxLength}
+        min={min}
+        max={max}
         className={`wysiwyg-input ${limitStatusClasses} ${className}`}
         style={style}
         placeholder={placeholder}
