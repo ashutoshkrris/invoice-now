@@ -138,7 +138,7 @@ export default function App() {
           : invoice.globalTaxRate || 0;
     }
 
-    const grandTotal = subtotal + totalTax;
+    const grandTotal = subtotal + totalTax + (parseFloat(invoice.shippingCharges) || 0);
     const balanceDue = grandTotal - (invoice.amountPaid || 0);
 
     return { subtotal, tax: totalTax, discount: totalDiscount, grandTotal, balanceDue };
