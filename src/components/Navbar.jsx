@@ -122,7 +122,7 @@ export default function Navbar({ theme, onThemeToggle }) {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
                   isActive
-                    ? "bg-brand-50/60 text-brand-600 dark:bg-brand-950/40 dark:text-brand-400 font-bold"
+                    ? "bg-brand-50/60 text-brand-600 dark:bg-brand-950/40 dark:text-white font-bold"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/60 hover:text-slate-950 dark:hover:text-white"
                 }`}
               >
