@@ -9,6 +9,8 @@ export const FIELD_LIMITS = {
   customerName: 60,
   customerCompany: 60,
   customerAddress: 180,
+  customerEmail: 60,
+  customerPhone: 30,
   customerTaxId: 35,
   businessTaxId: 35,
   businessRegId: 35,

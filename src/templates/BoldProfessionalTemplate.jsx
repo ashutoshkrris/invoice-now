@@ -149,7 +149,6 @@ export default function BoldProfessionalTemplate(props) {
               value={invoice.customerName}
               onChange={(e) => onUpdateField("customerName", e.target.value)}
               maxLength={FIELD_LIMITS.customerName}
-
               className="w-full font-bold text-slate-900"
               placeholder="Client Name"
               isExporting={isExporting}
@@ -158,7 +157,6 @@ export default function BoldProfessionalTemplate(props) {
               value={invoice.customerCompany}
               onChange={(e) => onUpdateField("customerCompany", e.target.value)}
               maxLength={FIELD_LIMITS.customerName}
-
               className="w-full text-slate-600"
               placeholder="Client Company"
               isExporting={isExporting}
@@ -168,10 +166,25 @@ export default function BoldProfessionalTemplate(props) {
               value={invoice.customerAddress}
               onChange={(e) => onUpdateField("customerAddress", e.target.value)}
               maxLength={FIELD_LIMITS.customerAddress}
-
               rows="2"
               className="w-full text-slate-500 mt-1"
               placeholder="Client's Address"
+              isExporting={isExporting}
+            />
+            <EditableField
+              value={invoice.customerPhone}
+              onChange={(e) => onUpdateField("customerPhone", e.target.value)}
+              maxLength={FIELD_LIMITS.customerPhone}
+              className="w-full text-slate-500 leading-relaxed"
+              placeholder="Client Phone Number"
+              isExporting={isExporting}
+            />
+            <EditableField
+              value={invoice.customerEmail}
+              onChange={(e) => onUpdateField("customerEmail", e.target.value)}
+              maxLength={FIELD_LIMITS.customerEmail}
+              className="w-full text-slate-500 leading-relaxed"
+              placeholder="Client Email"
               isExporting={isExporting}
             />
           </div>

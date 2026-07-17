@@ -121,6 +121,22 @@ export default function EmeraldPremiumTemplate(props) {
             placeholder="Client's Address"
             isExporting={isExporting}
           />
+          <EditableField
+            value={invoice.customerPhone}
+            onChange={(e) => onUpdateField("customerPhone", e.target.value)}
+            maxLength={FIELD_LIMITS.customerPhone}
+            className="w-full text-slate-500"
+            placeholder="Client Phone Number"
+            isExporting={isExporting}
+          />
+          <EditableField
+            value={invoice.customerEmail}
+            onChange={(e) => onUpdateField("customerEmail", e.target.value)}
+            maxLength={FIELD_LIMITS.customerEmail}
+            className="w-full text-slate-500"
+            placeholder="Client Email"
+            isExporting={isExporting}
+          />
         </div>
         <div className="border-r border-slate-200/60 px-4 space-y-2">
           <p
