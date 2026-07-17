@@ -1,5 +1,5 @@
 import { Icons } from "../components/Icons";
-import EditableField from "../components/EditableField";
+import EditableField from "../components/EditableField/EditableField";
 import { FIELD_LIMITS } from "../constants/fieldLimits";
 import InvoiceItemsTable from "../components/shared/InvoiceItemsTable";
 import RemittanceFooter from "../components/shared/RemittanceFooter";

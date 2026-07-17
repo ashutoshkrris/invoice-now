@@ -1,3 +1,6 @@
+import ExportFieldView from "./ExportFieldView";
+import CharacterCounter from "./CharacterCounter";
+
 export default function EditableField({
   value,
   onChange,
@@ -13,23 +16,7 @@ export default function EditableField({
   max,
 }) {
   if (isExporting) {
-    const hasNoContent =
-      value === null || value === undefined || (typeof value === "string" && value.trim() === "");
-    if (hasNoContent) {
-      return null;
-    }
-    if (type === "textarea") {
-      return (
-        <div className={`${className} whitespace-pre-wrap`} style={style}>
-          {value}
-        </div>
-      );
-    }
-    return (
-      <div className={className} style={style}>
-        {value}
-      </div>
-    );
+    return <ExportFieldView value={value} type={type} className={className} style={style} />;
   }
 
   const strValue = value ?? "";
@@ -37,24 +24,21 @@ export default function EditableField({
   const nearLimit = maxLength && length >= maxLength * 0.9;
   const atLimit = maxLength && length >= maxLength;
 
-  // Visual outline status injections for error cues
   const limitStatusClasses = atLimit
     ? "focus:ring-rose-500 border-rose-500 dark:border-rose-500 focus:border-rose-500!"
     : nearLimit
       ? "focus:ring-amber-500 border-amber-500 dark:border-amber-500 focus:border-amber-500!"
       : "";
 
-  // The counter will now ONLY render when showCount is true AND the length hits >= 90% of maxLength
-  const counter =
-    showCount && maxLength && nearLimit ? (
-      <span
-        className={`no-print block text-right text-[9px] mt-0.5 select-none font-sans ${
-          atLimit ? "text-rose-500 font-bold" : "text-amber-500 font-semibold"
-        }`}
-      >
-        {length}/{maxLength}
-      </span>
-    ) : null;
+  const renderCounter = () => (
+    <CharacterCounter
+      length={length}
+      maxLength={maxLength}
+      showCount={showCount}
+      nearLimit={nearLimit}
+      atLimit={atLimit}
+    />
+  );
 
   if (type === "textarea") {
     return (
@@ -68,22 +52,21 @@ export default function EditableField({
           style={style}
           placeholder={placeholder}
         />
-        {counter}
+        {renderCounter()}
       </div>
     );
   }
 
+  const wrapperClass =
+    type === "number" ||
+    className.includes("inline") ||
+    className.includes("w-10") ||
+    className.includes("w-14")
+      ? "contents"
+      : "w-full";
+
   return (
-    <div
-      className={
-        type === "number" ||
-        className.includes("inline") ||
-        className.includes("w-10") ||
-        className.includes("w-14")
-          ? "contents"
-          : "w-full"
-      }
-    >
+    <div className={wrapperClass}>
       <input
         type={type}
         value={value}
@@ -95,7 +78,7 @@ export default function EditableField({
         style={style}
         placeholder={placeholder}
       />
-      {type !== "number" && counter}
+      {type !== "number" && renderCounter()}
     </div>
   );
 }
