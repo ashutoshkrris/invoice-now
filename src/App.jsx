@@ -124,50 +124,72 @@ export default function App() {
 
   // --- LIVE INVOICE CALCULATORS ---
   const calculatedTotals = useMemo(() => {
-    let subtotal = 0;
+    let rawItemSubtotal = 0; // Pure sum of (qty * price)
     let totalTax = 0;
     let totalDiscount = 0;
+    let itemSubtotalAfterDiscounts = 0; // Running total to anchor global calculations
 
     invoice.items.forEach((item) => {
+      // 1. Sanitize baseline inputs safely
       const qty = parseInt(item.qty, 10) || 0;
       const price = parseFloat(item.price) || 0;
       const rawSub = qty * price;
+
+      rawItemSubtotal += rawSub;
+
+      // 2. Handle Item-Level Discounts
       let rowDiscount = 0;
       if (invoice.discountScope === "item") {
         const discount = parseFloat(item.discount) || 0;
         rowDiscount = invoice.discountType === "percentage" ? (rawSub * discount) / 100 : discount;
       }
+      totalDiscount += rowDiscount;
       const runningSubtotal = rawSub - rowDiscount;
+      itemSubtotalAfterDiscounts += runningSubtotal;
 
+      // 3. Handle Item-Level Taxes
       let rowTax = 0;
       if (invoice.taxScope === "item") {
         const taxRate = parseFloat(item.taxRate) || 0;
         rowTax = invoice.taxType === "percentage" ? (runningSubtotal * taxRate) / 100 : taxRate;
+        totalTax += rowTax;
       }
-
-      subtotal += runningSubtotal;
-      totalTax += rowTax;
     });
 
+    // 4. Handle Global Subtotal-Level Adjustments
+    let globalDiscountAmount = 0;
     if (invoice.discountScope === "subtotal") {
-      totalDiscount =
-        invoice.discountType === "percentage"
-          ? (subtotal * (invoice.globalDiscount || 0)) / 100
-          : invoice.globalDiscount || 0;
-      subtotal -= totalDiscount;
+      const globalDisc = parseFloat(invoice.globalDiscount) || 0;
+      globalDiscountAmount =
+        invoice.discountType === "flat"
+          ? globalDisc
+          : (itemSubtotalAfterDiscounts * globalDisc) / 100;
+      totalDiscount += globalDiscountAmount;
     }
 
     if (invoice.taxScope === "subtotal") {
-      totalTax =
-        invoice.taxType === "percentage"
-          ? (subtotal * (invoice.globalTaxRate || 0)) / 100
-          : invoice.globalTaxRate || 0;
+      const globalTax = parseFloat(invoice.globalTaxRate) || 0;
+      const taxBase = itemSubtotalAfterDiscounts - globalDiscountAmount;
+      const globalTaxAmount = invoice.taxType === "flat" ? globalTax : (taxBase * globalTax) / 100;
+      totalTax += globalTaxAmount;
     }
 
-    const grandTotal = subtotal + totalTax + (parseFloat(invoice.shippingCharges) || 0);
-    const balanceDue = grandTotal - (invoice.amountPaid || 0);
+    // 5. Compute Final Aggregates
+    const shipping = parseFloat(invoice.shippingCharges) || 0;
 
-    return { subtotal, tax: totalTax, discount: totalDiscount, grandTotal, balanceDue };
+    // Standard accounting flow using raw subtotal minus the exact total absolute discount
+    const grandTotal = rawItemSubtotal - totalDiscount + totalTax + shipping;
+
+    const paid = parseFloat(invoice.amountPaid) || 0;
+    const balanceDue = grandTotal - paid;
+
+    return {
+      subtotal: rawItemSubtotal, // UI summary shows the clean, raw pre-discount subtotal
+      discount: totalDiscount, // Absolute total discount cash value
+      tax: totalTax, // Absolute total tax cash value
+      grandTotal,
+      balanceDue,
+    };
   }, [invoice]);
 
   const addLineItem = () => {
@@ -217,9 +239,42 @@ export default function App() {
       minHeight: target.style.minHeight,
     };
 
+    // 1. Establish the clean baseline layout structure
     target.style.width = "794px";
-    target.style.minHeight = invoice.paperSize === "letter" ? "1050px" : "1120px";
+    const isLetter = invoice.paperSize === "letter";
+    const singlePageHeight = isLetter ? 1050 : 1120;
+    target.style.minHeight = `${singlePageHeight}px`;
 
+    // 2. Select EVERY structural element, paragraph, list item, and block layout
+    const allElements = target.querySelectorAll("p, h1, h2, h3, h4, tr, th, div, blockquote");
+    const injectedSpacers = [];
+
+    allElements.forEach((el) => {
+      // Skip wrapper containers that hold the entire page to avoid layout inflation
+      if (el === target || el.contains(target) || el.offsetHeight > singlePageHeight) return;
+
+      // Get the exact coordinates of this element relative to the invoice top boundary
+      const elementTop = el.getBoundingClientRect().top - target.getBoundingClientRect().top;
+      const elementBottom = elementTop + el.offsetHeight;
+
+      const pageOfTop = Math.floor(elementTop / singlePageHeight);
+      const pageOfBottom = Math.floor(elementBottom / singlePageHeight);
+
+      // CRITICAL GLOBAL FIX: If any element crosses a page boundary line, push it entirely to the next page
+      if (pageOfTop !== pageOfBottom) {
+        const remainingSpaceOnCurrentPage = singlePageHeight * (pageOfTop + 1) - elementTop;
+
+        const globalSpacer = document.createElement("div");
+        globalSpacer.className = "injected-pdf-spacer no-print";
+        // Inject the dynamic pixel padding height to cushion the text block safely
+        globalSpacer.style.height = `${remainingSpaceOnCurrentPage + 8}px`;
+
+        el.parentNode.insertBefore(globalSpacer, el);
+        injectedSpacers.push(globalSpacer);
+      }
+    });
+
+    // 3. Perfect cleanup loop to strip spacers when the image capture finishes
     return () => {
       target.style.width = original.width;
       target.style.minHeight = original.minHeight;
@@ -251,15 +306,34 @@ export default function App() {
         setIsExporting(false);
         return;
       }
-      const restore = prepareInvoiceForExport(target);
+
+      // --- 1. CAPTURE RENDER ADJUSTMENTS (No PDF spacers injected here!) ---
+      const originalWidth = target.style.width;
+      const originalMinHeight = target.style.minHeight;
+
+      // Standardize to matching desktop width metrics for consistent high-res scaling
+      target.style.width = "794px";
+      const isLetter = invoice.paperSize === "letter";
+      target.style.minHeight = isLetter ? "1050px" : "1120px";
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        await new Promise((resolve) => setTimeout(resolve, 60)); // Small layout breathing buffer
+
         const dataUrl = await toPng(target, {
           quality: 0.95,
-          pixelRatio: 3,
+          pixelRatio: 3, // Kept at your high-definition 3x sharpness parameter
           backgroundColor: "#ffffff",
           filter: (node) => {
+            // Mutate child elements dynamically so tables drop standard overflow restrictions
+            if (node.style) {
+              node.style.overflow = "visible";
+              node.style.overflowX = "visible";
+              node.style.overflowY = "visible";
+              if (node.classList?.contains("overflow-x-auto")) {
+                node.style.scrollbarWidth = "none";
+              }
+            }
+
             if (node.tagName === "LINK" && node.getAttribute("rel") === "stylesheet") {
               const href = node.getAttribute("href");
               return (
@@ -273,17 +347,20 @@ export default function App() {
           },
         });
 
+        // 2. TRIGGER DOWNSTREAM DOWNLOAD PIPELINE
         const link = document.createElement("a");
         link.download = `${invoice.invoiceNumber || "invoice"}.png`;
         link.href = dataUrl;
         link.click();
+
         triggerToast("PNG Image download complete!");
       } catch (err) {
         console.error("PNG generation failed", err);
         triggerToast("PNG generation failed", "error");
-      }
-      {
-        restore();
+      } finally {
+        // --- 3. GUARANTEED STATE CLEANUP ---
+        target.style.width = originalWidth;
+        target.style.minHeight = originalMinHeight;
         setIsExporting(false);
       }
     }, 400);
@@ -299,15 +376,64 @@ export default function App() {
         setIsExporting(false);
         return;
       }
-      const restore = prepareInvoiceForExport(target);
 
+      // --- 1. GLOBAL PRE-RENDER SCANNED PAGINATION BUFFER WRAPPER ---
+      const originalWidth = target.style.width;
+      const originalMinHeight = target.style.minHeight;
+
+      // Standardize target sizing metrics
+      target.style.width = "794px";
+      const isLetter = invoice.paperSize === "letter";
+      const singlePageHeight = isLetter ? 1050 : 1120;
+      target.style.minHeight = `${singlePageHeight}px`;
+
+      // Select structural DOM targets to inspect for cross-page slicing vulnerabilities
+      const allElements = target.querySelectorAll("p, h1, h2, h3, h4, tr, th, div, blockquote");
+      const injectedSpacers = [];
+
+      allElements.forEach((el) => {
+        // Skip top-level system container frameworks or entries taller than a full canvas block
+        if (el === target || el.contains(target) || el.offsetHeight > singlePageHeight) return;
+
+        // Extract accurate pixel offset metrics relative to the current container ceiling boundary
+        const elementTop = el.getBoundingClientRect().top - target.getBoundingClientRect().top;
+        const elementBottom = elementTop + el.offsetHeight;
+
+        const pageOfTop = Math.floor(elementTop / singlePageHeight);
+        const pageOfBottom = Math.floor(elementBottom / singlePageHeight);
+
+        // GLOBAL DEFENSIVE FIX: If any text string or node splits a boundary, cushion it to the next page
+        if (pageOfTop !== pageOfBottom) {
+          const remainingSpaceOnCurrentPage = singlePageHeight * (pageOfTop + 1) - elementTop;
+
+          const globalSpacer = document.createElement("div");
+          globalSpacer.className = "injected-pdf-spacer no-print";
+          globalSpacer.style.height = `${remainingSpaceOnCurrentPage + 8}px`; // Fills page break gaps cleanly
+
+          el.parentNode.insertBefore(globalSpacer, el);
+          injectedSpacers.push(globalSpacer);
+        }
+      });
+
+      // --- 2. EXECUTE THE MULTI-PAGE CANVAS PIPELINE ---
       try {
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        await new Promise((resolve) => setTimeout(resolve, 60)); // Small buffer for DOM positioning adjustment
+
         const dataUrl = await toPng(target, {
           quality: 0.95,
           pixelRatio: 2.5,
           backgroundColor: "#ffffff",
           filter: (node) => {
+            if (node.style) {
+              node.style.overflow = "visible";
+              node.style.overflowX = "visible";
+              node.style.overflowY = "visible";
+              // Strip out custom webkit scrollbar tracks entirely if present
+              if (node.classList?.contains("overflow-x-auto")) {
+                node.style.scrollbarWidth = "none";
+              }
+            }
+
             if (node.tagName === "LINK" && node.getAttribute("rel") === "stylesheet") {
               const href = node.getAttribute("href");
               return (
@@ -321,26 +447,48 @@ export default function App() {
           },
         });
 
+        const format = isLetter ? "letter" : "a4";
         const pdf = new jsPDF({
           orientation: "portrait",
           unit: "mm",
-          format: invoice.paperSize === "letter" ? "letter" : "a4",
+          format: format,
         });
 
         const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfPageHeight = pdf.internal.pageSize.getHeight();
+
         const imgWidth = target.offsetWidth;
         const imgHeight = target.offsetHeight;
         const ratio = imgHeight / imgWidth;
-        const pdfHeight = pdfWidth * ratio;
 
-        pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
+        const totalPdfImgHeight = pdfWidth * ratio;
+
+        let heightLeft = totalPdfImgHeight;
+        let position = 0;
+
+        // Render Page 1
+        pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, totalPdfImgHeight, undefined, "FAST");
+        heightLeft -= pdfPageHeight;
+
+        // Slice through remaining layout viewport chunks sequentially
+        while (heightLeft > 0) {
+          position = heightLeft - totalPdfImgHeight;
+
+          pdf.addPage();
+          pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, totalPdfImgHeight, undefined, "FAST");
+          heightLeft -= pdfPageHeight;
+        }
+
         pdf.save(`${invoice.invoiceNumber || "invoice"}.pdf`);
         triggerToast("PDF document download complete!");
       } catch (err) {
         console.error("PDF engine crash", err);
         triggerToast("PDF generation failed", "error");
       } finally {
-        restore();
+        // --- 3. CLEANUP STEP: REMOVE TEMPORARY PADDING BLOCKS ---
+        target.style.width = originalWidth;
+        target.style.minHeight = originalMinHeight;
+        injectedSpacers.forEach((spacer) => spacer.remove());
         setIsExporting(false);
       }
     }, 400);
