@@ -7,6 +7,7 @@ import InvoiceToolbar from "./components/InvoiceToolbar/InvoiceToolbar";
 import InvoiceWorkspace from "./components/InvoiceWorkspace/InvoiceWorkspace";
 import Footer from "./components/Footer/Footer";
 import Toast from "./components/Toast/Toast";
+import { ExportLoader } from "./components/shared/ExportLoader";
 
 // Pages Layer Modules
 import AboutPage from "./pages/AboutPage";
@@ -83,6 +84,8 @@ export default function App() {
       {toast && !isExporting && (
         <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
+
+      <ExportLoader isExporting={isExporting} />
     </div>
   );
 }

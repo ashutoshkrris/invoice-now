@@ -72,7 +72,7 @@ export const exportToPNG = async (invoice, setIsExporting, triggerToast) => {
     link.download = `${invoice.invoiceNumber || "invoice"}.png`;
     link.href = dataUrl;
     link.click();
-    triggerToast("PNG Image download complete!");
+    triggerToast("PNG Image generated successfully!");
   } catch (err) {
     console.error(err);
     triggerToast("PNG generation failed", "error");
@@ -208,7 +208,7 @@ export const exportToPDF = async (invoice, setIsExporting, triggerToast) => {
       }
 
       pdf.save(`${invoice.invoiceNumber || "invoice"}.pdf`);
-      triggerToast("PDF document download complete!");
+      triggerToast("PDF document generated successfully!");
     } catch (err) {
       console.error(err);
       triggerToast("PDF generation failed", "error");
