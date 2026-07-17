@@ -21,19 +21,21 @@ export default function RemittanceFooter({ invoice, onUpdateField, isExporting }
         />
       </div>
 
-      <div className="text-center pt-4 border-t border-slate-100/40">
-        <span className="text-[10px] font-medium tracking-wide text-slate-600 block">
-          Generated for free using{" "}
-          <a
-            href="https://invoicenow.ashutoshkrris.in"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-bold text-slate-400/80 hover:text-brand-500 hover:underline transition-colors cursor-pointer"
-          >
-            Invoice Now
-          </a>
-        </span>
-      </div>
+      {!isExporting && (
+        <div className="text-center pt-4 border-t border-slate-100/40">
+          <span className="text-[10px] font-medium tracking-wide text-slate-600 block">
+            Generated for free using{" "}
+            <a
+              href="https://invoicenow.ashutoshkrris.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-slate-400/80 hover:text-brand-500 hover:underline transition-colors cursor-pointer"
+            >
+              Invoice Now
+            </a>
+          </span>
+        </div>
+      )}
     </div>
   );
 }

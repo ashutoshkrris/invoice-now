@@ -161,7 +161,7 @@ export function useInvoiceEditor(triggerToast) {
       const reader = new FileReader();
       reader.onloadend = () => {
         updateField("businessLogo", reader.result);
-        triggerToast("Corporate identity logo saved.");
+        triggerToast("Logo saved successfully.");
       };
       reader.readAsDataURL(file);
     }
