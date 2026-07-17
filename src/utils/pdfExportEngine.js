@@ -87,79 +87,89 @@ export const exportToPDF = async (invoice, setIsExporting, triggerToast) => {
   setIsExporting(true);
   triggerToast("Generating print-quality PDF...", "info");
 
-  const target = document.getElementById("printable-invoice-area");
-  if (!target) {
-    setIsExporting(false);
-    return;
-  }
-
-  const originalWidth = target.style.width;
-  const originalMinHeight = target.style.minHeight;
-  target.style.width = BASELINE_WIDTH;
-
-  const singlePageHeight = invoice.paperSize === "letter" ? 1050 : 1120;
-  target.style.minHeight = `${singlePageHeight}px`;
-
-  const allElements = target.querySelectorAll("p, h1, h2, h3, h4, tr, th, div, blockquote");
-  const injectedSpacers = [];
-
-  allElements.forEach((el) => {
-    if (el === target || el.contains(target) || el.offsetHeight > singlePageHeight) return;
-
-    const elementTop = el.getBoundingClientRect().top - target.getBoundingClientRect().top;
-    const elementBottom = elementTop + el.offsetHeight;
-    const pageOfTop = Math.floor(elementTop / singlePageHeight);
-    const pageOfBottom = Math.floor(elementBottom / singlePageHeight);
-
-    if (pageOfTop !== pageOfBottom) {
-      const remainingSpaceOnCurrentPage = singlePageHeight * (pageOfTop + 1) - elementTop;
-      const globalSpacer = document.createElement("div");
-      globalSpacer.className = "injected-pdf-spacer no-print";
-      globalSpacer.style.height = `${remainingSpaceOnCurrentPage + 8}px`;
-
-      el.parentNode.insertBefore(globalSpacer, el);
-      injectedSpacers.push(globalSpacer);
+  // CRITICAL REFACTOR: Re-introduce the lifecycle delay wrapper to allow
+  // React state changes and theme styling adjustments to paint to the DOM.
+  setTimeout(async () => {
+    const target = document.getElementById("printable-invoice-area");
+    if (!target) {
+      setIsExporting(false);
+      return;
     }
-  });
 
-  try {
-    await new Promise((res) => setTimeout(res, 60));
-    const dataUrl = await toPng(target, {
-      quality: 0.95,
-      pixelRatio: 2.5,
-      backgroundColor: "#ffffff",
-      filter: OPTIMIZED_FILTER,
+    const originalWidth = target.style.width;
+    const originalMinHeight = target.style.minHeight;
+
+    // 1. Force layout resize to target print parameters
+    target.style.width = BASELINE_WIDTH;
+    const singlePageHeight = invoice.paperSize === "letter" ? 1050 : 1120;
+    target.style.minHeight = `${singlePageHeight}px`;
+
+    // 2. Query structural components for boundary evaluation now that width is pinned
+    const allElements = target.querySelectorAll("p, h1, h2, h3, h4, tr, th, div, blockquote");
+    const injectedSpacers = [];
+
+    allElements.forEach((el) => {
+      if (el === target || el.contains(target) || el.offsetHeight > singlePageHeight) return;
+
+      const elementTop = el.getBoundingClientRect().top - target.getBoundingClientRect().top;
+      const elementBottom = elementTop + el.offsetHeight;
+      const pageOfTop = Math.floor(elementTop / singlePageHeight);
+      const pageOfBottom = Math.floor(elementBottom / singlePageHeight);
+
+      if (pageOfTop !== pageOfBottom) {
+        const remainingSpaceOnCurrentPage = singlePageHeight * (pageOfTop + 1) - elementTop;
+        const globalSpacer = document.createElement("div");
+        globalSpacer.className = "injected-pdf-spacer no-print";
+        globalSpacer.style.height = `${remainingSpaceOnCurrentPage + 8}px`;
+
+        el.parentNode.insertBefore(globalSpacer, el);
+        injectedSpacers.push(globalSpacer);
+      }
     });
 
-    const format = invoice.paperSize === "letter" ? "letter" : "a4";
-    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format });
+    // 3. Execute Image Capture and PDF Assembly Pipeline
+    try {
+      // Small structural layout breathing buffer to match working commit
+      await new Promise((res) => setTimeout(res, 60));
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfPageHeight = pdf.internal.pageSize.getHeight();
-    const totalPdfImgHeight = pdfWidth * (target.offsetHeight / target.offsetWidth);
+      const dataUrl = await toPng(target, {
+        quality: 0.95,
+        pixelRatio: 2.5,
+        backgroundColor: "#ffffff",
+        filter: OPTIMIZED_FILTER,
+      });
 
-    let heightLeft = totalPdfImgHeight;
-    let position = 0;
+      const format = invoice.paperSize === "letter" ? "letter" : "a4";
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format });
 
-    pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, totalPdfImgHeight, undefined, "FAST");
-    heightLeft -= pdfPageHeight;
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfPageHeight = pdf.internal.pageSize.getHeight();
+      const totalPdfImgHeight = pdfWidth * (target.offsetHeight / target.offsetWidth);
 
-    while (heightLeft > 0) {
-      position = heightLeft - totalPdfImgHeight;
-      pdf.addPage();
+      let heightLeft = totalPdfImgHeight;
+      let position = 0;
+
       pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, totalPdfImgHeight, undefined, "FAST");
       heightLeft -= pdfPageHeight;
-    }
 
-    pdf.save(`${invoice.invoiceNumber || "invoice"}.pdf`);
-    triggerToast("PDF document download complete!");
-  } catch (err) {
-    console.error(err);
-    triggerToast("PDF generation failed", "error");
-  } finally {
-    target.style.width = originalWidth;
-    target.style.minHeight = originalMinHeight;
-    injectedSpacers.forEach((s) => s.remove());
-    setIsExporting(false);
-  }
+      while (heightLeft > 0) {
+        position = heightLeft - totalPdfImgHeight;
+        pdf.addPage();
+        pdf.addImage(dataUrl, "PNG", 0, position, pdfWidth, totalPdfImgHeight, undefined, "FAST");
+        heightLeft -= pdfPageHeight;
+      }
+
+      pdf.save(`${invoice.invoiceNumber || "invoice"}.pdf`);
+      triggerToast("PDF document download complete!");
+    } catch (err) {
+      console.error(err);
+      triggerToast("PDF generation failed", "error");
+    } finally {
+      // 4. Reset DOM to standard workspace properties safely
+      target.style.width = originalWidth;
+      target.style.minHeight = originalMinHeight;
+      injectedSpacers.forEach((s) => s.remove());
+      setIsExporting(false);
+    }
+  }, 400); // Kept the matching 400ms time window from your operational commit
 };
