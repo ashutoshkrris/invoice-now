@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Icons } from "../Icons"; // Correct relative tracking resolution
+import { Icons } from "../shared/Icons"; // Correct relative tracking resolution
 
 export default function Navbar({ theme, onThemeToggle }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

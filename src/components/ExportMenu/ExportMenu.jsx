@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Icons } from "../Icons"; // Corrected folder step resolution matching original layout tree
+import { Icons } from "../shared/Icons"; // Corrected folder step resolution matching original layout tree
 
 export default function ExportMenu({ onPrint, onExportPNG, onExportPDF, isFloating }) {
   const [isOpen, setIsOpen] = useState(false);

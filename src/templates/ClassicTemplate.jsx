@@ -1,4 +1,4 @@
-import { Icons } from "../components/Icons";
+import { Icons } from "../components/shared/Icons";
 import EditableField from "../components/EditableField/EditableField";
 import { FIELD_LIMITS } from "../constants/fieldLimits";
 import InvoiceItemsTable from "../components/shared/InvoiceItemsTable";

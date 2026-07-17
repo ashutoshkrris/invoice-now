@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Icons } from "../Icons"; // Standard relative directory step configuration
+import { Icons } from "../shared/Icons"; // Standard relative directory step configuration
 
 export default function Footer() {
   const startYear = 2026;

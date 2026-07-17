@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BRAND_COLORS } from "../../constants/invoicePresets";
-import { Icons } from "../Icons";
+import { Icons } from "../shared/Icons";
 import SearchableCountryDropdown from "./SearchableCountryDropdown";
 import CustomWatermarkModal from "./CustomWatermarkModal";
 import CustomDropdown from "../shared/CustomDropdown/CustomDropdown";
