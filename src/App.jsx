@@ -5,7 +5,7 @@ import { jsPDF } from "jspdf";
 
 // Navigation & Layout Structure Components
 import Navbar from "./components/Navbar";
-import InvoiceToolbar from "./components/InvoiceToolbar";
+import InvoiceToolbar from "./components/InvoiceToolbar/InvoiceToolbar";
 import Footer from "./components/Footer";
 import Toast from "./components/Toast/Toast";
 import ExportMenu from "./components/ExportMenu/ExportMenu";
