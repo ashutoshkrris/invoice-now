@@ -30,16 +30,18 @@ export default function ClassicTemplate(props) {
                   alt="Corporate Logo"
                   className="max-h-16 max-w-47.5 object-contain"
                 />
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUpdateField("businessLogo", "");
-                  }}
-                  className="no-print absolute -top-2 -right-2 h-5 w-5 bg-rose-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow-md"
-                >
-                  ✕
-                </button>
+                {!isExporting && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUpdateField("businessLogo", "");
+                    }}
+                    className="no-print absolute -top-2 -right-2 h-5 w-5 bg-rose-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow-md cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
             ) : !isExporting ? (
               <label

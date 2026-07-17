@@ -28,16 +28,18 @@ export default function EmeraldPremiumTemplate(props) {
                 alt="Logo"
                 className="max-h-16 max-w-47.5 object-contain"
               />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUpdateField("businessLogo", "");
-                }}
-                className="no-print absolute -top-2 -right-2 h-4 w-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[8px] font-bold"
-              >
-                ✕
-              </button>
+              {!isExporting && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onUpdateField("businessLogo", "");
+                  }}
+                  className="no-print absolute -top-2 -right-2 h-4 w-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[8px] font-bold cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
             </div>
           ) : !isExporting ? (
             <label
