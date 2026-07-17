@@ -81,7 +81,10 @@ export default function DesktopItemsView({
           const lineTotal = rowSubtotal + rowTax;
 
           return (
-            <tr key={idx} className="group/item text-xs hover:bg-slate-50/40 transition-colors">
+            <tr
+              key={idx}
+              className="group/item text-xs hover:bg-slate-50/40 transition-colors avoid-page-slice"
+            >
               <td className="py-3 pr-4 space-y-1">
                 <EditableField
                   value={item.name}

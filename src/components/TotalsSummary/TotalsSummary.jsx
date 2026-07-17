@@ -13,7 +13,7 @@ export default function TotalsSummary({
   const hasTax = totals.tax > 0 || invoice.globalTaxRate > 0;
 
   return (
-    <div className="grid grid-cols-12 gap-6 mt-8 border-t border-slate-100 pt-6">
+    <div className="grid grid-cols-12 gap-6 mt-8 border-t border-slate-100 pt-6 avoid-page-slice">
       {/* --- LEFT HAND SECTION: TERMS & NOTES --- */}
       <div className="col-span-12 sm:col-span-7 space-y-4 text-xs order-2 sm:order-1 text-left">
         <div>
@@ -51,7 +51,7 @@ export default function TotalsSummary({
       </div>
 
       {/* --- RIGHT HAND SECTION: CLEAN TOTALS STACK --- */}
-      <div className="col-span-12 sm:col-span-5 text-xs text-slate-600 space-y-2.5 max-w-sm ml-auto w-full order-1 sm:order-2 select-none avoid-page-slice">
+      <div className="col-span-12 sm:col-span-5 text-xs text-slate-600 space-y-2.5 max-w-sm ml-auto w-full order-1 sm:order-2 select-none">
         {/* 1. Subtotal Row */}
         <div className="grid grid-cols-2 items-center py-0.5 w-full">
           <span className="font-bold text-slate-400 uppercase text-[10px] text-left">Subtotal</span>

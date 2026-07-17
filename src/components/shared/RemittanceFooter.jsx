@@ -3,7 +3,7 @@ import { FIELD_LIMITS } from "../../constants/fieldLimits";
 
 export default function RemittanceFooter({ invoice, onUpdateField, isExporting }) {
   return (
-    <div className="mt-12 pt-8 border-t border-slate-150 flex flex-col gap-6 text-[11px] text-slate-400 leading-relaxed font-sans">
+    <div className="mt-12 pt-8 border-t border-slate-150 flex flex-col gap-6 text-[11px] text-slate-400 leading-relaxed font-sans avoid-page-slice">
       <div>
         <h4 className="font-extrabold text-[9px] uppercase tracking-wider text-slate-500 mb-1.5">
           Payment Methods & Details

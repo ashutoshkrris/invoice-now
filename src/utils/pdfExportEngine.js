@@ -87,8 +87,6 @@ export const exportToPDF = async (invoice, setIsExporting, triggerToast) => {
   setIsExporting(true);
   triggerToast("Generating print-quality PDF...", "info");
 
-  // CRITICAL REFACTOR: Re-introduce the lifecycle delay wrapper to allow
-  // React state changes and theme styling adjustments to paint to the DOM.
   setTimeout(async () => {
     const target = document.getElementById("printable-invoice-area");
     if (!target) {
@@ -104,13 +102,17 @@ export const exportToPDF = async (invoice, setIsExporting, triggerToast) => {
     const singlePageHeight = invoice.paperSize === "letter" ? 1050 : 1120;
     target.style.minHeight = `${singlePageHeight}px`;
 
-    // 2. Query structural components for boundary evaluation now that width is pinned
-    const allElements = target.querySelectorAll("p, h1, h2, h3, h4, tr, th, div, blockquote");
+    // Removed generic "div" from the query selector.
+    // Now it only targets true content blocks, individual rows, and explicit component boundaries.
+    const allElements = target.querySelectorAll(
+      "p, h1, h2, h3, h4, tr, th, blockquote, .avoid-page-slice"
+    );
     const injectedSpacers = [];
 
     allElements.forEach((el) => {
       if (el === target || el.contains(target) || el.offsetHeight > singlePageHeight) return;
 
+      // Use live coordinates to factor in previous spacer shits dynamically
       const elementTop = el.getBoundingClientRect().top - target.getBoundingClientRect().top;
       const elementBottom = elementTop + el.offsetHeight;
       const pageOfTop = Math.floor(elementTop / singlePageHeight);
@@ -118,9 +120,20 @@ export const exportToPDF = async (invoice, setIsExporting, triggerToast) => {
 
       if (pageOfTop !== pageOfBottom) {
         const remainingSpaceOnCurrentPage = singlePageHeight * (pageOfTop + 1) - elementTop;
-        const globalSpacer = document.createElement("div");
-        globalSpacer.className = "injected-pdf-spacer no-print";
-        globalSpacer.style.height = `${remainingSpaceOnCurrentPage + 8}px`;
+
+        let globalSpacer;
+
+        // TABLE COMPLIANCE FIX: If the split element is an individual row,
+        // inject a valid <tr> with an internal block wrapper so table formatting stays intact.
+        if (el.tagName.toLowerCase() === "tr") {
+          globalSpacer = document.createElement("tr");
+          globalSpacer.className = "injected-pdf-spacer no-print";
+          globalSpacer.innerHTML = `<td colspan="100" style="padding:0; border:none;"><div style="height: ${remainingSpaceOnCurrentPage + 4}px;"></div></td>`;
+        } else {
+          globalSpacer = document.createElement("div");
+          globalSpacer.className = "injected-pdf-spacer no-print";
+          globalSpacer.style.height = `${remainingSpaceOnCurrentPage + 8}px`;
+        }
 
         el.parentNode.insertBefore(globalSpacer, el);
         injectedSpacers.push(globalSpacer);
