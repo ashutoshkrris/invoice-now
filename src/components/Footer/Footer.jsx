@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Icons } from "./Icons";
+import { Icons } from "../shared/Icons"; // Standard relative directory step configuration
 
 export default function Footer() {
   const startYear = 2026;
@@ -11,7 +11,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 md:px-8 py-10 md:py-14">
         {/* --- TOP SECTION: BRAND + LINKS GRID --- */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 pb-10 border-b border-slate-100 dark:border-slate-900">
-          {/* Left Column: Brand Identity & Description (Spans 5/12 columns on desktop) */}
+          {/* Left Column: Brand Identity & Description */}
           <div className="md:col-span-5 space-y-3.5 text-left">
             <div className="flex items-center gap-2">
               <div className="h-6 w-6 bg-gradient-to-tr from-brand-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
@@ -39,7 +39,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Middle Columns: Future-Proof Navigation Link Columns (Spans 4/12 columns) */}
+          {/* Middle Columns: Future-Proof Navigation Link Columns */}
           <div className="md:col-span-4 grid grid-cols-2 gap-6 text-left">
             {/* Column 1: Product info mapping */}
             <div className="space-y-3">
@@ -66,7 +66,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Column 2: Legal rules mapping (Ready for your upcoming updates) */}
+            {/* Column 2: Legal rules mapping */}
             <div className="space-y-3">
               <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                 Legal
@@ -98,7 +98,6 @@ export default function Footer() {
               Open Source
             </h4>
             <div className="flex flex-col gap-3 pt-1 w-full md:items-end font-semibold text-xs">
-              {/* GitHub Repo Link */}
               <a
                 href="https://github.com/ashutoshkrris/invoice-now"
                 target="_blank"
@@ -110,7 +109,6 @@ export default function Footer() {
                 <span>GitHub Repository</span>
               </a>
 
-              {/* Standalone Premium Sponsor Button Layout */}
               <a
                 href="https://github.com/sponsors/ashutoshkrris"
                 target="_blank"
@@ -118,7 +116,6 @@ export default function Footer() {
                 className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800/80 text-rose-600 dark:text-rose-400 font-bold text-xs rounded-lg border border-slate-200 dark:border-slate-800 transition-all duration-200 shadow-xs hover:shadow-sm w-max group select-none"
                 title="Sponsor the project on GitHub"
               >
-                {/* Heart Graphic with micro hover bounce */}
                 <svg
                   className="w-3.5 h-3.5 fill-current transform group-hover:scale-110 transition-transform duration-200 shrink-0"
                   viewBox="0 0 16 16"
@@ -133,14 +130,12 @@ export default function Footer() {
 
         {/* --- BOTTOM SECTION: COPYRIGHT + CREDITS --- */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-          {/* Left aligned standard copyright tracking signature */}
           <div className="flex items-center gap-1 order-2 sm:order-1 text-center sm:text-left">
             <span>© {copyrightYear}</span>
             <span className="font-bold text-slate-700 dark:text-slate-300">Invoice Now</span>
             <span>• Built Local & Secure</span>
           </div>
 
-          {/* Right aligned professional developer credits signature wrapper */}
           <div className="flex items-center gap-1 order-1 sm:order-2 p-0.5">
             <span>Developed with</span>
             <Icons.Heart />

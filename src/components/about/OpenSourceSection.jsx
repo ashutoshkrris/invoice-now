@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Icons } from "../Icons";
+import { Icons } from "../shared/Icons";
 
 export default function OpenSourceSection() {
   const [contributors, setContributors] = useState([]);
