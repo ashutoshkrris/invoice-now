@@ -3,7 +3,7 @@ import EditableField from "../components/EditableField/EditableField";
 import { FIELD_LIMITS } from "../constants/fieldLimits";
 import InvoiceItemsTable from "../components/shared/InvoiceItemsTable";
 import RemittanceFooter from "../components/shared/RemittanceFooter";
-import TotalsSummary from "../components/shared/TotalsSummary";
+import TotalsSummary from "../components/TotalsSummary/TotalsSummary";
 
 export default function ModernMinimalistTemplate(props) {
   const { invoice, onUpdateField, isExporting } = props;
