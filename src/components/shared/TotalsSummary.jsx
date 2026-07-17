@@ -51,22 +51,20 @@ export default function TotalsSummary({
       </div>
 
       {/* --- RIGHT HAND SECTION: CLEAN TOTALS STACK --- */}
-      <div className="col-span-12 sm:col-span-5 text-xs text-slate-600 space-y-2.5 max-w-sm ml-auto w-full order-1 sm:order-2 select-none">
+      <div className="col-span-12 sm:col-span-5 text-xs text-slate-600 space-y-2.5 max-w-sm ml-auto w-full order-1 sm:order-2 select-none avoid-page-slice">
         {/* 1. Subtotal */}
-        <div className="flex justify-between items-center py-0.5">
-          <span className="font-bold text-slate-400 uppercase text-[10px]">Subtotal</span>
-          <span className="font-bold text-slate-900">
-            {activeCurrencySymbol}{" "}
-            {(
-              totals.subtotal + (invoice.discountScope === "subtotal" ? totals.discount : 0)
-            ).toFixed(2)}
+        <div className="grid grid-cols-2 items-center py-0.5 w-full">
+          <span className="font-bold text-slate-400 uppercase text-[10px] text-left">Subtotal</span>
+          <span className="font-bold text-slate-900 text-right pr-6">
+            {activeCurrencySymbol}
+            {totals.subtotal.toFixed(2)}
           </span>
         </div>
 
         {/* 2. Discount */}
         {invoice.discountScope !== "none" && (!isExporting || hasDiscount) && (
-          <div className="flex justify-between items-center py-0.5 min-h-[24px]">
-            <div className="flex items-center gap-1.5">
+          <div className="grid grid-cols-2 items-center py-0.5 min-h-[24px] w-full">
+            <div className="flex items-center gap-1.5 text-left">
               <span className="font-bold text-slate-400 uppercase text-[10px]">Discount</span>
               {invoice.discountScope === "subtotal" && !isExporting && (
                 <select
@@ -79,11 +77,12 @@ export default function TotalsSummary({
                 </select>
               )}
             </div>
-            <div className="flex items-center justify-end text-right font-bold text-rose-600">
+
+            <div className="flex items-center justify-end text-right font-bold text-rose-600 w-full pr-6">
               {invoice.discountScope === "subtotal" ? (
-                <div className="flex items-center justify-end">
+                <div className="inline-flex items-center justify-end whitespace-nowrap">
                   {invoice.discountType === "flat" && (
-                    <span className="text-[11px] mr-0.5">{activeCurrencySymbol}</span>
+                    <span className="text-[11px] self-center">{activeCurrencySymbol}</span>
                   )}
                   <EditableField
                     type="number"
@@ -91,17 +90,19 @@ export default function TotalsSummary({
                     onChange={(e) =>
                       onUpdateField("globalDiscount", parseFloat(e.target.value) || 0)
                     }
-                    className="w-16 text-right text-rose-600 font-bold bg-transparent"
+                    // Adjusted width matrix to wrap tighter to content metrics
+                    className={`${isExporting ? "w-auto text-right" : "w-14 text-right"} text-rose-600 font-bold bg-transparent p-0 border-0 focus:ring-0`}
                     placeholder="0"
                     isExporting={isExporting}
                   />
                   {invoice.discountType === "percentage" && (
-                    <span className="text-[11px] ml-0.5">%</span>
+                    <span className="text-[11px] self-center ml-0.5">%</span>
                   )}
                 </div>
               ) : (
                 <span>
-                  -{activeCurrencySymbol} {totals.discount.toFixed(2)}
+                  -{activeCurrencySymbol}
+                  {totals.discount.toFixed(2)}
                 </span>
               )}
             </div>
@@ -110,13 +111,13 @@ export default function TotalsSummary({
 
         {/* 3. Tax */}
         {invoice.taxScope !== "none" && (!isExporting || hasTax) && (
-          <div className="flex justify-between items-center py-0.5 min-h-[24px]">
-            <div className="flex items-center gap-1.5">
+          <div className="grid grid-cols-2 items-center py-0.5 min-h-[24px] w-full">
+            <div className="flex items-center gap-1.5 text-left">
               <EditableField
                 value={invoice.taxName || "Tax"}
                 onChange={(e) => onUpdateField("taxName", e.target.value)}
                 maxLength={FIELD_LIMITS.taxName}
-                className="font-bold text-slate-400 uppercase text-[10px] max-w-[65px] bg-transparent"
+                className="font-bold text-slate-400 uppercase text-[10px] max-w-[65px] bg-transparent p-0 border-0 focus:ring-0"
                 placeholder="Tax"
                 isExporting={isExporting}
               />
@@ -131,9 +132,10 @@ export default function TotalsSummary({
                 </select>
               )}
             </div>
-            <div className="flex items-center justify-end text-right font-bold text-slate-900">
+
+            <div className="flex items-center justify-end text-right font-bold text-slate-900 w-full pr-6">
               {invoice.taxScope === "subtotal" ? (
-                <div className="flex items-center justify-end">
+                <div className="inline-flex items-center justify-end whitespace-nowrap">
                   {invoice.taxType === "flat" && (
                     <span className="text-[11px] text-slate-400 mr-0.5">
                       {activeCurrencySymbol}
@@ -145,7 +147,7 @@ export default function TotalsSummary({
                     onChange={(e) =>
                       onUpdateField("globalTaxRate", parseFloat(e.target.value) || 0)
                     }
-                    className="w-16 text-right font-bold text-slate-900 bg-transparent"
+                    className={`${isExporting ? "w-auto text-right" : "w-14 text-right"} font-bold text-slate-900 bg-transparent p-0 border-0 focus:ring-0`}
                     placeholder="0"
                     isExporting={isExporting}
                   />
@@ -155,51 +157,53 @@ export default function TotalsSummary({
                 </div>
               ) : (
                 <span>
-                  {activeCurrencySymbol} {totals.tax.toFixed(2)}
+                  {activeCurrencySymbol}
+                  {totals.tax.toFixed(2)}
                 </span>
               )}
             </div>
           </div>
         )}
 
-        {/* 4. Shipping Charges */}
+        {/* 4. Shipping Charges (FIXED ALIGNMENT & UNIFIED COMPONENT) */}
         {invoice.shippingCharges !== null &&
         invoice.shippingCharges !== undefined &&
         (invoice.shippingCharges > 0 ||
           typeof invoice.shippingCharges === "number" ||
           isExporting) ? (
-          <div className="flex justify-between items-center py-0.5">
-            <span className="font-bold text-slate-400 uppercase text-[10px]">Shipping</span>
-            <div className="flex items-center justify-end text-right group/shipping">
-              <span className="text-[10px] text-slate-400 mr-0.5">{activeCurrencySymbol}</span>
-              <input
-                type="number"
-                // Ensure that backspacing empty doesn't pass undefined values to uncontrolled inputs
-                value={
-                  invoice.shippingCharges === 0 || !invoice.shippingCharges
-                    ? ""
-                    : invoice.shippingCharges
-                }
-                min={0}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  // Allows input to be completely blank while typing without snapping shut
-                  if (val === "") {
-                    onUpdateField("shippingCharges", 0);
-                  } else {
-                    onUpdateField("shippingCharges", parseFloat(val) || 0);
+          <div className="grid grid-cols-2 items-center py-0.5 w-full relative">
+            <span className="font-bold text-slate-400 uppercase text-[10px] text-left">
+              Shipping
+            </span>
+            <div className="flex items-center justify-end text-right w-full relative pr-6">
+              <div className="inline-flex items-center justify-end whitespace-nowrap">
+                <span className="text-[10px] text-slate-900 mr-0.5">{activeCurrencySymbol}</span>
+                <EditableField
+                  type="number"
+                  value={
+                    invoice.shippingCharges === 0 || !invoice.shippingCharges
+                      ? ""
+                      : invoice.shippingCharges
                   }
-                }}
-                className="w-20 text-right font-semibold text-slate-900 bg-transparent outline-none focus:ring-1 focus:ring-brand-500 rounded px-1"
-                placeholder="0.00"
-              />
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "") {
+                      onUpdateField("shippingCharges", 0);
+                    } else {
+                      onUpdateField("shippingCharges", parseFloat(val) || 0);
+                    }
+                  }}
+                  className={`${isExporting ? "w-auto text-right" : "w-14 text-right"} font-semibold text-slate-900 bg-transparent p-0 border-0 focus:ring-0`}
+                  placeholder="0.00"
+                  isExporting={isExporting}
+                />
+              </div>
               {!isExporting && (
                 <button
                   type="button"
-                  // Explicitly sets it to null or undefined to clear it out and bring back the button selector
                   onClick={() => onUpdateField("shippingCharges", null)}
-                  className="no-print ml-1 text-slate-300 hover:text-rose-500 text-[10px] font-bold transition-colors cursor-pointer"
-                  title="Remove shipping charges panel"
+                  className="no-print absolute right-0 text-slate-300 hover:text-rose-500 text-[10px] font-bold transition-colors cursor-pointer w-4 text-center"
+                  title="Remove shipping charges"
                 >
                   ✕
                 </button>
@@ -208,52 +212,64 @@ export default function TotalsSummary({
           </div>
         ) : (
           !isExporting && (
-            <div className="no-print flex justify-between items-center py-0.5">
+            <div className="grid grid-cols-2 items-center py-0.5 w-full">
               <button
                 type="button"
-                // Initializes with exactly 0 so the input stays visible, rather than forcing a value of 1
                 onClick={() => onUpdateField("shippingCharges", 0)}
-                className="text-[10px] font-extrabold text-brand-600 hover:underline transition-all cursor-pointer"
+                className="text-[10px] font-extrabold text-brand-600 hover:underline transition-all cursor-pointer text-left"
               >
                 + Add Shipping Charges
               </button>
-              <span className="text-slate-300 font-medium text-[11px] select-none">—</span>
+              <span className="text-slate-300 font-medium text-[11px] select-none text-right pr-6">
+                —
+              </span>
             </div>
           )
         )}
 
         {/* 5. Total (Grand Total) */}
-        <div className="flex justify-between items-center py-1.5 border-t border-slate-100 font-bold text-slate-900">
-          <span className="uppercase text-[10px] tracking-wider text-slate-400">Total</span>
-          <span className="text-sm">
-            {activeCurrencySymbol} {totals.grandTotal.toFixed(2)}
+        <div className="grid grid-cols-2 items-center py-1.5 border-t border-slate-100 font-bold text-slate-900 w-full">
+          <span className="uppercase text-[10px] tracking-wider text-slate-400 text-left">
+            Total
+          </span>
+          <span className="text-sm text-right pr-6">
+            {activeCurrencySymbol}
+            {totals.grandTotal.toFixed(2)}
           </span>
         </div>
 
         {/* 6. Amount Paid */}
         {(!isExporting || invoice.amountPaid > 0) && (
-          <div className="flex justify-between items-center py-0.5">
-            <span className="font-bold text-slate-400 uppercase text-[10px]">Amount Paid</span>
-            <div className="flex items-center justify-end text-right">
-              <span className="text-[10px] text-slate-400 mr-0.5">{activeCurrencySymbol}</span>
-              <EditableField
-                type="number"
-                value={invoice.amountPaid === 0 || !invoice.amountPaid ? "" : invoice.amountPaid}
-                min={0}
-                onChange={(e) => onUpdateField("amountPaid", parseFloat(e.target.value) || 0)}
-                className="w-20 text-right font-semibold text-slate-900 bg-transparent"
-                placeholder="0.00"
-                isExporting={isExporting}
-              />
+          <div className="grid grid-cols-2 items-center py-0.5 w-full">
+            <span className="font-bold text-slate-400 uppercase text-[10px] text-left">
+              Amount Paid
+            </span>
+            <div className="flex items-center justify-end text-right w-full pr-6">
+              <div className="inline-flex items-center justify-end whitespace-nowrap">
+                <span className="text-[10px] text-slate-400 mr-0.5">{activeCurrencySymbol}</span>
+                <EditableField
+                  type="number"
+                  value={invoice.amountPaid === 0 || !invoice.amountPaid ? "" : invoice.amountPaid}
+                  min={0}
+                  onChange={(e) => onUpdateField("amountPaid", parseFloat(e.target.value) || 0)}
+                  className={`${isExporting ? "w-auto text-right" : "w-16 text-right"} font-semibold text-slate-900 bg-transparent p-0 border-0 focus:ring-0`}
+                  placeholder="0.00"
+                  isExporting={isExporting}
+                />
+              </div>
             </div>
           </div>
         )}
 
         {/* 7. Balance Due */}
-        <div className="flex justify-between items-center border-t-2 border-slate-200 pt-3 text-sm font-black text-slate-900">
-          <span>Balance Due</span>
-          <span className="text-lg" style={{ color: invoice.brandColor || "inherit" }}>
-            {activeCurrencySymbol} {totals.balanceDue.toFixed(2)}
+        <div className="grid grid-cols-2 items-center border-t-2 border-slate-200 pt-3 text-sm font-black text-slate-900 w-full">
+          <span className="text-left">Balance Due</span>
+          <span
+            className="text-lg text-right pr-6"
+            style={{ color: invoice.brandColor || "inherit" }}
+          >
+            {activeCurrencySymbol}
+            {totals.balanceDue.toFixed(2)}
           </span>
         </div>
       </div>
