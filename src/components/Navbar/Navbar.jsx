@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Icons } from "./Icons";
+import { Icons } from "../Icons"; // Correct relative tracking resolution
 
 export default function Navbar({ theme, onThemeToggle }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -110,6 +110,7 @@ export default function Navbar({ theme, onThemeToggle }) {
             ? "opacity-100 translate-y-0 visible"
             : "opacity-0 -translate-y-4 invisible pointer-events-none"
         }`}
+        data-testid="mobile-drawer"
       >
         <div className="flex flex-col gap-1">
           {routesList.map((route) => {
@@ -118,7 +119,6 @@ export default function Navbar({ theme, onThemeToggle }) {
               <Link
                 key={route.path}
                 to={route.path}
-                // CLOSES DRAWER INSTANTLY ON USER EVENT CLICK -> NO CASCADE RENDERS
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`w-full px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
                   isActive

@@ -4,7 +4,7 @@ import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 
 // Navigation & Layout Structure Components
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 import InvoiceToolbar from "./components/InvoiceToolbar/InvoiceToolbar";
 import Footer from "./components/Footer";
 import Toast from "./components/Toast/Toast";
