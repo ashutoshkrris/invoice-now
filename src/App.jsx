@@ -7,7 +7,7 @@ import { jsPDF } from "jspdf";
 import Navbar from "./components/Navbar";
 import InvoiceToolbar from "./components/InvoiceToolbar";
 import Footer from "./components/Footer";
-import Toast from "./components/Toast";
+import Toast from "./components/Toast/Toast";
 import ExportMenu from "./components/ExportMenu";
 
 // Pages Layer Imports
