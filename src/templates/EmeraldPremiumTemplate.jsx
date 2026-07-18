@@ -16,7 +16,7 @@ export default function EmeraldPremiumTemplate(props) {
         <LogoUploader
           invoice={invoice}
           onLogoUpload={props.onLogoUpload}
-          onUpdateField={onUpdateField}
+          onLogoDelete={props.onLogoDelete}
           isExporting={isExporting}
           id="logo-uploader-prem"
           labelText="Premium Header Logo"

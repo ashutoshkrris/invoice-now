@@ -1,7 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { INITIAL_INVOICE_STATE } from "../constants/invoicePresets";
 import { COUNTRIES } from "../constants/countries";
-import { loadCachedState, persistState } from "../utils/storage";
+import {
+  loadCachedState,
+  persistState,
+  assetStorage,
+  extractAndMigrateLegacyLogo,
+} from "../utils/storage";
 import { FIELD_LIMITS } from "../constants/fieldLimits";
 
 export function useInvoiceEditor(triggerToast) {
@@ -10,6 +15,34 @@ export function useInvoiceEditor(triggerToast) {
   // --- HISTORICAL UNDO / REDO STATE STACK ---
   const [history, setHistory] = useState([JSON.stringify(INITIAL_INVOICE_STATE)]);
   const [historyIdx, setHistoryIdx] = useState(0);
+
+  // --- ASSET HYDRATION & LEGACY MIGRATION PIPELINE ---
+  useEffect(() => {
+    const loadAndMigrateAssets = async () => {
+      try {
+        // 1. Try to fetch from modern IndexedDB storage first
+        let logoAsset = await assetStorage.getLogo();
+
+        // 2. Fallback: Check if there's a legacy logo trapped in localStorage
+        if (!logoAsset) {
+          const legacyLogo = extractAndMigrateLegacyLogo();
+          if (legacyLogo) {
+            // Silently migrate to IndexedDB in the background
+            await assetStorage.saveLogo(legacyLogo);
+            logoAsset = legacyLogo;
+          }
+        }
+
+        // 3. Hydrate state if a logo was found in either layer
+        if (logoAsset) {
+          setInvoice((prev) => ({ ...prev, businessLogo: logoAsset }));
+        }
+      } catch (err) {
+        console.error("Failed to safely hydrate or migrate logo assets:", err);
+      }
+    };
+    loadAndMigrateAssets();
+  }, []);
 
   const saveWithHistory = (newState) => {
     setInvoice(newState);
@@ -182,7 +215,7 @@ export function useInvoiceEditor(triggerToast) {
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new Image();
-      img.onload = () => {
+      img.onload = async () => {
         const MAX_WIDTH = 250;
         const MAX_HEIGHT = 250;
         let width = img.width;
@@ -218,9 +251,17 @@ export function useInvoiceEditor(triggerToast) {
         // Compress canvas output to a lightweight PNG Base64 payload
         const optimizedBase64 = canvas.toDataURL("image/png");
 
-        // Save processed structure to application stack
-        updateField("businessLogo", optimizedBase64);
-        triggerToast("Logo optimized and saved successfully.");
+        try {
+          // Store asset asynchronously inside modern database layer
+          await assetStorage.saveLogo(optimizedBase64);
+
+          // Save processed structure to application stack
+          updateField("businessLogo", optimizedBase64);
+          triggerToast("Logo saved successfully.");
+        } catch (error) {
+          console.error("Failed to store optimized asset layout securly.", error);
+          triggerToast("Failed to store optimized asset layout securely.", "error");
+        }
       };
 
       img.onerror = () => {
@@ -231,6 +272,22 @@ export function useInvoiceEditor(triggerToast) {
     };
 
     reader.readAsDataURL(file);
+  };
+
+  const handleLogoDelete = async () => {
+    try {
+      // 1. Wipe the asset record from modern IndexedDB completely
+      await assetStorage.deleteLogo();
+
+      // 2. Clear out the field state and update history stacks smoothly
+      const updated = { ...invoice, businessLogo: "" };
+      saveWithHistory(updated);
+
+      triggerToast("Logo removed successfully.", "info");
+    } catch (error) {
+      console.error("Failed to delete logo asset cleanly from database layer:", error);
+      triggerToast("Failed to remove logo asset securely.", "error");
+    }
   };
 
   return {
@@ -246,5 +303,6 @@ export function useInvoiceEditor(triggerToast) {
     removeLineItem,
     handleCountryChange,
     handleLogoUpload,
+    handleLogoDelete,
   };
 }

@@ -52,13 +52,17 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
               <li>
                 <strong className="text-slate-800 dark:text-slate-200">Invoice Metadata:</strong>{" "}
-                Line items, client names, payment notes, taxes, and branding colors exist solely
-                inside your browser&apos;s temporary state or local sandbox storage.
+                Line items, client names, payment notes, and financial tax parameters exist solely
+                inside your browser&apos;s local storage structures.
               </li>
               <li>
-                <strong className="text-slate-800 dark:text-slate-200">Image Uploads:</strong> When
-                importing a business logo, it is converted directly to a base64 inline graphic
-                string inside your browser cache. It is never transmitted across the network.
+                <strong className="text-slate-800 dark:text-slate-200">
+                  Image Assets & Logos:
+                </strong>{" "}
+                When importing a business logo, the asset passes through an optimized client-side
+                scaling pipeline and saves directly into your browser&apos;s local **IndexedDB**
+                instance. It is handled exclusively in isolation and is never transmitted across a
+                network.
               </li>
               <li>
                 <strong className="text-slate-800 dark:text-slate-200">
@@ -72,17 +76,26 @@ export default function PrivacyPolicyPage() {
 
           <section className="space-y-2.5">
             <h3 className="text-base font-bold text-slate-950 dark:text-white tracking-tight">
-              3. Local Browser Storage
+              3. Local Browser Storage Infrastructure
             </h3>
             <p>
               To protect your workspace against accidental window closures or page reloads, this
-              application stores your active working invoice layout variables inside your
-              browser&apos;s{" "}
-              <strong className="text-slate-950 dark:text-white font-semibold">
-                Local Storage
-              </strong>{" "}
-              cache. This profile data resides on your machine indefinitely until you manually click
-              through to wipe it out or clear your overall browser system cache history.
+              framework maintains your state across two client-side storage layers:
+            </p>
+            <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
+              <li>
+                <strong className="text-slate-800 dark:text-slate-200">LocalStorage:</strong>{" "}
+                Manages lightweight active layout state variables, totals, and text matrices.
+              </li>
+              <li>
+                <strong className="text-slate-800 dark:text-slate-200">IndexedDB:</strong> Manages
+                heavy base64 graphic branding elements to prevent data size boundary limits.
+              </li>
+            </ul>
+            <p className="pt-1.5">
+              This sandbox data resides on your physical machine indefinitely until you manually
+              click through to clear your workspace or intentionally wipe your overall browser
+              system cache history.
             </p>
           </section>
 

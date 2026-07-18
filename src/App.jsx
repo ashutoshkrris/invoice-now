@@ -41,6 +41,7 @@ export default function App() {
     onRemoveLineItem: editor.removeLineItem,
     onAddLineItem: editor.addLineItem,
     onLogoUpload: editor.handleLogoUpload,
+    onLogoDelete: editor.handleLogoDelete,
     onPrint: () => runSystemPrint(editor.invoice, setIsExporting),
     onExportPNG: () => exportToPNG(editor.invoice, setIsExporting, triggerToast),
     onExportPDF: () => exportToPDF(editor.invoice, setIsExporting, triggerToast),

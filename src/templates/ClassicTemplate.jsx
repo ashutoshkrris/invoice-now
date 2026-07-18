@@ -18,7 +18,7 @@ export default function ClassicTemplate(props) {
           <LogoUploader
             invoice={invoice}
             onLogoUpload={props.onLogoUpload}
-            onUpdateField={onUpdateField}
+            onLogoDelete={props.onLogoDelete}
             isExporting={isExporting}
             id="logo-uploader"
             labelText="Upload Brand Logo"

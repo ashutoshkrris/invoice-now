@@ -4,7 +4,7 @@ import { Icons } from "./Icons";
 export default function LogoUploader({
   invoice,
   onLogoUpload,
-  onUpdateField,
+  onLogoDelete,
   isExporting,
   id = "logo-uploader",
   labelText = "Upload Logo",
@@ -32,7 +32,7 @@ export default function LogoUploader({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                onUpdateField("businessLogo", "");
+                onLogoDelete();
               }}
               className={deleteButtonClassName}
             >
