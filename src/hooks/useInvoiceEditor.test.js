@@ -16,6 +16,7 @@ let targetMockValue = { ...baseMockState };
 vi.mock("../utils/storage", () => ({
   loadCachedState: vi.fn(() => targetMockValue),
   persistState: vi.fn(),
+  shadowPersistState: vi.fn(),
   extractAndMigrateLegacyLogo: vi.fn(() => null),
   assetStorage: {
     getLogo: vi.fn(() => Promise.resolve(null)),

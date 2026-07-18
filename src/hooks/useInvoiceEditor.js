@@ -4,6 +4,7 @@ import { COUNTRIES } from "../constants/countries";
 import {
   loadCachedState,
   persistState,
+  shadowPersistState,
   assetStorage,
   extractAndMigrateLegacyLogo,
 } from "../utils/storage";
@@ -48,6 +49,9 @@ export function useInvoiceEditor(triggerToast) {
     setInvoice(newState);
     persistState(newState);
 
+    // Silently fork state to IndexedDB background engine
+    shadowPersistState(newState);
+
     const stringified = JSON.stringify(newState);
     const currentHistory = history.slice(0, historyIdx + 1);
     setHistory([...currentHistory, stringified]);
@@ -73,6 +77,10 @@ export function useInvoiceEditor(triggerToast) {
       const restored = JSON.parse(history[prevIdx]);
       setInvoice(restored);
       persistState(restored);
+
+      // MILESTONE 1 CHANGE: Update the background database mirror on undo
+      shadowPersistState(restored);
+
       triggerToast("Changes Undone", "info");
     }
   };
@@ -84,6 +92,10 @@ export function useInvoiceEditor(triggerToast) {
       const restored = JSON.parse(history[nextIdx]);
       setInvoice(restored);
       persistState(restored);
+
+      // Update the background database mirror on redo
+      shadowPersistState(restored);
+
       triggerToast("Changes Redone", "info");
     }
   };
@@ -259,7 +271,7 @@ export function useInvoiceEditor(triggerToast) {
           updateField("businessLogo", optimizedBase64);
           triggerToast("Logo saved successfully.");
         } catch (error) {
-          console.error("Failed to store optimized asset layout securly.", error);
+          console.error("Failed to store optimized asset layout securely.", error);
           triggerToast("Failed to store optimized asset layout securely.", "error");
         }
       };

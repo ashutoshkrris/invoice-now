@@ -1,6 +1,5 @@
+import { CONSTANTS } from "../constants/globalConstants";
 import { INITIAL_INVOICE_STATE } from "../constants/invoicePresets";
-
-const STORAGE_KEY = "invoicenow_wysiwyg_state_v3";
 
 /**
  * ============================================================================
@@ -69,8 +68,8 @@ export class GenericIndexedDB {
   }
 }
 
-// Instantiate specific shared instance for handling heavy assets
-const dbInstance = new GenericIndexedDB("InvoiceNowDB", 1, ["assets"]);
+// Bump version from 1 to 2 and expand the objectStores instantiation array to include "invoices"
+const dbInstance = new GenericIndexedDB("InvoiceNowDB", 2, ["assets", "invoices"]);
 
 export const assetStorage = {
   async saveLogo(base64String) {
@@ -86,12 +85,30 @@ export const assetStorage = {
 
 /**
  * ============================================================================
+ * BACKGROUND SHADOW WRITER UTILITIES
+ * ============================================================================
+ */
+export const shadowPersistState = async (state) => {
+  try {
+    const pureTextState = { ...state };
+    delete pureTextState.businessLogo;
+
+    // Persist completely stringified payload into the new background layer
+    await dbInstance.put("invoices", "current", pureTextState);
+  } catch (e) {
+    // Silent catch prevents background database failures from disrupting active workflows
+    console.warn("Background shadow storage replication caught:", e);
+  }
+};
+
+/**
+ * ============================================================================
  * TEXT-STATE LOCALSTORAGE LAYER (EXCLUDES BASE64 LOGO ASSETS)
  * ============================================================================
  */
 export const loadCachedState = () => {
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
+    const data = localStorage.getItem(CONSTANTS.STORAGE_KEY);
     return data ? JSON.parse(data) : INITIAL_INVOICE_STATE;
   } catch (e) {
     console.error("Local data retrieval failed", e);
@@ -106,7 +123,7 @@ export const loadCachedState = () => {
  */
 export const extractAndMigrateLegacyLogo = () => {
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
+    const data = localStorage.getItem(CONSTANTS.STORAGE_KEY);
     if (!data) return null;
 
     const parsed = JSON.parse(data);
@@ -115,7 +132,7 @@ export const extractAndMigrateLegacyLogo = () => {
 
       // Clean the legacy logo out of localStorage immediately to free up space
       delete parsed.businessLogo;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(parsed));
 
       return legacyLogo;
     }
@@ -127,11 +144,10 @@ export const extractAndMigrateLegacyLogo = () => {
 
 export const persistState = (state) => {
   try {
-    // Strip the binary data image out before writing text to localStorage block
     const pureTextState = { ...state };
     delete pureTextState.businessLogo;
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(pureTextState));
+    localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(pureTextState));
   } catch (e) {
     console.error("Local data cache write failed", e);
   }
