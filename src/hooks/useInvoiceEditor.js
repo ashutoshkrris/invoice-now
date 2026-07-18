@@ -2,16 +2,19 @@ import { useState, useMemo, useEffect } from "react";
 import { INITIAL_INVOICE_STATE } from "../constants/invoicePresets";
 import { COUNTRIES } from "../constants/countries";
 import {
-  loadCachedState,
   persistState,
   shadowPersistState,
   assetStorage,
   extractAndMigrateLegacyLogo,
+  initializeAndMigrateDatabase,
+  purgeLegacyStorageKey,
 } from "../utils/storage";
 import { CONSTANTS } from "../constants/globalConstants";
 
 export function useInvoiceEditor(triggerToast) {
-  const [invoice, setInvoice] = useState(loadCachedState);
+  // Default workspace initialized to an empty template placeholder during DB resolution
+  const [invoice, setInvoice] = useState(INITIAL_INVOICE_STATE);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // --- HISTORICAL UNDO / REDO STATE STACK ---
   const [history, setHistory] = useState([JSON.stringify(INITIAL_INVOICE_STATE)]);
@@ -21,6 +24,9 @@ export function useInvoiceEditor(triggerToast) {
   useEffect(() => {
     const loadAndMigrateAssets = async () => {
       try {
+        // Asynchronously load deep state configuration from database
+        const operationalState = await initializeAndMigrateDatabase();
+
         // 1. Try to fetch from modern IndexedDB storage first
         let logoAsset = await assetStorage.getLogo();
 
@@ -35,17 +41,29 @@ export function useInvoiceEditor(triggerToast) {
         }
 
         // 3. Hydrate state if a logo was found in either layer
+        // Complete target application validation before dropping old schema keys
+        const fullyHydratedState = { ...operationalState };
         if (logoAsset) {
-          setInvoice((prev) => ({ ...prev, businessLogo: logoAsset }));
+          fullyHydratedState.businessLogo = logoAsset;
         }
+
+        setInvoice(fullyHydratedState);
+        setHistory([JSON.stringify(operationalState)]);
+        setHistoryIdx(0);
+        setIsHydrated(true);
+
+        // Safely complete transactional loop by cleaning the old un-indexed storage space
+        purgeLegacyStorageKey();
       } catch (err) {
         console.error("Failed to safely hydrate or migrate logo assets:", err);
+        setIsHydrated(true);
       }
     };
     loadAndMigrateAssets();
   }, []);
 
   const saveWithHistory = (newState) => {
+    if (!isHydrated) return; // Guard mutations until initialization complete
     setInvoice(newState);
     persistState(newState);
 
@@ -304,6 +322,7 @@ export function useInvoiceEditor(triggerToast) {
 
   return {
     invoice,
+    isHydrated,
     historyIdx,
     historyLength: history.length,
     calculatedTotals,

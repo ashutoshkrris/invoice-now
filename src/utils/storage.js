@@ -93,8 +93,12 @@ export const shadowPersistState = async (state) => {
     const pureTextState = { ...state };
     delete pureTextState.businessLogo;
 
-    // Persist completely stringified payload into the new background layer
-    await dbInstance.put("invoices", "current", pureTextState);
+    // Target the designated multi-document ID instead of the hardcoded "current" placeholder string
+    const targetId = localStorage.getItem(CONSTANTS.ACTIVE_ID_KEY) || "current";
+    await dbInstance.put("invoices", targetId, pureTextState);
+
+    // Update the lightweight tracking descriptor values inside the registry layout
+    updateRegistryMetadata(targetId, pureTextState);
   } catch (e) {
     // Silent catch prevents background database failures from disrupting active workflows
     console.warn("Background shadow storage replication caught:", e);
@@ -150,5 +154,127 @@ export const persistState = (state) => {
     localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(pureTextState));
   } catch (e) {
     console.error("Local data cache write failed", e);
+  }
+};
+
+/**
+ * ============================================================================
+ * HYBRID DATABASE MIGRATION & CORE ASYNCHRONOUS INITIALIZATION
+ * ============================================================================
+ */
+
+// Helper to keep the registry index aligned during background saves
+const updateRegistryMetadata = (id, pureTextState) => {
+  try {
+    const registryData = localStorage.getItem(CONSTANTS.REGISTRY_KEY);
+    let registry = registryData ? JSON.parse(registryData) : [];
+
+    const existingIndex = registry.findIndex((item) => item.id === id);
+    const metadata = {
+      id,
+      invoiceNumber: pureTextState.invoiceNumber || "UNTITLED",
+      clientName: pureTextState.customerName || pureTextState.businessName || "New Client",
+      updatedAt: Date.now(),
+    };
+
+    if (existingIndex !== -1) {
+      registry[existingIndex] = metadata;
+    } else {
+      registry.push(metadata);
+    }
+
+    localStorage.setItem(CONSTANTS.REGISTRY_KEY, JSON.stringify(registry));
+  } catch (e) {
+    console.error("Failed to update lightweight data directory map safely:", e);
+  }
+};
+
+export const initializeAndMigrateDatabase = async () => {
+  try {
+    // 1. Check if the structural migration loop has already executed in the past
+    let activeId = localStorage.getItem(CONSTANTS.ACTIVE_ID_KEY);
+    if (activeId) {
+      // User is already migrated, fetch active payload configuration block from IndexedDB
+      const activeInvoice = await dbInstance.get("invoices", activeId);
+      if (activeInvoice) return activeInvoice;
+    }
+
+    // 2. Intercept legacy data configurations trapped inside primitive storage
+    const legacyTextData = localStorage.getItem(CONSTANTS.STORAGE_KEY);
+
+    if (legacyTextData) {
+      const parsedLegacyState = JSON.parse(legacyTextData);
+      const newUuid = crypto.randomUUID();
+
+      // Write parsed schema configurations directly into the modern IndexedDB architecture
+      await dbInstance.put("invoices", newUuid, parsedLegacyState);
+
+      // Create initial index record parameters within regional properties map
+      const initialRegistry = [
+        {
+          id: newUuid,
+          invoiceNumber: parsedLegacyState.invoiceNumber || "INV-2026-001",
+          clientName: parsedLegacyState.customerName || "John Doe",
+          updatedAt: Date.now(),
+        },
+      ];
+
+      localStorage.setItem(CONSTANTS.REGISTRY_KEY, JSON.stringify(initialRegistry));
+      localStorage.setItem(CONSTANTS.ACTIVE_ID_KEY, newUuid);
+
+      return parsedLegacyState;
+    }
+
+    // 3. Check for the "current" temporary record fallback block
+    const currentKeyFallback = await dbInstance.get("invoices", "current");
+    if (currentKeyFallback) {
+      const newUuid = crypto.randomUUID();
+      await dbInstance.put("invoices", newUuid, currentKeyFallback);
+      await dbInstance.delete("invoices", "current");
+
+      const initialRegistry = [
+        {
+          id: newUuid,
+          invoiceNumber: currentKeyFallback.invoiceNumber || "INV-2026-001",
+          clientName: currentKeyFallback.customerName || "John Doe",
+          updatedAt: Date.now(),
+        },
+      ];
+
+      localStorage.setItem(CONSTANTS.REGISTRY_KEY, JSON.stringify(initialRegistry));
+      localStorage.setItem(CONSTANTS.ACTIVE_ID_KEY, newUuid);
+
+      return currentKeyFallback;
+    }
+
+    // 4. Fresh user scenario setup loop
+    const freshUuid = crypto.randomUUID();
+    localStorage.setItem(CONSTANTS.ACTIVE_ID_KEY, freshUuid);
+
+    const freshRegistry = [
+      {
+        id: freshUuid,
+        invoiceNumber: INITIAL_INVOICE_STATE.invoiceNumber,
+        clientName: INITIAL_INVOICE_STATE.customerName || "John Doe",
+        updatedAt: Date.now(),
+      },
+    ];
+
+    localStorage.setItem(CONSTANTS.REGISTRY_KEY, JSON.stringify(freshRegistry));
+    await dbInstance.put("invoices", freshUuid, INITIAL_INVOICE_STATE);
+
+    return INITIAL_INVOICE_STATE;
+  } catch (err) {
+    console.error("Database structural migration execution tracking failed:", err);
+    return loadCachedState();
+  }
+};
+
+// Safe implementation to purge the legacy standalone localStorage trace parameters in following stages
+export const purgeLegacyStorageKey = () => {
+  try {
+    localStorage.removeItem(CONSTANTS.STORAGE_KEY);
+  } catch (e) {
+    console.error("Failed to clear legacy schema item configuration mapping safely:", e);
   }
 };
