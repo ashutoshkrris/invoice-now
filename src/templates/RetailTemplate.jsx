@@ -276,7 +276,8 @@ export default function RetailTemplate({
                   <td className="py-2 text-center">
                     <EditableField
                       type="number"
-                      value={item.qty}
+                      value={item.qty === 0 ? "" : item.qty}
+                      min={1}
                       onChange={(e) =>
                         onUpdateNestedItem(idx, "qty", parseInt(e.target.value) || 0)
                       }
@@ -289,7 +290,8 @@ export default function RetailTemplate({
                     <EditableField
                       type="number"
                       step="0.01"
-                      value={item.price}
+                      value={item.price === 0 ? "" : item.price}
+                      min={0}
                       onChange={(e) =>
                         onUpdateNestedItem(idx, "price", parseFloat(e.target.value) || 0)
                       }
@@ -504,26 +506,40 @@ export default function RetailTemplate({
             </div>
           )}
 
-          {invoice.shippingCharges > 0 || isExporting ? (
+          {invoice.shippingCharges !== null &&
+          invoice.shippingCharges !== undefined &&
+          (invoice.shippingCharges > 0 ||
+            typeof invoice.shippingCharges === "number" ||
+            isExporting) ? (
             <div className="flex justify-between items-center">
               <span className="text-slate-500">SHIPPING/HANDLING:</span>
               <div className="flex items-center justify-end text-right">
                 <span className="text-[10px] text-slate-400 mr-0.5">{activeCurrencySymbol}</span>
                 <EditableField
                   type="number"
-                  value={invoice.shippingCharges || 0}
-                  onChange={(e) =>
-                    onUpdateField("shippingCharges", parseFloat(e.target.value) || 0)
+                  value={
+                    invoice.shippingCharges === 0 || !invoice.shippingCharges
+                      ? ""
+                      : invoice.shippingCharges
                   }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "") {
+                      onUpdateField("shippingCharges", 0);
+                    } else {
+                      onUpdateField("shippingCharges", parseFloat(val) || 0);
+                    }
+                  }}
                   className="w-16 text-right text-slate-800 bg-transparent font-semibold"
                   placeholder="0.00"
                   isExporting={isExporting}
                 />
-                {!isExporting && invoice.shippingCharges > 0 && (
+                {!isExporting && (
                   <button
                     type="button"
-                    onClick={() => onUpdateField("shippingCharges", 0)}
+                    onClick={() => onUpdateField("shippingCharges", null)}
                     className="no-print ml-1 text-slate-300 hover:text-rose-500 text-[9px] font-bold cursor-pointer"
+                    title="Remove shipping charges"
                   >
                     ✕
                   </button>
@@ -535,7 +551,9 @@ export default function RetailTemplate({
               <div className="no-print flex justify-between items-center py-0.5">
                 <button
                   type="button"
-                  onClick={() => onUpdateField("shippingCharges", 0.01)}
+                  onClick={() => {
+                    onUpdateField("shippingCharges", 0);
+                  }}
                   className="text-[10px] font-extrabold text-brand-600 dark:text-brand-400 hover:underline cursor-pointer"
                 >
                   + Add Shipping
@@ -547,12 +565,13 @@ export default function RetailTemplate({
 
           {(!isExporting || invoice.amountPaid > 0) && (
             <div className="flex justify-between items-center">
-              <span className="text-slate-500">AMOUNT TENDERED:</span>
+              <span className="text-slate-500">AMOUNT PAID:</span>
               <div className="flex items-center justify-end text-right">
                 <span className="text-[10px] text-slate-400 mr-0.5">{activeCurrencySymbol}</span>
                 <EditableField
                   type="number"
-                  value={invoice.amountPaid || 0}
+                  value={invoice.amountPaid === 0 || !invoice.amountPaid ? "" : invoice.amountPaid}
+                  min={0}
                   onChange={(e) => onUpdateField("amountPaid", parseFloat(e.target.value) || 0)}
                   className="w-16 text-right text-slate-800 bg-transparent font-semibold"
                   placeholder="0.00"
