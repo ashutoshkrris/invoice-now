@@ -1,4 +1,5 @@
 import { Icons } from "../components/shared/Icons";
+import LogoUploader from "../components/shared/LogoUploader";
 import EditableField from "../components/EditableField/EditableField";
 import { FIELD_LIMITS } from "../constants/fieldLimits";
 
@@ -19,43 +20,18 @@ export default function RetailTemplate({
       <div className="avoid-page-slice">
         {/* --- BUSINESS BRANDING HEADER --- */}
         <div className="text-center space-y-2 mb-6">
-          <div className="relative group/logo w-48 min-h-10 mx-auto flex items-center justify-center">
-            <input
-              type="file"
-              id="logo-uploader-retail"
-              accept="image/*"
-              onChange={onLogoUpload}
-              className="hidden"
-            />
-            {invoice.businessLogo ? (
-              <div className="relative">
-                <img
-                  src={invoice.businessLogo}
-                  alt="Logo"
-                  className="max-h-12 max-w-35 object-contain"
-                />
-                {!isExporting && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onUpdateField("businessLogo", "");
-                    }}
-                    className="no-print absolute -top-2 -right-2 h-4 w-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[8px] font-bold cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            ) : !isExporting ? (
-              <label
-                htmlFor="logo-uploader-retail"
-                className="text-[10px] text-slate-400 hover:text-brand-500 flex items-center gap-1 cursor-pointer select-none"
-              >
-                <Icons.Upload /> Upload Logo
-              </label>
-            ) : null}
-          </div>
+          <LogoUploader
+            invoice={invoice}
+            onLogoUpload={onLogoUpload}
+            onUpdateField={onUpdateField}
+            isExporting={isExporting}
+            id="logo-uploader-retail"
+            labelText="Upload Logo"
+            containerClassName="mx-auto justify-center mb-6"
+            labelClassName="text-[10px] text-slate-400 hover:text-brand-500 select-none"
+            imageClassName="max-h-12 max-w-35 object-contain"
+            deleteButtonClassName="no-print absolute -top-2 -right-2 h-4 w-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[8px] font-bold cursor-pointer"
+          />
           <EditableField
             value={invoice.businessName}
             onChange={(e) => onUpdateField("businessName", e.target.value)}

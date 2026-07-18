@@ -1,4 +1,4 @@
-import { Icons } from "../components/shared/Icons";
+import LogoUploader from "../components/shared/LogoUploader";
 import EditableField from "../components/EditableField/EditableField";
 import { FIELD_LIMITS } from "../constants/fieldLimits";
 import InvoiceItemsTable from "../components/InvoiceItemsTable/InvoiceItemsTable";
@@ -13,43 +13,18 @@ export default function EmeraldPremiumTemplate(props) {
         className="text-center mb-10 pb-8 border-b-2"
         style={{ borderBottomColor: invoice.brandColor }}
       >
-        <div className="relative group/logo w-48 min-h-12.5 mx-auto border border-dashed border-transparent hover:border-slate-300 rounded-lg flex items-center justify-center bg-slate-50/50 p-2 cursor-pointer mb-3">
-          <input
-            type="file"
-            id="logo-uploader-prem"
-            accept="image/*"
-            onChange={props.onLogoUpload}
-            className="hidden"
-          />
-          {invoice.businessLogo ? (
-            <div className="relative">
-              <img
-                src={invoice.businessLogo}
-                alt="Logo"
-                className="max-h-16 max-w-47.5 object-contain"
-              />
-              {!isExporting && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUpdateField("businessLogo", "");
-                  }}
-                  className="no-print absolute -top-2 -right-2 h-4 w-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[8px] font-bold cursor-pointer"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          ) : !isExporting ? (
-            <label
-              htmlFor="logo-uploader-prem"
-              className="text-[10px] font-bold font-sans text-slate-400 hover:text-brand-500 flex items-center gap-1 cursor-pointer"
-            >
-              <Icons.Upload /> Premium Header Logo
-            </label>
-          ) : null}
-        </div>
+        <LogoUploader
+          invoice={invoice}
+          onLogoUpload={props.onLogoUpload}
+          onUpdateField={onUpdateField}
+          isExporting={isExporting}
+          id="logo-uploader-prem"
+          labelText="Premium Header Logo"
+          containerClassName="mx-auto justify-center bg-slate-50/50 p-2 border border-dashed border-transparent hover:border-slate-300 rounded-lg mb-3"
+          labelClassName="text-[10px] font-bold font-sans text-slate-400 hover:text-brand-500"
+          imageClassName="max-h-16 max-w-47.5 object-contain"
+          deleteButtonClassName="no-print absolute -top-2 -right-2 h-4 w-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[8px] font-bold cursor-pointer"
+        />
         <EditableField
           value={invoice.businessName}
           onChange={(e) => onUpdateField("businessName", e.target.value)}

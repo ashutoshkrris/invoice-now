@@ -1,4 +1,4 @@
-import { Icons } from "../components/shared/Icons";
+import LogoUploader from "../components/shared/LogoUploader";
 import EditableField from "../components/EditableField/EditableField";
 import { FIELD_LIMITS } from "../constants/fieldLimits";
 import InvoiceItemsTable from "../components/InvoiceItemsTable/InvoiceItemsTable";
@@ -15,43 +15,17 @@ export default function BoldProfessionalTemplate(props) {
       >
         <div className="p-8 flex flex-col justify-between">
           <div>
-            <div className="relative group/logo w-48 min-h-10 rounded-lg flex items-center mb-3">
-              <input
-                type="file"
-                id="logo-uploader-bold"
-                accept="image/*"
-                onChange={props.onLogoUpload}
-                className="hidden"
-              />
-              {invoice.businessLogo ? (
-                <div className="relative bg-white p-1.5 border rounded-lg">
-                  <img
-                    src={invoice.businessLogo}
-                    alt="Logo"
-                    className="max-h-10 max-w-40 object-contain"
-                  />
-                  {!isExporting && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onUpdateField("businessLogo", "");
-                      }}
-                      className="no-print absolute -top-2 -right-2 h-4 w-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[8px] font-bold cursor-pointer"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              ) : !isExporting ? (
-                <label
-                  htmlFor="logo-uploader-bold"
-                  className="text-[10px] font-bold text-white/80 hover:text-white flex items-center gap-1 cursor-pointer"
-                >
-                  <Icons.Upload /> Upload Logo
-                </label>
-              ) : null}
-            </div>
+            <LogoUploader
+              invoice={invoice}
+              onLogoUpload={props.onLogoUpload}
+              onUpdateField={onUpdateField}
+              isExporting={isExporting}
+              id="logo-uploader-min"
+              labelText="Upload Logo"
+              containerClassName="bg-slate-50/50 p-2 border border-dashed border-transparent hover:border-slate-300 rounded-lg"
+              labelClassName="text-[10px] font-bold text-slate-400 hover:text-brand-500"
+              imageClassName="max-h-12 max-w-45 object-contain"
+            />
             <EditableField
               value={invoice.businessName}
               onChange={(e) => onUpdateField("businessName", e.target.value)}
