@@ -12,8 +12,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 md:px-8 py-10 md:py-14">
         {/* --- TOP SECTION: BRAND + LINKS GRID --- */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 pb-10 border-b border-slate-100 dark:border-slate-900">
-          {/* Left Column: Brand Identity & Description */}
-          <div className="md:col-span-5 space-y-3.5 text-left">
+          {/* Left Column: Brand Identity, Description & Badge Embed */}
+          <div className="md:col-span-5 space-y-4 text-left">
             <div className="flex items-center gap-2">
               <div className="h-6 w-6 bg-gradient-to-tr from-brand-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
                 <svg
@@ -38,6 +38,23 @@ export default function Footer() {
               A modern, privacy-first invoice generator built for freelancers and small businesses.
               Generate professional PDF invoices locally in your browser.
             </p>
+            {/* Product Hunt Embed Badge right under description */}
+            <div className="pt-1 select-none">
+              <a
+                href="https://www.producthunt.com/products/invoice-now?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-invoice-now"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block transition-opacity duration-200 hover:opacity-90"
+              >
+                <img
+                  alt="Invoice Now - Privacy-first invoice builder that runs entirely locally | Product Hunt"
+                  width="250"
+                  height="54"
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1198464&amp;theme=light&amp;t=1784394098394"
+                  className="w-[140px] md:w-[150px] h-auto object-contain dark:invert-[0.05] dark:hue-rotate-180"
+                />
+              </a>
+            </div>
           </div>
 
           {/* Middle Columns: Future-Proof Navigation Link Columns */}
@@ -108,6 +125,26 @@ export default function Footer() {
               >
                 <Icons.Github />
                 <span>GitHub Repository</span>
+              </a>
+
+              {/* Added Report Issue Link */}
+              <a
+                href="https://github.com/ashutoshkrris/invoice-now/issues/new?template=bug_report.yml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors w-max"
+                title="Report a bug or submit feedback on GitHub"
+              >
+                <svg
+                  className="w-3.5 h-3.5 stroke-current fill-none shrink-0"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2.5"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span>Report an Issue</span>
               </a>
 
               <a
