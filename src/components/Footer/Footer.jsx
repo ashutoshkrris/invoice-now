@@ -5,6 +5,7 @@ export default function Footer() {
   const startYear = 2026;
   const currentYear = new Date().getFullYear();
   const copyrightYear = currentYear > startYear ? `${startYear}-${currentYear}` : `${startYear}`;
+  const appVersion = __APP_VERSION__;
 
   return (
     <footer className="no-print mt-auto bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 transition-colors duration-300 w-full">
@@ -134,6 +135,7 @@ export default function Footer() {
             <span>© {copyrightYear}</span>
             <span className="font-bold text-slate-700 dark:text-slate-300">Invoice Now</span>
             <span>• Built Local & Secure</span>
+            <span>• v{appVersion}</span>
           </div>
 
           <div className="flex items-center gap-1 order-1 sm:order-2 p-0.5">
