@@ -44,6 +44,7 @@ export default function InvoiceWorkspace({
     onRemoveLineItem: onActions.onRemoveLineItem,
     onAddLineItem: onActions.onAddLineItem,
     onLogoUpload: onActions.onLogoUpload,
+    onLogoDelete: onActions.onLogoDelete,
   };
 
   return (

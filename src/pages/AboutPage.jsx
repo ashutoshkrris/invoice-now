@@ -29,20 +29,26 @@ export default function AboutPage() {
               <strong className="text-slate-900 dark:text-white font-bold">
                 Everything stays local:
               </strong>{" "}
-              line items, customer details, branding, and exports. There is{" "}
+              line items, customer details, branding, assets, and exports. There is{" "}
               <strong className="text-slate-900 dark:text-white font-bold">
                 no account signup, no cloud sync, and no telemetry pipeline
               </strong>
-              . Your browser holds the working state exclusively via{" "}
+              . Your browser manages workspace setups using a hybrid local storage system: text
+              configurations map to{" "}
               <strong className="text-slate-900 dark:text-white font-bold">local storage</strong>,
-              and exports render as PNG or PDF directly on your hardware device.
+              while heavy assets like business logos scale seamlessly through an isolated
+              client-side{" "}
+              <strong className="text-slate-900 dark:text-white font-bold">
+                IndexedDB sandbox
+              </strong>
+              .
             </p>
             <p>
               We built Invoice Now because most online tools force an unnecessary trade-off between
-              polish and data privacy. You should{" "}
+              highlighted layouts and data privacy. You should{" "}
               <strong className="text-brand-600 dark:text-brand-400 font-bold">
                 not need a SaaS subscription
-              </strong>
+              </strong>{" "}
               —or a complex data processing agreement—to simply send a clean bill to your client.
             </p>
           </div>
@@ -112,6 +118,16 @@ export default function AboutPage() {
                   fully mobile-responsive
                 </strong>{" "}
                 viewports.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>
+              <span>
+                High-performance architecture separating metadata from graphics using{" "}
+                <strong className="text-slate-900 dark:text-white font-bold">
+                  IndexedDB asset storage
+                </strong>
+                .
               </span>
             </li>
           </ul>

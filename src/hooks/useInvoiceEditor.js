@@ -1,7 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { INITIAL_INVOICE_STATE } from "../constants/invoicePresets";
 import { COUNTRIES } from "../constants/countries";
-import { loadCachedState, persistState } from "../utils/storage";
+import {
+  loadCachedState,
+  persistState,
+  assetStorage,
+  extractAndMigrateLegacyLogo,
+} from "../utils/storage";
+import { FIELD_LIMITS } from "../constants/fieldLimits";
 
 export function useInvoiceEditor(triggerToast) {
   const [invoice, setInvoice] = useState(loadCachedState);
@@ -9,6 +15,34 @@ export function useInvoiceEditor(triggerToast) {
   // --- HISTORICAL UNDO / REDO STATE STACK ---
   const [history, setHistory] = useState([JSON.stringify(INITIAL_INVOICE_STATE)]);
   const [historyIdx, setHistoryIdx] = useState(0);
+
+  // --- ASSET HYDRATION & LEGACY MIGRATION PIPELINE ---
+  useEffect(() => {
+    const loadAndMigrateAssets = async () => {
+      try {
+        // 1. Try to fetch from modern IndexedDB storage first
+        let logoAsset = await assetStorage.getLogo();
+
+        // 2. Fallback: Check if there's a legacy logo trapped in localStorage
+        if (!logoAsset) {
+          const legacyLogo = extractAndMigrateLegacyLogo();
+          if (legacyLogo) {
+            // Silently migrate to IndexedDB in the background
+            await assetStorage.saveLogo(legacyLogo);
+            logoAsset = legacyLogo;
+          }
+        }
+
+        // 3. Hydrate state if a logo was found in either layer
+        if (logoAsset) {
+          setInvoice((prev) => ({ ...prev, businessLogo: logoAsset }));
+        }
+      } catch (err) {
+        console.error("Failed to safely hydrate or migrate logo assets:", err);
+      }
+    };
+    loadAndMigrateAssets();
+  }, []);
 
   const saveWithHistory = (newState) => {
     setInvoice(newState);
@@ -156,14 +190,103 @@ export function useInvoiceEditor(triggerToast) {
   }, [invoice]);
 
   const handleLogoUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateField("businessLogo", reader.result);
-        triggerToast("Logo saved successfully.");
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 1. Guardrail Check: Allowed File Types
+    if (!FIELD_LIMITS.allowedTypesForLogo.includes(file.type)) {
+      triggerToast("Upload failed: Only JPG, JPEG, and PNG formats are supported.", "error");
+      e.target.value = ""; // Reset file input
+      return;
+    }
+
+    // 2. Guardrail Check: Size limit validation
+    const maxSizeBytes = FIELD_LIMITS.logoSizeInMB * 1024 * 1024; // 1MB
+    if (file.size > maxSizeBytes) {
+      triggerToast(
+        `Upload failed: Logo size cannot exceed ${FIELD_LIMITS.logoSizeInMB} MB.`,
+        "error"
+      );
+      e.target.value = ""; // Clear file input field string
+      return;
+    }
+
+    // 3. Off-screen optimization pipeline
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        const MAX_WIDTH = 250;
+        const MAX_HEIGHT = 250;
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate aspect-ratio safe scaling boundaries
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        // Initialize canvas pipeline
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          triggerToast("Failed to process image optimization.", "error");
+          return;
+        }
+
+        // Render target image into context boundaries
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Compress canvas output to a lightweight PNG Base64 payload
+        const optimizedBase64 = canvas.toDataURL("image/png");
+
+        try {
+          // Store asset asynchronously inside modern database layer
+          await assetStorage.saveLogo(optimizedBase64);
+
+          // Save processed structure to application stack
+          updateField("businessLogo", optimizedBase64);
+          triggerToast("Logo saved successfully.");
+        } catch (error) {
+          console.error("Failed to store optimized asset layout securly.", error);
+          triggerToast("Failed to store optimized asset layout securely.", "error");
+        }
       };
-      reader.readAsDataURL(file);
+
+      img.onerror = () => {
+        triggerToast("Invalid image file format.", "error");
+      };
+
+      img.src = event.target.result;
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const handleLogoDelete = async () => {
+    try {
+      // 1. Wipe the asset record from modern IndexedDB completely
+      await assetStorage.deleteLogo();
+
+      // 2. Clear out the field state and update history stacks smoothly
+      const updated = { ...invoice, businessLogo: "" };
+      saveWithHistory(updated);
+
+      triggerToast("Logo removed successfully.", "info");
+    } catch (error) {
+      console.error("Failed to delete logo asset cleanly from database layer:", error);
+      triggerToast("Failed to remove logo asset securely.", "error");
     }
   };
 
@@ -180,5 +303,6 @@ export function useInvoiceEditor(triggerToast) {
     removeLineItem,
     handleCountryChange,
     handleLogoUpload,
+    handleLogoDelete,
   };
 }

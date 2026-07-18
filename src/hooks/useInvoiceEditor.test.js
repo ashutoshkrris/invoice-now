@@ -12,10 +12,20 @@ const baseMockState = {
 // Hoist a clean variable target to swap values dynamically inside test scopes
 let targetMockValue = { ...baseMockState };
 
+// Fully mock the storage module boundary line before tests execute
 vi.mock("../utils/storage", () => ({
   loadCachedState: vi.fn(() => targetMockValue),
   persistState: vi.fn(),
+  extractAndMigrateLegacyLogo: vi.fn(() => null),
+  assetStorage: {
+    getLogo: vi.fn(() => Promise.resolve(null)),
+    saveLogo: vi.fn(() => Promise.resolve()),
+    deleteLogo: vi.fn(() => Promise.resolve()),
+  },
 }));
+
+// Re-import the mocked module hooks so we can check tracking assertions cleanly
+import { assetStorage, extractAndMigrateLegacyLogo } from "../utils/storage";
 
 describe("useInvoiceEditor Custom Hook", () => {
   const mockTriggerToast = vi.fn();
@@ -167,5 +177,197 @@ describe("Live Financial Calculation Matrices", () => {
     expect(result.current.calculatedTotals.discount).toBe(0.0);
     expect(result.current.calculatedTotals.tax).toBe(0.0);
     expect(result.current.calculatedTotals.grandTotal).toBe(110.0);
+  });
+});
+
+describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
+  const mockTriggerToast = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    targetMockValue = { ...baseMockState };
+  });
+
+  it("blocks file uploads that exceed the 1MB safety threshold and sets proper toast warnings", () => {
+    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+
+    const giantFile = new File(["x".repeat(1.5 * 1024 * 1024)], "massive_logo.png", {
+      type: "image/png",
+    });
+
+    const mockEvent = {
+      target: {
+        files: [giantFile],
+        value: "C:\\fakepath\\massive_logo.png",
+      },
+    };
+
+    act(() => {
+      result.current.handleLogoUpload(mockEvent);
+    });
+
+    expect(mockTriggerToast).toHaveBeenCalledWith(
+      "Upload failed: Logo size cannot exceed 1 MB.",
+      "error"
+    );
+    expect(mockEvent.target.value).toBe("");
+    // Adjusted to match the initial empty string state from your presets
+    expect(result.current.invoice.businessLogo).toBe("");
+  });
+
+  it("blocks unsupported image formats (e.g. webp) and alerts the user via toast", () => {
+    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+
+    const invalidFile = new File(["dummy_data"], "logo.webp", {
+      type: "image/webp",
+    });
+
+    const mockEvent = {
+      target: {
+        files: [invalidFile],
+        value: "C:\\fakepath\\logo.webp",
+      },
+    };
+
+    act(() => {
+      result.current.handleLogoUpload(mockEvent);
+    });
+
+    expect(mockTriggerToast).toHaveBeenCalledWith(
+      "Upload failed: Only JPG, JPEG, and PNG formats are supported.",
+      "error"
+    );
+    expect(mockEvent.target.value).toBe("");
+    // Adjusted to match the initial empty string state from your presets
+    expect(result.current.invoice.businessLogo).toBe("");
+  });
+
+  it("successfully passes safe images through the off-screen canvas scaling pipeline and hits IndexedDB", async () => {
+    // 1. Mock FileReader API using a standard constructible function
+    const mockFileReaderInstance = {
+      readAsDataURL: vi.fn(function () {
+        if (this.onload) {
+          this.onload({ target: { result: "data:image/png;base64,mockRawString" } });
+        }
+      }),
+    };
+    vi.stubGlobal(
+      "FileReader",
+      vi.fn(function () {
+        return mockFileReaderInstance;
+      })
+    );
+
+    // 2. Mock Image API using a standard constructible function
+    const mockImageInstance = {
+      width: 800,
+      height: 600,
+      set src(val) {
+        if (this.onload) this.onload();
+      },
+      get src() {
+        return "data:image/png;base64,mockRawString";
+      },
+    };
+    vi.stubGlobal(
+      "Image",
+      vi.fn(function () {
+        return mockImageInstance;
+      })
+    );
+
+    // 3. Mock Canvas element methods
+    const mockContext2D = {
+      drawImage: vi.fn(),
+    };
+    const mockCanvasElement = {
+      getContext: vi.fn(() => mockContext2D),
+      toDataURL: vi.fn(() => "data:image/png;base64,optimizedMicroPayload"),
+      width: 0,
+      height: 0,
+    };
+
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation((tagName) => {
+      if (tagName === "canvas") return mockCanvasElement;
+      return originalCreateElement(tagName);
+    });
+
+    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+
+    const safeFile = new File(["x".repeat(200 * 1024)], "company_logo.png", {
+      type: "image/png",
+    });
+    const mockEvent = { target: { files: [safeFile] } };
+
+    await act(async () => {
+      result.current.handleLogoUpload(mockEvent);
+    });
+
+    expect(mockCanvasElement.width).toBe(250);
+    expect(mockCanvasElement.height).toBe(188);
+    expect(mockContext2D.drawImage).toHaveBeenCalledWith(mockImageInstance, 0, 0, 250, 188);
+
+    expect(assetStorage.saveLogo).toHaveBeenCalledWith(
+      "data:image/png;base64,optimizedMicroPayload"
+    );
+    expect(result.current.invoice.businessLogo).toBe("data:image/png;base64,optimizedMicroPayload");
+
+    // Adjusted to match the exact toast notification returned by your editor pipeline
+    expect(mockTriggerToast).toHaveBeenCalledWith("Logo saved successfully.");
+  });
+
+  it("safely hydrates the application state when an existing logo asset exists in IndexedDB", async () => {
+    vi.mocked(assetStorage.getLogo).mockResolvedValueOnce(
+      "data:image/png;base64,preExistingLogoAsset"
+    );
+
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+    });
+
+    expect(assetStorage.getLogo).toHaveBeenCalled();
+    expect(renderResult.result.current.invoice.businessLogo).toBe(
+      "data:image/png;base64,preExistingLogoAsset"
+    );
+  });
+
+  it("detects, migrates, and cleans up legacy logos found inside localStorage on mount", async () => {
+    const legacyLogoMockString = "data:image/png;base64,oldLegacyStringTrappedInLocalStorage";
+
+    // We can now use vi.mocked cleanly since the property is defined in our top-level factory
+    vi.mocked(extractAndMigrateLegacyLogo).mockReturnValueOnce(legacyLogoMockString);
+    vi.mocked(assetStorage.getLogo).mockResolvedValueOnce(null);
+
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+    });
+
+    expect(extractAndMigrateLegacyLogo).toHaveBeenCalled();
+    expect(assetStorage.saveLogo).toHaveBeenCalledWith(legacyLogoMockString);
+    expect(renderResult.result.current.invoice.businessLogo).toBe(legacyLogoMockString);
+  });
+
+  it("clears the asset record out of IndexedDB and resets hook state when the logo is removed", async () => {
+    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+
+    // Fast-track mock state to pretend a logo is currently active
+    await act(async () => {
+      result.current.updateField("businessLogo", "data:image/png;base64,activeLogoPayload");
+    });
+    expect(result.current.invoice.businessLogo).toBe("data:image/png;base64,activeLogoPayload");
+
+    // Execute the removal operation
+    await act(async () => {
+      await result.current.handleLogoDelete();
+    });
+
+    // Assert the database interface was instructed to delete the file
+    expect(assetStorage.deleteLogo).toHaveBeenCalled();
+    // Assert the hook state fell back to an empty string
+    expect(result.current.invoice.businessLogo).toBe("");
   });
 });

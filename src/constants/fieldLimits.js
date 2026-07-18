@@ -20,4 +20,6 @@ export const FIELD_LIMITS = {
   paymentInstructions: 350,
   terms: 450,
   notes: 300,
+  logoSizeInMB: 1,
+  allowedTypesForLogo: ["image/jpeg", "image/jpg", "image/png"],
 };

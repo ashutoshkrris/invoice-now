@@ -10,6 +10,7 @@ export default function RetailTemplate({
   onRemoveLineItem,
   onAddLineItem,
   onLogoUpload,
+  onLogoDelete,
   totals,
   activeCurrencySymbol,
   isExporting,
@@ -23,7 +24,7 @@ export default function RetailTemplate({
           <LogoUploader
             invoice={invoice}
             onLogoUpload={onLogoUpload}
-            onUpdateField={onUpdateField}
+            onLogoDelete={onLogoDelete}
             isExporting={isExporting}
             id="logo-uploader-retail"
             labelText="Upload Logo"

@@ -14,7 +14,7 @@ export default function ModernMinimalistTemplate(props) {
           <LogoUploader
             invoice={invoice}
             onLogoUpload={props.onLogoUpload}
-            onUpdateField={onUpdateField}
+            onLogoDelete={props.onLogoDelete}
             isExporting={isExporting}
             id="logo-uploader-min"
             labelText="Upload Logo"
