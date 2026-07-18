@@ -3,6 +3,32 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "A lightweight, modern, client-side web application for generating, managing, and exporting beautifully formatted invoices directly in the browser.",
+  "author": {
+    "name": "Ashutosh Krishna",
+    "url": "https://ashutoshkrris.in"
+  },
+  "license": "MIT",
+  "keywords": [
+    "invoice",
+    "invoice-generator",
+    "react",
+    "vite",
+    "tailwind-css",
+    "jspdf",
+    "html-to-image",
+    "client-side",
+    "localstorage",
+    "invoicenow"
+  ],
+  "homepage": "https://invoicenow.ashutoshkrris.in",
+  "bugs": {
+    "url": "https://github.com/ashutoshkrris/invoice-now/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ashutoshkrris/invoice-now.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
