@@ -55,24 +55,31 @@ export default function App() {
         <Route
           path="/"
           element={
-            <>
-              <InvoiceToolbar
-                invoice={editor.invoice}
-                historyIdx={editor.historyIdx}
-                historyLength={editor.historyLength}
-                onUpdateField={editor.updateField}
-                onCountryChange={editor.handleCountryChange}
-                onUndo={editor.handleUndo}
-                onRedo={editor.handleRedo}
-              />
-              <InvoiceWorkspace
-                invoice={editor.invoice}
-                totals={editor.calculatedTotals}
-                activeCurrencySymbol={activeCurrencySymbol}
-                isExporting={isExporting}
-                onActions={actionHandlers}
-              />
-            </>
+            // Prevent component layout injection crashes before database properties map completes resolution
+            !editor.isHydrated ? (
+              <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+                <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              <>
+                <InvoiceToolbar
+                  invoice={editor.invoice}
+                  historyIdx={editor.historyIdx}
+                  historyLength={editor.historyLength}
+                  onUpdateField={editor.updateField}
+                  onCountryChange={editor.handleCountryChange}
+                  onUndo={editor.handleUndo}
+                  onRedo={editor.handleRedo}
+                />
+                <InvoiceWorkspace
+                  invoice={editor.invoice}
+                  totals={editor.calculatedTotals}
+                  activeCurrencySymbol={activeCurrencySymbol}
+                  isExporting={isExporting}
+                  onActions={actionHandlers}
+                />
+              </>
+            )
           }
         />
         <Route path="/about" element={<AboutPage />} />

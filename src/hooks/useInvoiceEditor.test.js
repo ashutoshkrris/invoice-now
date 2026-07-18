@@ -18,6 +18,8 @@ vi.mock("../utils/storage", () => ({
   persistState: vi.fn(),
   shadowPersistState: vi.fn(),
   extractAndMigrateLegacyLogo: vi.fn(() => null),
+  purgeLegacyStorageKey: vi.fn(),
+  initializeAndMigrateDatabase: vi.fn(() => Promise.resolve(targetMockValue)),
   assetStorage: {
     getLogo: vi.fn(() => Promise.resolve(null)),
     saveLogo: vi.fn(() => Promise.resolve()),
@@ -26,7 +28,16 @@ vi.mock("../utils/storage", () => ({
 }));
 
 // Re-import the mocked module hooks so we can check tracking assertions cleanly
-import { assetStorage, extractAndMigrateLegacyLogo } from "../utils/storage";
+import {
+  assetStorage,
+  extractAndMigrateLegacyLogo,
+  initializeAndMigrateDatabase,
+} from "../utils/storage";
+
+// Helper utility to safely flush microtasks and await hook asynchronous rendering hydration
+const waitForHydration = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 0));
+};
 
 describe("useInvoiceEditor Custom Hook", () => {
   const mockTriggerToast = vi.fn();
@@ -34,24 +45,36 @@ describe("useInvoiceEditor Custom Hook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     targetMockValue = { ...baseMockState };
+    vi.mocked(initializeAndMigrateDatabase).mockResolvedValue(targetMockValue);
   });
 
-  it("initializes with core preset parameters and standard currency calculations", () => {
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+  it("initializes with core preset parameters and standard currency calculations", async () => {
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
+    const { result } = renderResult;
     expect(result.current.invoice).toBeDefined();
     expect(result.current.calculatedTotals.subtotal).toBe(0);
     expect(result.current.historyIdx).toBe(0);
   });
 
-  it("calculates extension line totals accurately when row prices mutate", () => {
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+  it("calculates extension line totals accurately when row prices mutate", async () => {
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
-    act(() => {
+    const { result } = renderResult;
+
+    await act(async () => {
       result.current.updateNestedItem(0, "qty", 2);
     });
 
-    act(() => {
+    await act(async () => {
       result.current.updateNestedItem(0, "price", 150);
     });
 
@@ -59,15 +82,21 @@ describe("useInvoiceEditor Custom Hook", () => {
     expect(result.current.calculatedTotals.grandTotal).toBe(300);
   });
 
-  it("traverses historical pointer states backwards when triggering undo mutations", () => {
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+  it("traverses historical pointer states backwards when triggering undo mutations", async () => {
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
-    act(() => {
+    const { result } = renderResult;
+
+    await act(async () => {
       result.current.updateField("invoiceNumber", "INV-2026");
     });
     expect(result.current.invoice.invoiceNumber).toBe("INV-2026");
 
-    act(() => {
+    await act(async () => {
       result.current.handleUndo();
     });
 
@@ -75,11 +104,17 @@ describe("useInvoiceEditor Custom Hook", () => {
     expect(mockTriggerToast).toHaveBeenCalledWith("Changes Undone", "info");
   });
 
-  it("appends new structural row templates cleanly into the items container array", () => {
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+  it("appends new structural row templates cleanly into the items container array", async () => {
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
+
+    const { result } = renderResult;
     const baselineLength = result.current.invoice.items.length;
 
-    act(() => {
+    await act(async () => {
       result.current.addLineItem();
     });
 
@@ -91,7 +126,11 @@ describe("useInvoiceEditor Custom Hook", () => {
 describe("Live Financial Calculation Matrices", () => {
   const mockTriggerToast = vi.fn();
 
-  it("Scenario A: Handles per-item percentage taxes and per-item flat discounts", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("Scenario A: Handles per-item percentage taxes and per-item flat discounts", async () => {
     targetMockValue = {
       discountScope: "item",
       discountType: "flat",
@@ -108,16 +147,22 @@ describe("Live Financial Calculation Matrices", () => {
         },
       ],
     };
+    vi.mocked(initializeAndMigrateDatabase).mockResolvedValueOnce(targetMockValue);
 
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
+    const { result } = renderResult;
     expect(result.current.calculatedTotals.subtotal).toBe(200.0);
     expect(result.current.calculatedTotals.discount).toBe(20.0);
     expect(result.current.calculatedTotals.tax).toBe(18.0);
     expect(result.current.calculatedTotals.grandTotal).toBe(198.0);
   });
 
-  it("Scenario B: Handles global subtotal percentage discounts and global flat taxes", () => {
+  it("Scenario B: Handles global subtotal percentage discounts and global flat taxes", async () => {
     targetMockValue = {
       discountScope: "subtotal",
       discountType: "percentage",
@@ -132,9 +177,15 @@ describe("Live Financial Calculation Matrices", () => {
         { qty: 1, price: 50.0, discount: 0, taxRate: 0 },
       ],
     };
+    vi.mocked(initializeAndMigrateDatabase).mockResolvedValueOnce(targetMockValue);
 
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
+    const { result } = renderResult;
     expect(result.current.calculatedTotals.subtotal).toBe(250.0);
     expect(result.current.calculatedTotals.discount).toBe(25.0);
     expect(result.current.calculatedTotals.tax).toBe(15.0);
@@ -142,7 +193,7 @@ describe("Live Financial Calculation Matrices", () => {
     expect(result.current.calculatedTotals.balanceDue).toBe(210.0);
   });
 
-  it("Scenario C: Handles global subtotal flat discounts and global percentage taxes", () => {
+  it("Scenario C: Handles global subtotal flat discounts and global percentage taxes", async () => {
     targetMockValue = {
       discountScope: "subtotal",
       discountType: "flat",
@@ -154,16 +205,22 @@ describe("Live Financial Calculation Matrices", () => {
       amountPaid: 0,
       items: [{ qty: 1, price: 250.0, discount: 0, taxRate: 0 }],
     };
+    vi.mocked(initializeAndMigrateDatabase).mockResolvedValueOnce(targetMockValue);
 
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
+    const { result } = renderResult;
     expect(result.current.calculatedTotals.subtotal).toBe(250.0);
     expect(result.current.calculatedTotals.discount).toBe(50.0);
     expect(result.current.calculatedTotals.tax).toBe(10.0);
     expect(result.current.calculatedTotals.grandTotal).toBe(210.0);
   });
 
-  it("Scenario D: Ensures clean calculation fallbacks when scopes are turned off ('none')", () => {
+  it("Scenario D: Ensures clean calculation fallbacks when scopes are turned off ('none')", async () => {
     targetMockValue = {
       discountScope: "none",
       taxScope: "none",
@@ -171,9 +228,15 @@ describe("Live Financial Calculation Matrices", () => {
       amountPaid: 0,
       items: [{ qty: 1, price: 100.0, discount: 50, taxRate: 20 }],
     };
+    vi.mocked(initializeAndMigrateDatabase).mockResolvedValueOnce(targetMockValue);
 
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
+    const { result } = renderResult;
     expect(result.current.calculatedTotals.subtotal).toBe(100.0);
     expect(result.current.calculatedTotals.discount).toBe(0.0);
     expect(result.current.calculatedTotals.tax).toBe(0.0);
@@ -188,11 +251,17 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
     targetMockValue = { ...baseMockState };
+    vi.mocked(initializeAndMigrateDatabase).mockResolvedValue(targetMockValue);
   });
 
-  it("blocks file uploads that exceed the 1MB safety threshold and sets proper toast warnings", () => {
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+  it("blocks file uploads that exceed the 1MB safety threshold and sets proper toast warnings", async () => {
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
+    const { result } = renderResult;
     const giantFile = new File(["x".repeat(1.5 * 1024 * 1024)], "massive_logo.png", {
       type: "image/png",
     });
@@ -204,7 +273,7 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
       },
     };
 
-    act(() => {
+    await act(async () => {
       result.current.handleLogoUpload(mockEvent);
     });
 
@@ -213,13 +282,17 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
       "error"
     );
     expect(mockEvent.target.value).toBe("");
-    // Adjusted to match the initial empty string state from your presets
     expect(result.current.invoice.businessLogo).toBe("");
   });
 
-  it("blocks unsupported image formats (e.g. webp) and alerts the user via toast", () => {
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+  it("blocks unsupported image formats (e.g. webp) and alerts the user via toast", async () => {
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
+    const { result } = renderResult;
     const invalidFile = new File(["dummy_data"], "logo.webp", {
       type: "image/webp",
     });
@@ -231,7 +304,7 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
       },
     };
 
-    act(() => {
+    await act(async () => {
       result.current.handleLogoUpload(mockEvent);
     });
 
@@ -240,12 +313,10 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
       "error"
     );
     expect(mockEvent.target.value).toBe("");
-    // Adjusted to match the initial empty string state from your presets
     expect(result.current.invoice.businessLogo).toBe("");
   });
 
   it("successfully passes safe images through the off-screen canvas scaling pipeline and hits IndexedDB", async () => {
-    // 1. Mock FileReader API using a standard constructible function
     const mockFileReaderInstance = {
       readAsDataURL: vi.fn(function () {
         if (this.onload) {
@@ -260,7 +331,6 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
       })
     );
 
-    // 2. Mock Image API using a standard constructible function
     const mockImageInstance = {
       width: 800,
       height: 600,
@@ -278,7 +348,6 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
       })
     );
 
-    // 3. Mock Canvas element methods
     const mockContext2D = {
       drawImage: vi.fn(),
     };
@@ -295,8 +364,13 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
       return originalCreateElement(tagName);
     });
 
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
+    const { result } = renderResult;
     const safeFile = new File(["x".repeat(200 * 1024)], "company_logo.png", {
       type: "image/png",
     });
@@ -314,8 +388,6 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
       "data:image/png;base64,optimizedMicroPayload"
     );
     expect(result.current.invoice.businessLogo).toBe("data:image/png;base64,optimizedMicroPayload");
-
-    // Adjusted to match the exact toast notification returned by your editor pipeline
     expect(mockTriggerToast).toHaveBeenCalledWith("Logo saved successfully.");
   });
 
@@ -327,6 +399,7 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
     let renderResult;
     await act(async () => {
       renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
     });
 
     expect(assetStorage.getLogo).toHaveBeenCalled();
@@ -338,13 +411,13 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
   it("detects, migrates, and cleans up legacy logos found inside localStorage on mount", async () => {
     const legacyLogoMockString = "data:image/png;base64,oldLegacyStringTrappedInLocalStorage";
 
-    // We can now use vi.mocked cleanly since the property is defined in our top-level factory
     vi.mocked(extractAndMigrateLegacyLogo).mockReturnValueOnce(legacyLogoMockString);
     vi.mocked(assetStorage.getLogo).mockResolvedValueOnce(null);
 
     let renderResult;
     await act(async () => {
       renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
     });
 
     expect(extractAndMigrateLegacyLogo).toHaveBeenCalled();
@@ -353,22 +426,24 @@ describe("Logo Upload Pipeline & Guardrails with IndexedDB Storage", () => {
   });
 
   it("clears the asset record out of IndexedDB and resets hook state when the logo is removed", async () => {
-    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+    let renderResult;
+    await act(async () => {
+      renderResult = renderHook(() => useInvoiceEditor(mockTriggerToast));
+      await waitForHydration();
+    });
 
-    // Fast-track mock state to pretend a logo is currently active
+    const { result } = renderResult;
+
     await act(async () => {
       result.current.updateField("businessLogo", "data:image/png;base64,activeLogoPayload");
     });
     expect(result.current.invoice.businessLogo).toBe("data:image/png;base64,activeLogoPayload");
 
-    // Execute the removal operation
     await act(async () => {
       await result.current.handleLogoDelete();
     });
 
-    // Assert the database interface was instructed to delete the file
     expect(assetStorage.deleteLogo).toHaveBeenCalled();
-    // Assert the hook state fell back to an empty string
     expect(result.current.invoice.businessLogo).toBe("");
   });
 });
