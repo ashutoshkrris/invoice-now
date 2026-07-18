@@ -169,3 +169,136 @@ describe("Live Financial Calculation Matrices", () => {
     expect(result.current.calculatedTotals.grandTotal).toBe(110.0);
   });
 });
+
+describe("Logo Upload Pipeline & Guardrails", () => {
+  const mockTriggerToast = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+  });
+
+  it("blocks file uploads that exceed the 1MB safety threshold and sets proper toast warnings", () => {
+    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+
+    const giantFile = new File(["x".repeat(1.5 * 1024 * 1024)], "massive_logo.png", {
+      type: "image/png",
+    });
+
+    const mockEvent = {
+      target: {
+        files: [giantFile],
+        value: "C:\\fakepath\\massive_logo.png",
+      },
+    };
+
+    act(() => {
+      result.current.handleLogoUpload(mockEvent);
+    });
+
+    expect(mockTriggerToast).toHaveBeenCalledWith(
+      "Upload failed: Logo size cannot exceed 1 MB.",
+      "error"
+    );
+    expect(mockEvent.target.value).toBe("");
+    expect(result.current.invoice.businessLogo).not.toBeDefined();
+  });
+
+  it("blocks unsupported image formats (e.g. webp) and alerts the user via toast", () => {
+    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+
+    const invalidFile = new File(["dummy_data"], "logo.webp", {
+      type: "image/webp",
+    });
+
+    const mockEvent = {
+      target: {
+        files: [invalidFile],
+        value: "C:\\fakepath\\logo.webp",
+      },
+    };
+
+    act(() => {
+      result.current.handleLogoUpload(mockEvent);
+    });
+
+    expect(mockTriggerToast).toHaveBeenCalledWith(
+      "Upload failed: Only JPG, JPEG, and PNG formats are supported.",
+      "error"
+    );
+    expect(mockEvent.target.value).toBe("");
+    expect(result.current.invoice.businessLogo).not.toBeDefined();
+  });
+
+  it("successfully passes safe images through the off-screen canvas scaling pipeline", async () => {
+    // 1. Mock FileReader API using a standard constructible function
+    const mockFileReaderInstance = {
+      readAsDataURL: vi.fn(function () {
+        if (this.onload) {
+          this.onload({ target: { result: "data:image/png;base64,mockRawString" } });
+        }
+      }),
+    };
+    vi.stubGlobal(
+      "FileReader",
+      vi.fn(function () {
+        return mockFileReaderInstance;
+      })
+    );
+
+    // 2. Mock Image API using a standard constructible function
+    const mockImageInstance = {
+      width: 800,
+      height: 600,
+      set src(val) {
+        if (this.onload) this.onload();
+      },
+      get src() {
+        return "data:image/png;base64,mockRawString";
+      },
+    };
+    vi.stubGlobal(
+      "Image",
+      vi.fn(function () {
+        return mockImageInstance;
+      })
+    );
+
+    // 3. Mock Canvas element methods
+    const mockContext2D = {
+      drawImage: vi.fn(),
+    };
+    const mockCanvasElement = {
+      getContext: vi.fn(() => mockContext2D),
+      toDataURL: vi.fn(() => "data:image/jpeg;base64,optimizedMicroPayload"),
+      width: 0,
+      height: 0,
+    };
+
+    // Capture the authentic method beforehand to prevent recursion loops
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation((tagName) => {
+      if (tagName === "canvas") return mockCanvasElement;
+      return originalCreateElement(tagName);
+    });
+
+    const { result } = renderHook(() => useInvoiceEditor(mockTriggerToast));
+
+    const safeFile = new File(["x".repeat(200 * 1024)], "company_logo.jpg", {
+      type: "image/jpeg",
+    });
+    const mockEvent = { target: { files: [safeFile] } };
+
+    act(() => {
+      result.current.handleLogoUpload(mockEvent);
+    });
+
+    expect(mockCanvasElement.width).toBe(250);
+    expect(mockCanvasElement.height).toBe(188); // 4:3 Aspect Ratio calculation verification
+    expect(mockContext2D.drawImage).toHaveBeenCalledWith(mockImageInstance, 0, 0, 250, 188);
+    expect(result.current.invoice.businessLogo).toBe(
+      "data:image/jpeg;base64,optimizedMicroPayload"
+    );
+    expect(mockTriggerToast).toHaveBeenCalledWith("Logo optimized and saved successfully.");
+  });
+});

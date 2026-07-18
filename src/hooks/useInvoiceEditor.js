@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { INITIAL_INVOICE_STATE } from "../constants/invoicePresets";
 import { COUNTRIES } from "../constants/countries";
 import { loadCachedState, persistState } from "../utils/storage";
+import { FIELD_LIMITS } from "../constants/fieldLimits";
 
 export function useInvoiceEditor(triggerToast) {
   const [invoice, setInvoice] = useState(loadCachedState);
@@ -156,15 +157,80 @@ export function useInvoiceEditor(triggerToast) {
   }, [invoice]);
 
   const handleLogoUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateField("businessLogo", reader.result);
-        triggerToast("Logo saved successfully.");
-      };
-      reader.readAsDataURL(file);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 1. Guardrail Check: Allowed File Types
+    if (!FIELD_LIMITS.allowedTypesForLogo.includes(file.type)) {
+      triggerToast("Upload failed: Only JPG, JPEG, and PNG formats are supported.", "error");
+      e.target.value = ""; // Reset file input
+      return;
     }
+
+    // 2. Guardrail Check: Size limit validation
+    const maxSizeBytes = FIELD_LIMITS.logoSizeInMB * 1024 * 1024; // 1MB
+    if (file.size > maxSizeBytes) {
+      triggerToast(
+        `Upload failed: Logo size cannot exceed ${FIELD_LIMITS.logoSizeInMB} MB.`,
+        "error"
+      );
+      e.target.value = ""; // Clear file input field string
+      return;
+    }
+
+    // 3. Off-screen optimization pipeline
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX_WIDTH = 250;
+        const MAX_HEIGHT = 250;
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate aspect-ratio safe scaling boundaries
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        // Initialize canvas pipeline
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          triggerToast("Failed to process image optimization.", "error");
+          return;
+        }
+
+        // Render target image into context boundaries
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Compress canvas output to a lightweight PNG Base64 payload
+        const optimizedBase64 = canvas.toDataURL("image/png");
+
+        // Save processed structure to application stack
+        updateField("businessLogo", optimizedBase64);
+        triggerToast("Logo optimized and saved successfully.");
+      };
+
+      img.onerror = () => {
+        triggerToast("Invalid image file format.", "error");
+      };
+
+      img.src = event.target.result;
+    };
+
+    reader.readAsDataURL(file);
   };
 
   return {

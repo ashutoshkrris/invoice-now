@@ -1,3 +1,4 @@
+import { FIELD_LIMITS } from "../../constants/fieldLimits";
 import { Icons } from "./Icons";
 
 export default function LogoUploader({
@@ -15,7 +16,13 @@ export default function LogoUploader({
 }) {
   return (
     <div className={`relative group/logo w-48 min-h-10 flex items-center ${containerClassName}`}>
-      <input type="file" id={id} accept="image/*" onChange={onLogoUpload} className="hidden" />
+      <input
+        type="file"
+        id={id}
+        accept={FIELD_LIMITS.allowedTypesForLogo.join(", ")}
+        onChange={onLogoUpload}
+        className="hidden"
+      />
 
       {invoice.businessLogo ? (
         <div className="relative">
