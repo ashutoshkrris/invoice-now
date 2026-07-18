@@ -1,4 +1,4 @@
-import { FIELD_LIMITS } from "../../constants/fieldLimits";
+import { CONSTANTS } from "../../constants/globalConstants";
 import { Icons } from "./Icons";
 
 export default function LogoUploader({
@@ -19,7 +19,7 @@ export default function LogoUploader({
       <input
         type="file"
         id={id}
-        accept={FIELD_LIMITS.allowedTypesForLogo.join(", ")}
+        accept={CONSTANTS.ALLOWED_TYPES_FOR_LOGO.join(", ")}
         onChange={onLogoUpload}
         className="hidden"
       />

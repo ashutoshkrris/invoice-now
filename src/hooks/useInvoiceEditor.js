@@ -7,7 +7,7 @@ import {
   assetStorage,
   extractAndMigrateLegacyLogo,
 } from "../utils/storage";
-import { FIELD_LIMITS } from "../constants/fieldLimits";
+import { CONSTANTS } from "../constants/globalConstants";
 
 export function useInvoiceEditor(triggerToast) {
   const [invoice, setInvoice] = useState(loadCachedState);
@@ -194,17 +194,17 @@ export function useInvoiceEditor(triggerToast) {
     if (!file) return;
 
     // 1. Guardrail Check: Allowed File Types
-    if (!FIELD_LIMITS.allowedTypesForLogo.includes(file.type)) {
+    if (!CONSTANTS.ALLOWED_TYPES_FOR_LOGO.includes(file.type)) {
       triggerToast("Upload failed: Only JPG, JPEG, and PNG formats are supported.", "error");
       e.target.value = ""; // Reset file input
       return;
     }
 
     // 2. Guardrail Check: Size limit validation
-    const maxSizeBytes = FIELD_LIMITS.logoSizeInMB * 1024 * 1024; // 1MB
+    const maxSizeBytes = CONSTANTS.LOGO_SIZE_IN_MB * 1024 * 1024; // 1MB
     if (file.size > maxSizeBytes) {
       triggerToast(
-        `Upload failed: Logo size cannot exceed ${FIELD_LIMITS.logoSizeInMB} MB.`,
+        `Upload failed: Logo size cannot exceed ${CONSTANTS.LOGO_SIZE_IN_MB} MB.`,
         "error"
       );
       e.target.value = ""; // Clear file input field string
