@@ -278,3 +278,83 @@ export const purgeLegacyStorageKey = () => {
     console.error("Failed to clear legacy schema item configuration mapping safely:", e);
   }
 };
+
+/**
+ * ============================================================================
+ * MULTI-DOCUMENT WORKSPACE CRUD UTILITIES
+ * ============================================================================
+ */
+
+/**
+ * Fetches a single specific invoice state entry out of the IndexedDB primary vault layer
+ * @param {string} id - Unique document identifier UUID
+ * @returns {Promise<Object|null>}
+ */
+export const getInvoiceById = async (id) => {
+  try {
+    return await dbInstance.get("invoices", id);
+  } catch (e) {
+    console.error(`Failed to retrieve invoice target id ${id} from database storage:`, e);
+    return null;
+  }
+};
+
+/**
+ * Creates a brand new document record block with isolated properties and saves it to tracking paths
+ * @returns {Promise<Object>} The initialized state definition alongside the generated active tracking UUID
+ */
+export const createNewInvoiceWorkspace = async () => {
+  const newUuid = crypto.randomUUID();
+
+  // Clean initialization values based on standard workspace schemas
+  const baseTemplate = {
+    ...INITIAL_INVOICE_STATE,
+    invoiceNumber: `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+  };
+
+  await dbInstance.put("invoices", newUuid, baseTemplate);
+  updateRegistryMetadata(newUuid, baseTemplate);
+
+  return { id: newUuid, payload: baseTemplate };
+};
+
+/**
+ * Drops record entities entirely out of IndexedDB and purges references inside tracking maps
+ * @param {string} id - The specific target tracking key UUID pointer intended for cascading drop execution
+ * @returns {Promise<string|null>} Resolves with the next best available active ID string to switch view targets to
+ */
+export const deleteInvoiceWorkspace = async (id) => {
+  try {
+    // 1. Evict main payload configuration structures from database store mapping
+    await dbInstance.delete("invoices", id);
+
+    // 2. Clear out lightweight array parameters from index registry layout
+    const registryData = localStorage.getItem(CONSTANTS.REGISTRY_KEY);
+    let registry = registryData ? JSON.parse(registryData) : [];
+    const filteredRegistry = registry.filter((item) => item.id !== id);
+    localStorage.setItem(CONSTANTS.REGISTRY_KEY, JSON.stringify(filteredRegistry));
+
+    // 3. Evaluate proper alternative workspaces fallback targets to safely return to application layers
+    if (filteredRegistry.length > 0) {
+      return filteredRegistry[filteredRegistry.length - 1].id;
+    }
+
+    // Completely empty database state fallback management initialization loop block
+    const freshUuid = crypto.randomUUID();
+    const freshRegistry = [
+      {
+        id: freshUuid,
+        invoiceNumber: INITIAL_INVOICE_STATE.invoiceNumber,
+        clientName: INITIAL_INVOICE_STATE.customerName || "John Doe",
+        updatedAt: Date.now(),
+      },
+    ];
+    localStorage.setItem(CONSTANTS.REGISTRY_KEY, JSON.stringify(freshRegistry));
+    await dbInstance.put("invoices", freshUuid, INITIAL_INVOICE_STATE);
+
+    return freshUuid;
+  } catch (e) {
+    console.error(`Failed to delete invoice workspace target allocation for entry ${id}:`, e);
+    return null;
+  }
+};
