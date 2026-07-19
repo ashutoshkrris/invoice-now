@@ -279,6 +279,18 @@ export const initializeAndMigrateDatabase = async () => {
       return currentKeyFallback;
     }
 
+    // If a concurrent cycle has just initialized the fresh registry configuration arrays,
+    // immediately pivot to return that invoice structure instead of spawning an un-indexed zombie record block.
+    const checkRegistry = localStorage.getItem(CONSTANTS.REGISTRY_KEY);
+    if (checkRegistry) {
+      const existingRegistry = JSON.parse(checkRegistry);
+      if (existingRegistry && existingRegistry.length > 0) {
+        const structuralFallbackId = existingRegistry[0].id;
+        const activeInvoice = await dbInstance.get("invoices", structuralFallbackId);
+        if (activeInvoice) return activeInvoice;
+      }
+    }
+
     // 4. Fresh user scenario setup loop
     const freshUuid = crypto.randomUUID();
     localStorage.setItem(CONSTANTS.ACTIVE_ID_KEY, freshUuid);
