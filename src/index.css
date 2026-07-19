@@ -112,3 +112,36 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* --- FORCE TABLE STRUCTURE DURING EXPORTS --- */
+#printable-invoice-area.forcing-pdf-export .block.md\:hidden {
+  display: none !important;
+}
+
+#printable-invoice-area.forcing-pdf-export .hidden.md\:block {
+  display: block !important;
+}
+
+#printable-invoice-area.forcing-pdf-export table.min-w-\[600px\] {
+  min-w: 100% !important;
+  width: 100% !important;
+}
+
+/* --- FORCING TOTALS LAYOUT GRID RE-ALIGNMENT DURING EXPORTS --- */
+#printable-invoice-area.forcing-pdf-export .avoid-page-slice.grid-cols-12 {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+}
+
+#printable-invoice-area.forcing-pdf-export .col-span-12.sm\:col-span-7 {
+  width: 55% !important;
+  order: 1 !important; /* Left hand side notes */
+}
+
+#printable-invoice-area.forcing-pdf-export .col-span-12.sm\:col-span-5 {
+  width: 40% !important;
+  order: 2 !important; /* Right hand side totals block */
+  margin-left: auto !important;
+}
