@@ -33,13 +33,19 @@ export const runSystemPrint = (invoice, setIsExporting) => {
 
   const originalWidth = target.style.width;
   const originalMinHeight = target.style.minHeight;
+
+  // Inject alignment forcing classes
   target.style.width = BASELINE_WIDTH;
   target.style.minHeight = invoice.paperSize === "letter" ? "1050px" : "1120px";
+  target.classList.add("forcing-pdf-export");
 
   setTimeout(() => {
     window.print();
+
+    // Cleanup styles and layout tracking classes
     target.style.width = originalWidth;
     target.style.minHeight = originalMinHeight;
+    target.classList.remove("forcing-pdf-export");
     setIsExporting(false);
   }, 300);
 };
@@ -56,11 +62,14 @@ export const exportToPNG = async (invoice, setIsExporting, triggerToast) => {
 
   const originalWidth = target.style.width;
   const originalMinHeight = target.style.minHeight;
+
+  // Inject alignment forcing classes
   target.style.width = BASELINE_WIDTH;
   target.style.minHeight = invoice.paperSize === "letter" ? "1050px" : "1120px";
+  target.classList.add("forcing-pdf-export");
 
   try {
-    await new Promise((res) => setTimeout(res, 60));
+    await new Promise((res) => setTimeout(res, 150)); // Bumped slightly to guarantee re-layout paint completion
     const dataUrl = await toPng(target, {
       quality: 0.95,
       pixelRatio: 3,
@@ -77,8 +86,10 @@ export const exportToPNG = async (invoice, setIsExporting, triggerToast) => {
     console.error(err);
     triggerToast("PNG generation failed", "error");
   } finally {
+    // Cleanup styles and layout tracking classes
     target.style.width = originalWidth;
     target.style.minHeight = originalMinHeight;
+    target.classList.remove("forcing-pdf-export");
     setIsExporting(false);
   }
 };
@@ -97,9 +108,11 @@ export const exportToPDF = async (invoice, setIsExporting, triggerToast) => {
     const originalWidth = target.style.width;
     const originalMinHeight = target.style.minHeight;
 
+    // Inject alignment forcing classes
     target.style.width = BASELINE_WIDTH;
     const singlePageHeight = invoice.paperSize === "letter" ? 1050 : 1120;
     target.style.minHeight = `${singlePageHeight}px`;
+    target.classList.add("forcing-pdf-export");
 
     // 1. EVALUATE ELEMENTS & INJECT SPACERS
     const allElements = target.querySelectorAll(
@@ -141,7 +154,7 @@ export const exportToPDF = async (invoice, setIsExporting, triggerToast) => {
 
     // 2. CAPTURE HIGHFIDELITY SNAPSHOT
     try {
-      await new Promise((res) => setTimeout(res, 60));
+      await new Promise((res) => setTimeout(res, 150)); // Bumped to match paint timing guarantees
 
       const dataUrl = await toPng(target, {
         quality: 0.95,
@@ -216,6 +229,7 @@ export const exportToPDF = async (invoice, setIsExporting, triggerToast) => {
       // 3. SAFE RETRACTION CLEANUP
       target.style.width = originalWidth;
       target.style.minHeight = originalMinHeight;
+      target.classList.remove("forcing-pdf-export");
       injectedSpacers.forEach((s) => s.remove());
       setIsExporting(false);
     }
