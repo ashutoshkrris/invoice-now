@@ -9,14 +9,21 @@ export function InvoiceSwitcher({
   switchInvoiceWorkspace,
   handleCreateNewInvoice,
   handleDeleteInvoice,
+  handleDuplicateInvoice,
+  handleRenameInvoice,
   triggerToast,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
 
+  // Track which invoice is being renamed inline
+  const [editingId, setEditingId] = useState(null);
+  const [editValue, setEditValue] = useState("");
+
   const sidebarRef = useRef(null);
   const searchInputRef = useRef(null);
+  const renameInputRef = useRef(null);
 
   const maxInvoicesThreshold = CONSTANTS.MAX_INVOICE_LIMIT || 25;
 
@@ -51,6 +58,14 @@ export function InvoiceSwitcher({
       setTimeout(() => searchInputRef.current.focus(), 100);
     }
   }, [isOpen]);
+
+  // --- AUTO-FOCUS RENAME FIELD WHEN TOGGLED ---
+  useEffect(() => {
+    if (editingId && renameInputRef.current) {
+      renameInputRef.current.focus();
+      renameInputRef.current.select();
+    }
+  }, [editingId]);
 
   // --- FILTER & SORT REGISTRY ENGINE ---
   const processedInvoices = useMemo(() => {
@@ -103,6 +118,36 @@ export function InvoiceSwitcher({
     // Otherwise proceed with creation sequence safely
     handleCreateNewInvoice();
     setSearchQuery("");
+  };
+
+  const onDuplicateClick = (e, item) => {
+    e.stopPropagation(); // Avoid triggering the row switcher workspace transition!
+
+    // Safety check against maximum ceilings
+    const limit = CONSTANTS?.MAX_INVOICE_LIMIT || 25;
+    if (invoiceRegistry.length >= limit) {
+      if (typeof triggerToast === "function") {
+        triggerToast(`Limit reached. Cannot duplicate past ${limit} workspaces.`, "warning");
+      }
+      return;
+    }
+
+    handleDuplicateInvoice(item.id);
+  };
+
+  // Turn on editing panel mode
+  const startRenaming = (e, item) => {
+    e.stopPropagation();
+    setEditingId(item.id);
+    setEditValue(item.clientName || ""); // <-- Targets clientName instead of invoiceNumber now
+  };
+
+  // Save the modified string parameter down into database pipeline
+  const saveRenameAction = (id) => {
+    if (editValue.trim() && editValue !== invoiceRegistry.find((i) => i.id === id)?.clientName) {
+      handleRenameInvoice(id, editValue.trim()); // <-- Passes new client/workspace name up
+    }
+    setEditingId(null);
   };
 
   const isMac = navigator.platform.toUpperCase().includes("MAC");
@@ -192,45 +237,128 @@ export function InvoiceSwitcher({
           ) : (
             processedInvoices.map((item) => {
               const isActive = item.id === activeInvoiceId;
+              const isEditing = item.id === editingId;
+
               return (
                 <div
                   key={item.id}
                   onClick={() => {
-                    switchInvoiceWorkspace(item.id);
-                    if (window.innerWidth < 640) setIsOpen(false);
+                    if (!isEditing) {
+                      switchInvoiceWorkspace(item.id);
+                      if (window.innerWidth < 640) setIsOpen(false);
+                    }
                   }}
-                  className={`group relative w-full flex items-center justify-between p-3 rounded-xl text-left transition-all cursor-pointer border ${
-                    isActive
+                  className={`group relative w-full flex items-center justify-between p-3 rounded-xl text-left transition-all border ${
+                    isEditing
+                      ? "cursor-default border-brand-500 bg-white dark:bg-slate-900"
+                      : "cursor-pointer"
+                  } ${
+                    isActive && !isEditing
                       ? "bg-slate-50 dark:bg-slate-800/50 border-brand-500/30 dark:border-brand-500/20 shadow-sm"
-                      : "hover:bg-slate-50 dark:hover:bg-slate-800/30 border-transparent"
+                      : !isEditing
+                        ? "hover:bg-slate-50 dark:hover:bg-slate-800/30 border-transparent"
+                        : ""
                   }`}
                 >
-                  <div className="flex flex-col min-w-0 pr-4">
-                    <span
-                      className={`text-xs font-bold truncate ${isActive ? "text-brand-600 dark:text-brand-400" : "text-slate-700 dark:text-slate-300"}`}
-                    >
-                      {item.clientName || "Unnamed Client"}
-                    </span>
-                    <div className="flex flex-col items-start gap-1 mt-1 text-[10px] font-semibold text-slate-400">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md border border-slate-200/60 dark:border-slate-700/60 text-slate-500 dark:text-slate-400">
+                  <div className="flex flex-col min-w-0 pr-24 w-full">
+                    {/* Workspace Text Field / Inline Renamer Input */}
+                    {isEditing ? (
+                      <div
+                        className="flex items-center gap-1 w-full mb-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          ref={renameInputRef}
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveRenameAction(item.id);
+                            if (e.key === "Escape") setEditingId(null);
+                          }}
+                          className="flex-1 px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-lg text-xs font-bold outline-none focus:border-brand-500"
+                        />
+
+                        {/* DEDICATED MOBILE-FRIENDLY SAVE ICON BUTTON */}
+                        <button
+                          onClick={() => saveRenameAction(item.id)}
+                          className="p-1 bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/40 dark:hover:bg-brand-900/60 text-brand-600 dark:text-brand-400 rounded-lg transition-colors cursor-pointer"
+                          title="Save Name"
+                        >
+                          <Icons.Check className="w-3.5 h-3.5" strokeWidth={2.5} />
+                        </button>
+
+                        {/* CANCEL EDITING ICON BUTTON */}
+                        <button
+                          onClick={() => setEditingId(null)}
+                          className="p-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg transition-colors cursor-pointer"
+                          title="Cancel"
+                        >
+                          <Icons.Close className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <span
+                        className={`text-xs font-bold truncate ${isActive ? "text-brand-600 dark:text-brand-400" : "text-slate-700 dark:text-slate-300"}`}
+                      >
+                        {item.clientName || "Unnamed Client"}
+                      </span>
+                    )}
+
+                    <div className="flex flex-col items-start gap-1 text-[10px] font-semibold text-slate-400 w-full">
+                      <div className="flex items-center gap-1.5 w-full mt-0.5">
+                        <span className="font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md border border-slate-200/60 dark:border-slate-700/60 text-slate-500 dark:text-slate-400 truncate max-w-full">
                           {item.invoiceNumber || "Draft"}
                         </span>
                       </div>
-                      <span className="text-[9px] text-slate-400/80 font-medium">
-                        Updated: {formatLastUpdated(item.updatedAt)}
-                      </span>
+                      {!isEditing && (
+                        <span className="text-[9px] text-slate-400/80 font-medium">
+                          Updated: {formatLastUpdated(item.updatedAt)}
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  {/* DELETION TRIGGER */}
-                  <button
-                    onClick={(e) => triggerDeleteConfirmation(e, item.id, item.invoiceNumber)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 sm:opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                    title="Delete Invoice"
-                  >
-                    <Icons.Trash className="w-3.5 h-3.5" />
-                  </button>
+                  {/* INTERACTIVE ACTION BUTTON ROW GROUP */}
+                  {!isEditing && (
+                    <div className="flex items-center gap-1 no-print sm:opacity-0 group-hover:opacity-100 transition-all absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-l from-slate-50 via-slate-50 to-transparent pl-4 dark:from-slate-800/80 dark:via-slate-800/80 h-full rounded-r-xl">
+                      {/* RENAME TRIGGER */}
+                      <button
+                        onClick={(e) => startRenaming(e, item)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-slate-700/50 transition-all cursor-pointer"
+                        title="Rename Workspace Name"
+                      >
+                        <Icons.Pencil className="w-3 h-3" />
+                      </button>
+
+                      {/* DUPLICATE TRIGGER */}
+                      <button
+                        onClick={(e) => onDuplicateClick(e, item)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-slate-700/50 transition-all cursor-pointer"
+                        title="Duplicate Invoice"
+                      >
+                        <Icons.Copy className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* DELETION TRIGGER */}
+                      <button
+                        disabled={invoiceRegistry.length <= 1}
+                        onClick={(e) => triggerDeleteConfirmation(e, item.id, item.invoiceNumber)}
+                        className={`p-1 rounded-lg transition-all ${
+                          invoiceRegistry.length <= 1
+                            ? "text-slate-200 dark:text-slate-800 cursor-not-allowed"
+                            : "text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer"
+                        }`}
+                        title={
+                          invoiceRegistry.length <= 1
+                            ? "Cannot delete final invoice"
+                            : "Delete Invoice"
+                        }
+                      >
+                        <Icons.Trash className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })

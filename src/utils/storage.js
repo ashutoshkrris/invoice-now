@@ -358,3 +358,65 @@ export const deleteInvoiceWorkspace = async (id) => {
     return null;
   }
 };
+
+/**
+ * Reads a target invoice state configuration, clones it, and assigns a new unique database identity pointer.
+ * @param {string} sourceId - The unique identifier UUID of the invoice template to duplicate.
+ * @returns {Promise<Object>} Resolves with the cloned payload and its newly minted workspace identity pointer.
+ */
+export const duplicateInvoiceWorkspace = async (sourceId) => {
+  try {
+    // 1. Pull down the exact source state structure from IndexedDB
+    const sourceData = await dbInstance.get("invoices", sourceId);
+    if (!sourceData) throw new Error(`Source workspace allocation ${sourceId} not found.`);
+
+    // 2. Generate clean target identities and deep clone parameters
+    const cloneUuid = crypto.randomUUID();
+    const clonedPayload = {
+      ...JSON.parse(JSON.stringify(sourceData)), // Deep copy to prevent pointer leaks
+      invoiceNumber: `${sourceData.invoiceNumber || "INV"}-COPY`,
+    };
+
+    // 3. Write target clone payload down into the database layer
+    await dbInstance.put("invoices", cloneUuid, clonedPayload);
+
+    // 4. Force synchronous inline metadata indexing update
+    updateRegistryMetadata(cloneUuid, clonedPayload);
+
+    return { id: cloneUuid, payload: clonedPayload };
+  } catch (e) {
+    console.error("Database workspace duplication caught an execution block:", e);
+    throw e;
+  }
+};
+
+/**
+ * Updates the workspace client name identifier within a target invoice document.
+ * @param {string} id - Unique document workspace UUID
+ * @param {string} nextClientName - The updated workspace/client name string
+ * @returns {Promise<void>}
+ */
+export const renameInvoiceWorkspace = async (id, nextClientName) => {
+  try {
+    const data = await dbInstance.get("invoices", id);
+    if (!data) throw new Error(`Target invoice workspace ${id} not found.`);
+
+    // 1. Update the document payload properties inside IndexedDB
+    data.clientName = nextClientName;
+    await dbInstance.put("invoices", id, data);
+
+    // 2. Synchronize the local metadata tracking indices map
+    const registryData = localStorage.getItem(CONSTANTS.REGISTRY_KEY);
+    let registry = registryData ? JSON.parse(registryData) : [];
+    const index = registry.findIndex((item) => item.id === id);
+
+    if (index !== -1) {
+      registry[index].clientName = nextClientName;
+      registry[index].updatedAt = Date.now();
+      localStorage.setItem(CONSTANTS.REGISTRY_KEY, JSON.stringify(registry));
+    }
+  } catch (e) {
+    console.error("Failed to rename target invoice workspace configuration records:", e);
+    throw e;
+  }
+};

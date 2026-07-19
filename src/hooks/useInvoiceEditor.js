@@ -11,6 +11,8 @@ import {
   getInvoiceById,
   createNewInvoiceWorkspace,
   deleteInvoiceWorkspace,
+  duplicateInvoiceWorkspace,
+  renameInvoiceWorkspace,
 } from "../utils/storage";
 import { CONSTANTS } from "../constants/globalConstants";
 
@@ -456,6 +458,82 @@ export function useInvoiceEditor(triggerToast) {
     }
   };
 
+  /**
+   * Clones a target workspace, registers its indexing metadata, and transitions viewport focuses.
+   * @param {string} targetId - Document ID target intended for cloning processing
+   */
+  const handleDuplicateInvoice = async (targetId) => {
+    try {
+      // Upper bound limit validation block check
+      const currentLimit = CONSTANTS?.MAX_INVOICE_LIMIT || 25; // Fallback to 25 if needed
+      if (invoiceRegistry.length >= currentLimit) {
+        triggerToast(`Duplication failed. Maximum allowed is ${currentLimit} invoices.`, "warning");
+        return;
+      }
+
+      setIsHydrated(false);
+      const { id, payload } = await duplicateInvoiceWorkspace(targetId);
+
+      // Extract unified shared asset logos cleanly from separate IndexedDB asset store
+      const currentLogo = await assetStorage.getLogo();
+      const nextState = { ...payload };
+      if (currentLogo) {
+        nextState.businessLogo = currentLogo;
+      }
+
+      // Transition global active identifiers and clear state history tracks
+      localStorage.setItem(CONSTANTS.ACTIVE_ID_KEY, id);
+      setActiveInvoiceId(id);
+      setInvoice(nextState);
+      setHistory([JSON.stringify(payload)]);
+      setHistoryIdx(0);
+      persistState(payload);
+
+      refreshRegistryCache();
+      setIsHydrated(true);
+      triggerToast("Invoice duplicated successfully.", "success");
+    } catch (e) {
+      console.error("Workspace hook state duplication failed:", e);
+      triggerToast("Failed to safely clone target invoice.", "error");
+      setIsHydrated(true);
+    }
+  };
+
+  /**
+   * Modifies the primary client name/title string of a specific invoice workspace allocation.
+   * @param {string} targetId - Document UUID target pointer
+   * @param {string} nextClientName - The updated workspace identification title text string
+   */
+  const handleRenameInvoice = async (targetId, nextClientName) => {
+    if (!nextClientName.trim()) {
+      triggerToast("Workspace name cannot be empty.", "warning");
+      return;
+    }
+
+    try {
+      await renameInvoiceWorkspace(targetId, nextClientName.trim());
+
+      // If the currently viewed invoice is renamed, synchronize active viewport state matrices
+      if (targetId === activeInvoiceId) {
+        setInvoice((prev) => {
+          const updated = { ...prev, clientName: nextClientName.trim() };
+          // Keep internal tracking history references correctly aligned
+          const currentHistory = history.slice(0, historyIdx + 1);
+          setHistory([...currentHistory, JSON.stringify(updated)]);
+          setHistoryIdx(currentHistory.length);
+          persistState(updated);
+          return updated;
+        });
+      }
+
+      refreshRegistryCache();
+      triggerToast("Workspace renamed successfully.", "success");
+    } catch (e) {
+      console.error("Hook context processing caught a file rename exception block:", e);
+      triggerToast("Failed to alter invoice workspace title details.", "error");
+    }
+  };
+
   return {
     invoice,
     isHydrated,
@@ -476,5 +554,7 @@ export function useInvoiceEditor(triggerToast) {
     switchInvoiceWorkspace,
     handleCreateNewInvoice,
     handleDeleteInvoice,
+    handleDuplicateInvoice,
+    handleRenameInvoice,
   };
 }
