@@ -8,6 +8,9 @@ import {
   extractAndMigrateLegacyLogo,
   initializeAndMigrateDatabase,
   purgeLegacyStorageKey,
+  getInvoiceById,
+  createNewInvoiceWorkspace,
+  deleteInvoiceWorkspace,
 } from "../utils/storage";
 import { CONSTANTS } from "../constants/globalConstants";
 
@@ -15,10 +18,24 @@ export function useInvoiceEditor(triggerToast) {
   // Default workspace initialized to an empty template placeholder during DB resolution
   const [invoice, setInvoice] = useState(INITIAL_INVOICE_STATE);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [activeInvoiceId, setActiveInvoiceId] = useState(() => {
+    return localStorage.getItem(CONSTANTS.ACTIVE_ID_KEY) || "";
+  });
+  const [invoiceRegistry, setInvoiceRegistry] = useState([]);
 
   // --- HISTORICAL UNDO / REDO STATE STACK ---
   const [history, setHistory] = useState([JSON.stringify(INITIAL_INVOICE_STATE)]);
   const [historyIdx, setHistoryIdx] = useState(0);
+
+  // Sync state registry definitions whenever local tracking variables trigger change vectors
+  const refreshRegistryCache = () => {
+    try {
+      const registryData = localStorage.getItem(CONSTANTS.REGISTRY_KEY);
+      setInvoiceRegistry(registryData ? JSON.parse(registryData) : []);
+    } catch (e) {
+      console.error("Failed to read context tracking directories accurately:", e);
+    }
+  };
 
   // --- ASSET HYDRATION & LEGACY MIGRATION PIPELINE ---
   useEffect(() => {
@@ -47,9 +64,13 @@ export function useInvoiceEditor(triggerToast) {
           fullyHydratedState.businessLogo = logoAsset;
         }
 
+        const currentActiveId = localStorage.getItem(CONSTANTS.ACTIVE_ID_KEY) || "";
+        setActiveInvoiceId(currentActiveId);
+
         setInvoice(fullyHydratedState);
         setHistory([JSON.stringify(operationalState)]);
         setHistoryIdx(0);
+        refreshRegistryCache();
         setIsHydrated(true);
 
         // Safely complete transactional loop by cleaning the old un-indexed storage space
@@ -62,18 +83,21 @@ export function useInvoiceEditor(triggerToast) {
     loadAndMigrateAssets();
   }, []);
 
-  const saveWithHistory = (newState) => {
+  const saveWithHistory = async (newState) => {
     if (!isHydrated) return; // Guard mutations until initialization complete
     setInvoice(newState);
     persistState(newState);
 
     // Silently fork state to IndexedDB background engine
-    shadowPersistState(newState);
+    await shadowPersistState(newState);
 
     const stringified = JSON.stringify(newState);
     const currentHistory = history.slice(0, historyIdx + 1);
     setHistory([...currentHistory, stringified]);
     setHistoryIdx(currentHistory.length);
+
+    // Refresh lightweight directory components instantly to balance titles inside listings
+    refreshRegistryCache();
   };
 
   const updateField = (key, value) => {
@@ -320,9 +344,123 @@ export function useInvoiceEditor(triggerToast) {
     }
   };
 
+  /**
+   * ============================================================================
+   * MULTI-DOCUMENT WORKSPACE LIFECYCLE HANDLERS
+   * ============================================================================
+   */
+
+  /**
+   * Switches views to a different designated document and targets isolated history queues
+   * @param {string} targetId - Unique destination workspace pointer string
+   */
+  const switchInvoiceWorkspace = async (targetId) => {
+    if (targetId === activeInvoiceId) return;
+
+    try {
+      setIsHydrated(false);
+      const targetData = await getInvoiceById(targetId);
+
+      if (targetData) {
+        // Fetch any unified shared logo details securely attached inside IndexedDB
+        const sharedLogo = await assetStorage.getLogo();
+        const alignedState = { ...targetData };
+        if (sharedLogo) {
+          alignedState.businessLogo = sharedLogo;
+        }
+
+        // Lock in application details and wipe the tracking state history
+        localStorage.setItem(CONSTANTS.ACTIVE_ID_KEY, targetId);
+        setActiveInvoiceId(targetId);
+        setInvoice(alignedState);
+        setHistory([JSON.stringify(targetData)]);
+        setHistoryIdx(0);
+        persistState(targetData);
+      }
+      setIsHydrated(true);
+      triggerToast("Workspace switched successfully.", "info");
+    } catch (e) {
+      console.error("Failed to transition invoice workspaces smoothly:", e);
+      triggerToast("Failed to switch workspaces cleanly.", "error");
+      setIsHydrated(true);
+    }
+  };
+
+  /**
+   * Triggers generation commands to launch entirely clean tracking templates
+   */
+  const handleCreateNewInvoice = async () => {
+    try {
+      setIsHydrated(false);
+      const { id, payload } = await createNewInvoiceWorkspace();
+
+      // Align logo references
+      const currentLogo = await assetStorage.getLogo();
+      const nextState = { ...payload };
+      if (currentLogo) {
+        nextState.businessLogo = currentLogo;
+      }
+
+      localStorage.setItem(CONSTANTS.ACTIVE_ID_KEY, id);
+      setActiveInvoiceId(id);
+      setInvoice(nextState);
+      setHistory([JSON.stringify(payload)]);
+      setHistoryIdx(0);
+      persistState(payload);
+
+      refreshRegistryCache();
+      setIsHydrated(true);
+      triggerToast("Created new workspace entry.");
+    } catch (e) {
+      console.error("Workspace instantiation caught operational failure:", e);
+      triggerToast("Failed to build a new invoice workflow.", "error");
+      setIsHydrated(true);
+    }
+  };
+
+  /**
+   * Clears out target payloads and transitions back to stable workspace tracks
+   * @param {string} targetId - Document ID target intended for removal processing
+   */
+  const handleDeleteInvoice = async (targetId) => {
+    try {
+      setIsHydrated(false);
+      const standardFallbackId = await deleteInvoiceWorkspace(targetId);
+
+      // If the current viewport is deleting itself, trigger automatic switching routines
+      if (targetId === activeInvoiceId && standardFallbackId) {
+        const nextData = await getInvoiceById(standardFallbackId);
+        if (nextData) {
+          const activeLogo = await assetStorage.getLogo();
+          const targetPayload = { ...nextData };
+          if (activeLogo) {
+            targetPayload.businessLogo = activeLogo;
+          }
+
+          localStorage.setItem(CONSTANTS.ACTIVE_ID_KEY, standardFallbackId);
+          setActiveInvoiceId(standardFallbackId);
+          setInvoice(targetPayload);
+          setHistory([JSON.stringify(nextData)]);
+          setHistoryIdx(0);
+          persistState(nextData);
+        }
+      }
+
+      refreshRegistryCache();
+      setIsHydrated(true);
+      triggerToast("Document removed successfully.", "info");
+    } catch (e) {
+      console.error("Cascade deletion processing caught a critical layer interruption:", e);
+      triggerToast("Failed to completely evict target invoice properties.", "error");
+      setIsHydrated(true);
+    }
+  };
+
   return {
     invoice,
     isHydrated,
+    activeInvoiceId,
+    invoiceRegistry,
     historyIdx,
     historyLength: history.length,
     calculatedTotals,
@@ -335,5 +473,8 @@ export function useInvoiceEditor(triggerToast) {
     handleCountryChange,
     handleLogoUpload,
     handleLogoDelete,
+    switchInvoiceWorkspace,
+    handleCreateNewInvoice,
+    handleDeleteInvoice,
   };
 }

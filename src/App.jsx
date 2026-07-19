@@ -8,6 +8,7 @@ import InvoiceWorkspace from "./components/InvoiceWorkspace/InvoiceWorkspace";
 import Footer from "./components/Footer/Footer";
 import Toast from "./components/Toast/Toast";
 import { ExportLoader } from "./components/shared/ExportLoader";
+import { InvoiceSwitcher } from "./components/InvoiceSwitcher/InvoiceSwitcher";
 
 // Pages Layer Modules
 import AboutPage from "./pages/AboutPage";
@@ -50,6 +51,17 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-100 dark:bg-slate-900 transition-colors duration-200">
       <Navbar theme={theme} onThemeToggle={() => setTheme(theme === "dark" ? "light" : "dark")} />
+
+      {/* Multi-Document Workspace Switcher Overlay Control Drawer */}
+      {editor.isHydrated && (
+        <InvoiceSwitcher
+          activeInvoiceId={editor.activeInvoiceId}
+          invoiceRegistry={editor.invoiceRegistry}
+          switchInvoiceWorkspace={editor.switchInvoiceWorkspace}
+          handleCreateNewInvoice={editor.handleCreateNewInvoice}
+          handleDeleteInvoice={editor.handleDeleteInvoice}
+        />
+      )}
 
       <Routes>
         <Route
