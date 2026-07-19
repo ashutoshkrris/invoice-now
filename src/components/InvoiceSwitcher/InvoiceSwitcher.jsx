@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Icons } from "../shared/Icons";
+import ConfirmationModal from "../shared/ConfirmationModal";
+import { CONSTANTS } from "../../constants/globalConstants";
 
 export function InvoiceSwitcher({
   activeInvoiceId,
@@ -7,11 +9,16 @@ export function InvoiceSwitcher({
   switchInvoiceWorkspace,
   handleCreateNewInvoice,
   handleDeleteInvoice,
+  triggerToast,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
   const sidebarRef = useRef(null);
   const searchInputRef = useRef(null);
+
+  const maxInvoicesThreshold = CONSTANTS.MAX_INVOICE_LIMIT || 25;
 
   // --- DISMISS ON EXTERNAL CLICK ---
   useEffect(() => {
@@ -61,7 +68,6 @@ export function InvoiceSwitcher({
   }, [invoiceRegistry, searchQuery]);
 
   // --- PURE DATE FORMATTER ---
-  // Replaced relative calculation engine with standard, system-localized date presentation
   const formatLastUpdated = (timestamp) => {
     if (!timestamp) return "Draft";
     return new Date(timestamp).toLocaleDateString(undefined, {
@@ -72,11 +78,31 @@ export function InvoiceSwitcher({
     });
   };
 
-  const safeDelete = (e, id, invoiceNumber) => {
+  // Intercept event loop safely and staging parameters
+  const triggerDeleteConfirmation = (e, id, invoiceNumber) => {
     e.stopPropagation();
-    if (window.confirm(`Are you sure you want to delete ${invoiceNumber || "this invoice"}?`)) {
-      handleDeleteInvoice(id);
+    if (invoiceRegistry.length <= 1) {
+      triggerToast("You can't delete the last invoice. At least one invoice must remain.", "error");
+      return;
     }
+    setDeleteTarget({ id, invoiceNumber });
+  };
+
+  // Helper handling maximum creation bounds safely
+  const onCreateWorkspaceClick = () => {
+    if (invoiceRegistry.length >= maxInvoicesThreshold) {
+      if (typeof triggerToast === "function") {
+        triggerToast(
+          `Invoice limit reached. Maximum allowed is ${maxInvoicesThreshold} invoices. Delete old invoices to create new. Make sure to save them locally before deleting.`,
+          "warning"
+        );
+      }
+      return; // Stop execution out immediately
+    }
+
+    // Otherwise proceed with creation sequence safely
+    handleCreateNewInvoice();
+    setSearchQuery("");
   };
 
   const isMac = navigator.platform.toUpperCase().includes("MAC");
@@ -132,21 +158,23 @@ export function InvoiceSwitcher({
           </div>
 
           <button
-            onClick={() => {
-              handleCreateNewInvoice();
-              setSearchQuery("");
-            }}
+            onClick={onCreateWorkspaceClick}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md transition-colors cursor-pointer h-[36px]"
+            title={
+              invoiceRegistry.length >= (CONSTANTS?.MAX_INVOICE_LIMIT || 25)
+                ? `Maximum threshold reached (${CONSTANTS.MAX_INVOICE_LIMIT} invoices)`
+                : "Create new invoice"
+            }
           >
             <Icons.Plus className="w-4 h-4" strokeWidth={2.5} />
-            <span>New Invoice Workspace</span>
+            <span>New Invoice</span>
           </button>
 
           <div className="relative">
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search workspaces..."
+              placeholder="Search invoices..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-8 pr-3 py-2 bg-white dark:bg-slate-900 focus:bg-white border border-slate-200 dark:border-slate-800 focus:border-slate-300 dark:focus:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none transition-all"
@@ -178,7 +206,6 @@ export function InvoiceSwitcher({
                   }`}
                 >
                   <div className="flex flex-col min-w-0 pr-4">
-                    {/* The name now renders directly from the current registry object */}
                     <span
                       className={`text-xs font-bold truncate ${isActive ? "text-brand-600 dark:text-brand-400" : "text-slate-700 dark:text-slate-300"}`}
                     >
@@ -196,11 +223,11 @@ export function InvoiceSwitcher({
                     </div>
                   </div>
 
-                  {/* DELETION CONTROLS LAYER */}
+                  {/* DELETION TRIGGER */}
                   <button
-                    onClick={(e) => safeDelete(e, item.id, item.invoiceNumber)}
+                    onClick={(e) => triggerDeleteConfirmation(e, item.id, item.invoiceNumber)}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 sm:opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                    title="Delete document workspace"
+                    title="Delete Invoice"
                   >
                     <Icons.Trash className="w-3.5 h-3.5" />
                   </button>
@@ -210,11 +237,30 @@ export function InvoiceSwitcher({
           )}
         </div>
 
-        {/* LIGHTWEIGHT FOOTER BRANDING */}
         <div className="p-3 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 text-center text-[10px] font-mono tracking-tight text-slate-400 select-none">
           Invoice Now • Built Local & Secure
         </div>
       </div>
+
+      {/* GLOBAL CONFIRMATION PORTAL MODAL */}
+      <ConfirmationModal
+        isOpen={Boolean(deleteTarget)}
+        title="Delete Invoice"
+        message={`Are you sure you want to delete ${deleteTarget?.invoiceNumber || "this invoice"}? This operation cannot be undone.`}
+        confirmLabel="Delete Invoice"
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) {
+            handleDeleteInvoice(deleteTarget.id);
+            if (typeof triggerToast === "function") {
+              triggerToast(
+                `Invoice ${deleteTarget.invoiceNumber || ""} deleted successfully`,
+                "success"
+              );
+            }
+          }
+        }}
+      />
     </>
   );
 }

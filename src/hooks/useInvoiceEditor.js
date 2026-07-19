@@ -410,7 +410,7 @@ export function useInvoiceEditor(triggerToast) {
 
       refreshRegistryCache();
       setIsHydrated(true);
-      triggerToast("Created new workspace entry.");
+      triggerToast("Created new invoice successfully.");
     } catch (e) {
       console.error("Workspace instantiation caught operational failure:", e);
       triggerToast("Failed to build a new invoice workflow.", "error");
@@ -448,7 +448,7 @@ export function useInvoiceEditor(triggerToast) {
 
       refreshRegistryCache();
       setIsHydrated(true);
-      triggerToast("Document removed successfully.", "info");
+      triggerToast("Invoice deleted successfully.", "success");
     } catch (e) {
       console.error("Cascade deletion processing caught a critical layer interruption:", e);
       triggerToast("Failed to completely evict target invoice properties.", "error");

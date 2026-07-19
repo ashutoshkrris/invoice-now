@@ -60,6 +60,7 @@ export default function App() {
           switchInvoiceWorkspace={editor.switchInvoiceWorkspace}
           handleCreateNewInvoice={editor.handleCreateNewInvoice}
           handleDeleteInvoice={editor.handleDeleteInvoice}
+          triggerToast={triggerToast}
         />
       )}
 
