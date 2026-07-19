@@ -1,6 +1,6 @@
 ## Summary
 
-Provide a brief description of your changes.
+<!-- Briefly describe what this PR does and why. -->
 
 ---
 
@@ -8,12 +8,23 @@ Provide a brief description of your changes.
 
 Closes #
 
-> **Note:** Pull Requests that are not linked to an assigned issue may be closed.
-> If you want to work on something new, please open or request an issue first.
+<!--
+Link the issue this PR resolves.
+
+Examples:
+Closes #123
+Fixes #456
+Resolves #789
+
+PRs not linked to an assigned issue may be closed.
+If you're proposing a new feature or change, please open an issue first.
+-->
 
 ---
 
 ## Type of Change
+
+<!-- Mark all that apply. -->
 
 - [ ] Bug fix
 - [ ] New feature
@@ -28,23 +39,53 @@ Closes #
 
 ## Testing
 
-Describe how you tested your changes.
+<!-- Describe how you verified your changes. -->
+
+- [ ] Tested locally
+
+### Test Details
+
+<!--
+Examples:
+- Added/updated unit tests
+- Tested invoice creation
+- Verified responsive layout
+- Ran `npm run lint`
+-->
 
 ---
 
-## Screenshots
+## Screenshots (if applicable)
 
-If your changes affect the UI, include before/after screenshots or recordings.
+<!--
+Add before/after screenshots or screen recordings for UI changes.
+Remove this section if not applicable.
+-->
 
 ---
 
 ## Checklist
 
-- [ ] I have read the CONTRIBUTING.md guidelines.
+<!-- Mark completed items before requesting a review. -->
+
+- [ ] I have read the `CONTRIBUTING.md` guidelines.
 - [ ] This PR is linked to an assigned issue.
 - [ ] My branch is up to date with `main`.
 - [ ] I tested my changes locally.
 - [ ] Linting passes (`npm run lint`).
-- [ ] I updated documentation if necessary.
-- [ ] My PR only contains changes related to this issue.
-- [ ] I have removed any debugging code or `console.log` statements.
+- [ ] Documentation has been updated where necessary.
+- [ ] This PR only contains changes related to the linked issue.
+- [ ] I removed debugging code (e.g. `console.log` statements).
+
+---
+
+## Additional Notes
+
+<!--
+Anything reviewers should know?
+Examples:
+- Breaking changes
+- Known limitations
+- Follow-up work
+- Dependencies
+-->
