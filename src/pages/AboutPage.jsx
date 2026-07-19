@@ -44,6 +44,14 @@ export default function AboutPage() {
               .
             </p>
             <p>
+              With our built-in{" "}
+              <strong className="text-slate-900 dark:text-white font-bold">
+                JSON Portability Engine
+              </strong>
+              , you can backup all your data, workspaces, and branding assets in a single text file
+              to keep your local information secure, portable, and offline.
+            </p>
+            <p>
               We built Invoice Now because most online tools force an unnecessary trade-off between
               highlighted layouts and data privacy. You should{" "}
               <strong className="text-brand-600 dark:text-brand-400 font-bold">
@@ -73,11 +81,41 @@ export default function AboutPage() {
             <li className="flex items-start gap-2.5">
               <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>
               <span>
+                Isolated{" "}
+                <strong className="text-slate-900 dark:text-white font-bold">
+                  Multi-Workspace switcher
+                </strong>{" "}
+                supporting up to 25 completely standalone invoice registries.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>
+              <span>
+                Universal{" "}
+                <strong className="text-slate-900 dark:text-white font-bold">
+                  JSON Data Backup & Restore
+                </strong>{" "}
+                engines with built-in cache-eviction safeguards.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>
+              <span>
                 Intelligent localized configurations for currencies,{" "}
                 <strong className="text-slate-900 dark:text-white font-bold">
                   custom tax labels
                 </strong>
                 , and default system rates.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>
+              <span>
+                High-performance architecture separating metadata from graphics using{" "}
+                <strong className="text-slate-900 dark:text-white font-bold">
+                  IndexedDB asset storage
+                </strong>
+                .
               </span>
             </li>
             <li className="flex items-start gap-2.5">
@@ -117,17 +155,7 @@ export default function AboutPage() {
                 <strong className="text-slate-900 dark:text-white font-bold">
                   fully mobile-responsive
                 </strong>{" "}
-                viewports.
-              </span>
-            </li>
-            <li className="flex items-start gap-2.5">
-              <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>
-              <span>
-                High-performance architecture separating metadata from graphics using{" "}
-                <strong className="text-slate-900 dark:text-white font-bold">
-                  IndexedDB asset storage
-                </strong>
-                .
+                and touch-accessible layouts.
               </span>
             </li>
           </ul>

@@ -9,10 +9,12 @@ Generate professional, print-ready invoices directly in your browser with live c
 ## ✨ Features
 
 - **⚡ Real-Time Adjustments:** Live preview updates as you tweak layout details, styles, and data settings.
-- **🌍 Multi-Country Presets:** Instantly adjust default formatting rules, styling grids, and configurations.
+- **🗂️ Isolated Multi-Workspaces:** Switch seamlessly between up to 25 distinct client and billing invoice workspaces in a centralized flyout directory.
+- **📥 Universal Portability Backup Engine:** Export all active workspace registries, invoice payload datasets, and high-fidelity branding assets into a single serialized `.json` utility backup. Import anytime with complete database state-hydration guards.
+- **📈 Dynamic Limit Indicators:** Keep tabs on database capacity with an embedded slot counter that updates dynamically and changes color text safely ($\ge$ 60% orange warnings, $\ge$ 80% red constraints).
 - **🎨 Custom Branding:** Switch between curated color palettes, typography pairs, and custom hex picking on the fly.
 - **✍️ Custom Watermarks:** Stamp invoices seamlessly with presets (`DRAFT`, `PAID`, `OVERDUE`) or dynamic text with custom modal configurations.
-- **📱 Super Responsive Grid Nav:** Clean collapsible utility panels designed to keep mobile layouts fast and desktop tools in a single line.
+- **📱 Touch-First Accessible Operations:** Optimized workflow row layouts designed for zero-hover dependency. Duplicate, rename inline, or safely delete workspaces instantly across touch targets and mobile screens.
 - **💾 Secure Direct Exports:** Download pristine `PDF` structures via `jspdf` or rasterized `PNG` snapshots via `html-to-image` client-side.
 - **🖨️ Smart Print Optimization:** Pure browser-level alignment filters hidden layout elements (`no-print`) and enforces a baseline layout style across PDF engines.
 
@@ -62,6 +64,7 @@ Here are the available command vectors configured for this workspace:
 - Frontend Library: React 19
 - Build Tool / Server: Vite 8
 - Styling Engine: Tailwind CSS v4
+- Storage Engine: Hybrid Client-Side Storage Engine (IndexedDB + LocalStorage Wrapper)
 - Document Generators: jsPDF & html-to-image
 - Quality Assurance Gates: ESLint, Prettier, Husky, and `lint-staged`.
 

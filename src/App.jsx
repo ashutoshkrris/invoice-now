@@ -8,6 +8,7 @@ import InvoiceWorkspace from "./components/InvoiceWorkspace/InvoiceWorkspace";
 import Footer from "./components/Footer/Footer";
 import Toast from "./components/Toast/Toast";
 import { ExportLoader } from "./components/shared/ExportLoader";
+import AnnouncementModal from "./components/shared/AnnouncementModal";
 import { InvoiceSwitcher } from "./components/InvoiceSwitcher/InvoiceSwitcher";
 
 // Pages Layer Modules
@@ -111,6 +112,9 @@ export default function App() {
       )}
 
       <ExportLoader isExporting={isExporting} />
+
+      {/* Dynamic, single-trigger announcement gateway */}
+      <AnnouncementModal />
     </div>
   );
 }
