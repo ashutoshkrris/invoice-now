@@ -93,7 +93,7 @@ export function InvoiceSwitcher({
     if (invoiceRegistry.length >= maxInvoicesThreshold) {
       if (typeof triggerToast === "function") {
         triggerToast(
-          `Invoice limit reached. Maximum allowed is ${maxInvoicesThreshold} invoices. Delete old invoices to create new. Make sure to save them locally before deleting.`,
+          `Invoice limit reached (${maxInvoicesThreshold}). Delete an existing invoice to create a new one.`,
           "warning"
         );
       }

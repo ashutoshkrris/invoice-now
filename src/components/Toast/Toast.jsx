@@ -1,7 +1,8 @@
 import { useEffect } from "react";
+import { Icons } from "../shared/Icons";
 
 export default function Toast({ message, type, onClose }) {
-  // Automatically trigger dismiss cleanup after 3.5 seconds
+  // Automatically trigger dismiss cleanup after 2 seconds
   useEffect(() => {
     const timer = setTimeout(onClose, 2000);
 
@@ -15,29 +16,39 @@ export default function Toast({ message, type, onClose }) {
     success: "bg-emerald-600 dark:bg-emerald-500 text-white",
     error: "bg-rose-600 dark:bg-rose-500 text-white",
     info: "bg-brand-600 dark:bg-brand-500 text-white",
+    warning: "bg-amber-600 dark:bg-amber-500 text-white",
   };
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 animate-bounce ${colors[type] || colors.info}`}
+      className={`
+        fixed
+        bottom-4 left-4 right-4
+        sm:bottom-6 sm:right-6 sm:left-auto sm:max-w-md
+        z-50
+        flex items-start gap-3
+        rounded-xl
+        px-5 py-3.5
+        shadow-2xl
+        transition-all duration-300
+        animate-bounce
+        ${colors[type] || colors.info}
+      `}
       data-testid="toast-container"
+      role="alert"
+      aria-live="polite"
     >
-      <span className="font-semibold text-xs tracking-wide">{message}</span>
+      <span className="flex-1 text-xs font-semibold tracking-wide break-words whitespace-normal">
+        {message}
+      </span>
 
-      {/* Explicit close handler override control */}
+      {/* Close button */}
       <button
         onClick={onClose}
-        className="p-1 hover:bg-white/25 rounded-md transition-colors"
+        className="flex-shrink-0 rounded-md p-1 transition-colors hover:bg-white/25"
         aria-label="Close notification"
       >
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2.5}
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
+        <Icons.Close />
       </button>
     </div>
   );
