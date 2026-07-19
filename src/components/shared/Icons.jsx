@@ -14,9 +14,10 @@ export const Icons = {
       />
     </svg>
   ),
-  Download: () => (
+  Download: (props) => (
     <svg
       className="w-4 h-4"
+      {...props}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -26,6 +27,23 @@ export const Icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+      />
+    </svg>
+  ),
+  GenericUpload: (props) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth="2"
+      stroke="currentColor"
+      className="w-4 h-4"
+      {...props}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15"
       />
     </svg>
   ),

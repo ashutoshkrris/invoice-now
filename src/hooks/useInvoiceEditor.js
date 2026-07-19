@@ -13,6 +13,8 @@ import {
   deleteInvoiceWorkspace,
   duplicateInvoiceWorkspace,
   renameInvoiceWorkspace,
+  exportFullBackupData,
+  importFullBackupData,
 } from "../utils/storage";
 import { CONSTANTS } from "../constants/globalConstants";
 
@@ -122,7 +124,7 @@ export function useInvoiceEditor(triggerToast) {
       setInvoice(restored);
       persistState(restored);
 
-      // MILESTONE 1 CHANGE: Update the background database mirror on undo
+      // Update the background database mirror on undo
       shadowPersistState(restored);
 
       triggerToast("Changes Undone", "info");
@@ -534,6 +536,85 @@ export function useInvoiceEditor(triggerToast) {
     }
   };
 
+  /**
+   * Generates a structural workspace JSON backup file download action
+   */
+  const handleExportBackup = async () => {
+    try {
+      const jsonString = await exportFullBackupData();
+
+      // Build a standard download anchor link elements arrangement
+      const dataBlob = new Blob([jsonString], { type: "application/json" });
+      const downloadUrl = URL.createObjectURL(dataBlob);
+      const tempAnchor = document.createElement("a");
+
+      const fileTimestamp = new Date().toISOString().slice(0, 10);
+      tempAnchor.href = downloadUrl;
+      tempAnchor.download = `invoicenow_backup_${fileTimestamp}.json`;
+
+      document.body.appendChild(tempAnchor);
+      tempAnchor.click();
+
+      // Teardown cleanup
+      document.body.removeChild(tempAnchor);
+      URL.revokeObjectURL(downloadUrl);
+
+      triggerToast("Backup data file downloaded successfully.", "success");
+    } catch (e) {
+      console.error("Backup file generation process dropped out:", e);
+      triggerToast("Failed to compile or export backup data files.", "error");
+    }
+  };
+
+  /**
+   * Parses, validates, and mounts an uploaded configuration bundle into the state engines
+   * @param {File} fileObject - The uploaded JSON file element package
+   */
+  const handleImportBackup = async (fileObject) => {
+    if (!fileObject) return;
+
+    const fileReader = new FileReader();
+    fileReader.onload = async (e) => {
+      try {
+        const parsedRawJson = JSON.parse(e.target.result);
+        setIsHydrated(false);
+
+        // Run deep database initialization and transaction migration operations
+        const replacementActiveId = await importFullBackupData(parsedRawJson);
+
+        // Re-read configuration metrics from newly updated indexed tracking stores
+        const operationalState = await getInvoiceById(replacementActiveId);
+        const unifiedSharedLogo = await assetStorage.getLogo();
+
+        const fullyHydratedState = { ...operationalState };
+        if (unifiedSharedLogo) {
+          fullyHydratedState.businessLogo = unifiedSharedLogo;
+        }
+
+        // Reset component memory stacks to match restored workspace parameters
+        setActiveInvoiceId(replacementActiveId);
+        setInvoice(fullyHydratedState);
+        setHistory([JSON.stringify(operationalState)]);
+        setHistoryIdx(0);
+        persistState(operationalState);
+
+        refreshRegistryCache();
+        setIsHydrated(true);
+        triggerToast("Workspace state restored from backup successfully!", "success");
+      } catch (err) {
+        console.error("Backup engine system extraction failure tracking:", err);
+        triggerToast(err.message || "Failed to parse imported backup configuration file.", "error");
+        setIsHydrated(true);
+      }
+    };
+
+    fileReader.onerror = () => {
+      triggerToast("Error reading the selected data file element.", "error");
+    };
+
+    fileReader.readAsText(fileObject);
+  };
+
   return {
     invoice,
     isHydrated,
@@ -556,5 +637,7 @@ export function useInvoiceEditor(triggerToast) {
     handleDeleteInvoice,
     handleDuplicateInvoice,
     handleRenameInvoice,
+    handleExportBackup,
+    handleImportBackup,
   };
 }

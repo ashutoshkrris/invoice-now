@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { Icons } from "../shared/Icons";
 import ConfirmationModal from "../shared/ConfirmationModal";
 import { CONSTANTS } from "../../constants/globalConstants";
+import { BackupControlPanel } from "../BackupControlPanel/BackupControlPanel";
 
 export function InvoiceSwitcher({
   activeInvoiceId,
@@ -12,6 +13,9 @@ export function InvoiceSwitcher({
   handleDuplicateInvoice,
   handleRenameInvoice,
   triggerToast,
+  handleExportBackup,
+  handleImportBackup,
+  isHydrated = true,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -363,6 +367,15 @@ export function InvoiceSwitcher({
               );
             })
           )}
+        </div>
+
+        {/* UNIVERSAL BACKUP MANAGEMENT INJECTOR */}
+        <div className="p-2 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800/60">
+          <BackupControlPanel
+            onExport={handleExportBackup}
+            onImport={handleImportBackup}
+            isProcessing={!isHydrated}
+          />
         </div>
 
         <div className="p-3 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 text-center text-[10px] font-mono tracking-tight text-slate-400 select-none">
