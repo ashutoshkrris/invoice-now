@@ -1,12 +1,8 @@
 import { Link } from "react-router-dom";
 import { Icons } from "../shared/Icons"; // Standard relative directory step configuration
+import { getCopyrightYear, getAppVersion } from "../../utils/utils";
 
 export default function Footer() {
-  const startYear = 2026;
-  const currentYear = new Date().getFullYear();
-  const copyrightYear = currentYear > startYear ? `${startYear}-${currentYear}` : `${startYear}`;
-  const appVersion = __APP_VERSION__;
-
   return (
     <footer className="no-print mt-auto bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 transition-colors duration-300 w-full">
       <div className="max-w-7xl mx-auto px-6 md:px-8 py-10 md:py-14">
@@ -169,10 +165,10 @@ export default function Footer() {
         {/* --- BOTTOM SECTION: COPYRIGHT + CREDITS --- */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-medium text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-1 order-2 sm:order-1 text-center sm:text-left">
-            <span>© {copyrightYear}</span>
+            <span>© {getCopyrightYear()}</span>
             <span className="font-bold text-slate-700 dark:text-slate-300">Invoice Now</span>
             <span>• Built Local & Secure</span>
-            <span>• v{appVersion}</span>
+            <span>• v{getAppVersion()}</span>
           </div>
 
           <div className="flex items-center gap-1 order-1 sm:order-2 p-0.5">

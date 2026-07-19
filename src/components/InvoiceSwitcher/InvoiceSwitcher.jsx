@@ -3,6 +3,7 @@ import { Icons } from "../shared/Icons";
 import ConfirmationModal from "../shared/ConfirmationModal";
 import { CONSTANTS } from "../../constants/globalConstants";
 import { BackupControlPanel } from "../BackupControlPanel/BackupControlPanel";
+import { getAppVersion, getCopyrightYear } from "../../utils/utils";
 
 export function InvoiceSwitcher({
   activeInvoiceId,
@@ -31,9 +32,22 @@ export function InvoiceSwitcher({
 
   const maxInvoicesThreshold = CONSTANTS.MAX_INVOICE_LIMIT || 25;
 
+  // --- DYNAMIC COUNTER COLOR LOGIC ---
+  const currentCount = invoiceRegistry.length;
+  const usagePercentage = (currentCount / maxInvoicesThreshold) * 100;
+
+  const counterColorClass = useMemo(() => {
+    if (usagePercentage >= 80) return "text-red-500 font-bold";
+    if (usagePercentage >= 60) return "text-orange-500 font-bold";
+    return "text-slate-500 dark:text-slate-400 font-medium";
+  }, [usagePercentage]);
+
   // --- DISMISS ON EXTERNAL CLICK ---
   useEffect(() => {
     function handleClickOutside(event) {
+      // Guardrail: If the delete confirmation modal is open, do not close the drawer
+      if (deleteTarget) return;
+
       if (isOpen && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
         if (!event.target.closest('[data-testid="workspace-trigger"]')) {
           setIsOpen(false);
@@ -42,7 +56,7 @@ export function InvoiceSwitcher({
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, deleteTarget]);
 
   // --- KEYBOARD SHORTCUT INITIALIZATION (Ctrl/Cmd + K) ---
   useEffect(() => {
@@ -143,13 +157,13 @@ export function InvoiceSwitcher({
   const startRenaming = (e, item) => {
     e.stopPropagation();
     setEditingId(item.id);
-    setEditValue(item.clientName || ""); // <-- Targets clientName instead of invoiceNumber now
+    setEditValue(item.clientName || "");
   };
 
   // Save the modified string parameter down into database pipeline
   const saveRenameAction = (id) => {
     if (editValue.trim() && editValue !== invoiceRegistry.find((i) => i.id === id)?.clientName) {
-      handleRenameInvoice(id, editValue.trim()); // <-- Passes new client/workspace name up
+      handleRenameInvoice(id, editValue.trim());
     }
     setEditingId(null);
   };
@@ -196,8 +210,14 @@ export function InvoiceSwitcher({
         <div className="p-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wide">
-              Workspaces
+              Your Invoices
             </h2>
+            {/* INVOICE COUNT LIMIT INDICATOR */}
+            <div
+              className={`text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-center font-mono select-none ${counterColorClass}`}
+            >
+              {currentCount}/{maxInvoicesThreshold}
+            </div>
             <button
               onClick={() => setIsOpen(false)}
               className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
@@ -210,8 +230,8 @@ export function InvoiceSwitcher({
             onClick={onCreateWorkspaceClick}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md transition-colors cursor-pointer h-[36px]"
             title={
-              invoiceRegistry.length >= (CONSTANTS?.MAX_INVOICE_LIMIT || 25)
-                ? `Maximum threshold reached (${CONSTANTS.MAX_INVOICE_LIMIT} invoices)`
+              invoiceRegistry.length >= maxInvoicesThreshold
+                ? `Maximum threshold reached (${maxInvoicesThreshold} invoices)`
                 : "Create new invoice"
             }
           >
@@ -325,7 +345,7 @@ export function InvoiceSwitcher({
 
                   {/* INTERACTIVE ACTION BUTTON ROW GROUP */}
                   {!isEditing && (
-                    <div className="flex items-center gap-1 no-print sm:opacity-0 group-hover:opacity-100 transition-all absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-l from-slate-50 via-slate-50 to-transparent pl-4 dark:from-slate-800/80 dark:via-slate-800/80 h-full rounded-r-xl">
+                    <div className="flex items-center gap-1 no-print transition-all absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-l from-slate-50 via-slate-50 to-transparent pl-4 dark:from-slate-800 dark:via-slate-800 h-full rounded-r-xl">
                       {/* RENAME TRIGGER */}
                       <button
                         onClick={(e) => startRenaming(e, item)}
@@ -378,8 +398,16 @@ export function InvoiceSwitcher({
           />
         </div>
 
-        <div className="p-3 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 text-center text-[10px] font-mono tracking-tight text-slate-400 select-none">
-          Invoice Now • Built Local & Secure
+        {/* SYNCHRONIZED COMPACT APPLICATION FOOTER CONTAINER */}
+        <div className="p-3 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 no-print select-none">
+          <div className="flex flex-wrap items-center justify-center gap-1 text-[10px] text-slate-400 font-mono tracking-tight">
+            <span>© {getCopyrightYear()}</span>
+            <span className="font-bold text-slate-700 dark:text-slate-300">Invoice Now</span>
+            <span>• v{getAppVersion()}</span>
+          </div>
+          <div className="text-center text-[10px] text-slate-400 font-mono tracking-tight mt-1">
+            Built Local & Secure
+          </div>
         </div>
       </div>
 
