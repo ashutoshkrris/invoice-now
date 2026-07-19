@@ -11,6 +11,10 @@ import {
   getInvoiceById,
   createNewInvoiceWorkspace,
   deleteInvoiceWorkspace,
+  duplicateInvoiceWorkspace,
+  renameInvoiceWorkspace,
+  exportFullBackupData,
+  importFullBackupData,
 } from "../utils/storage";
 import { CONSTANTS } from "../constants/globalConstants";
 
@@ -120,7 +124,7 @@ export function useInvoiceEditor(triggerToast) {
       setInvoice(restored);
       persistState(restored);
 
-      // MILESTONE 1 CHANGE: Update the background database mirror on undo
+      // Update the background database mirror on undo
       shadowPersistState(restored);
 
       triggerToast("Changes Undone", "info");
@@ -456,6 +460,161 @@ export function useInvoiceEditor(triggerToast) {
     }
   };
 
+  /**
+   * Clones a target workspace, registers its indexing metadata, and transitions viewport focuses.
+   * @param {string} targetId - Document ID target intended for cloning processing
+   */
+  const handleDuplicateInvoice = async (targetId) => {
+    try {
+      // Upper bound limit validation block check
+      const currentLimit = CONSTANTS?.MAX_INVOICE_LIMIT || 25; // Fallback to 25 if needed
+      if (invoiceRegistry.length >= currentLimit) {
+        triggerToast(`Duplication failed. Maximum allowed is ${currentLimit} invoices.`, "warning");
+        return;
+      }
+
+      setIsHydrated(false);
+      const { id, payload } = await duplicateInvoiceWorkspace(targetId);
+
+      // Extract unified shared asset logos cleanly from separate IndexedDB asset store
+      const currentLogo = await assetStorage.getLogo();
+      const nextState = { ...payload };
+      if (currentLogo) {
+        nextState.businessLogo = currentLogo;
+      }
+
+      // Transition global active identifiers and clear state history tracks
+      localStorage.setItem(CONSTANTS.ACTIVE_ID_KEY, id);
+      setActiveInvoiceId(id);
+      setInvoice(nextState);
+      setHistory([JSON.stringify(payload)]);
+      setHistoryIdx(0);
+      persistState(payload);
+
+      refreshRegistryCache();
+      setIsHydrated(true);
+      triggerToast("Invoice duplicated successfully.", "success");
+    } catch (e) {
+      console.error("Workspace hook state duplication failed:", e);
+      triggerToast("Failed to safely clone target invoice.", "error");
+      setIsHydrated(true);
+    }
+  };
+
+  /**
+   * Modifies the primary client name/title string of a specific invoice workspace allocation.
+   * @param {string} targetId - Document UUID target pointer
+   * @param {string} nextClientName - The updated workspace identification title text string
+   */
+  const handleRenameInvoice = async (targetId, nextClientName) => {
+    if (!nextClientName.trim()) {
+      triggerToast("Workspace name cannot be empty.", "warning");
+      return;
+    }
+
+    try {
+      await renameInvoiceWorkspace(targetId, nextClientName.trim());
+
+      // If the currently viewed invoice is renamed, synchronize active viewport state matrices
+      if (targetId === activeInvoiceId) {
+        setInvoice((prev) => {
+          const updated = { ...prev, clientName: nextClientName.trim() };
+          // Keep internal tracking history references correctly aligned
+          const currentHistory = history.slice(0, historyIdx + 1);
+          setHistory([...currentHistory, JSON.stringify(updated)]);
+          setHistoryIdx(currentHistory.length);
+          persistState(updated);
+          return updated;
+        });
+      }
+
+      refreshRegistryCache();
+      triggerToast("Workspace renamed successfully.", "success");
+    } catch (e) {
+      console.error("Hook context processing caught a file rename exception block:", e);
+      triggerToast("Failed to alter invoice workspace title details.", "error");
+    }
+  };
+
+  /**
+   * Generates a structural workspace JSON backup file download action
+   */
+  const handleExportBackup = async () => {
+    try {
+      const jsonString = await exportFullBackupData();
+
+      // Build a standard download anchor link elements arrangement
+      const dataBlob = new Blob([jsonString], { type: "application/json" });
+      const downloadUrl = URL.createObjectURL(dataBlob);
+      const tempAnchor = document.createElement("a");
+
+      const fileTimestamp = new Date().toISOString().slice(0, 10);
+      tempAnchor.href = downloadUrl;
+      tempAnchor.download = `invoicenow_backup_${fileTimestamp}.json`;
+
+      document.body.appendChild(tempAnchor);
+      tempAnchor.click();
+
+      // Teardown cleanup
+      document.body.removeChild(tempAnchor);
+      URL.revokeObjectURL(downloadUrl);
+
+      triggerToast("Backup data file downloaded successfully.", "success");
+    } catch (e) {
+      console.error("Backup file generation process dropped out:", e);
+      triggerToast("Failed to compile or export backup data files.", "error");
+    }
+  };
+
+  /**
+   * Parses, validates, and mounts an uploaded configuration bundle into the state engines
+   * @param {File} fileObject - The uploaded JSON file element package
+   */
+  const handleImportBackup = async (fileObject) => {
+    if (!fileObject) return;
+
+    const fileReader = new FileReader();
+    fileReader.onload = async (e) => {
+      try {
+        const parsedRawJson = JSON.parse(e.target.result);
+        setIsHydrated(false);
+
+        // Run deep database initialization and transaction migration operations
+        const replacementActiveId = await importFullBackupData(parsedRawJson);
+
+        // Re-read configuration metrics from newly updated indexed tracking stores
+        const operationalState = await getInvoiceById(replacementActiveId);
+        const unifiedSharedLogo = await assetStorage.getLogo();
+
+        const fullyHydratedState = { ...operationalState };
+        if (unifiedSharedLogo) {
+          fullyHydratedState.businessLogo = unifiedSharedLogo;
+        }
+
+        // Reset component memory stacks to match restored workspace parameters
+        setActiveInvoiceId(replacementActiveId);
+        setInvoice(fullyHydratedState);
+        setHistory([JSON.stringify(operationalState)]);
+        setHistoryIdx(0);
+        persistState(operationalState);
+
+        refreshRegistryCache();
+        setIsHydrated(true);
+        triggerToast("Workspace state restored from backup successfully!", "success");
+      } catch (err) {
+        console.error("Backup engine system extraction failure tracking:", err);
+        triggerToast(err.message || "Failed to parse imported backup configuration file.", "error");
+        setIsHydrated(true);
+      }
+    };
+
+    fileReader.onerror = () => {
+      triggerToast("Error reading the selected data file element.", "error");
+    };
+
+    fileReader.readAsText(fileObject);
+  };
+
   return {
     invoice,
     isHydrated,
@@ -476,5 +635,9 @@ export function useInvoiceEditor(triggerToast) {
     switchInvoiceWorkspace,
     handleCreateNewInvoice,
     handleDeleteInvoice,
+    handleDuplicateInvoice,
+    handleRenameInvoice,
+    handleExportBackup,
+    handleImportBackup,
   };
 }
