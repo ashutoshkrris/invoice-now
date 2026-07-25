@@ -17,6 +17,7 @@ Generate professional, print-ready invoices directly in your browser with live c
 - **📱 Touch-First Accessible Operations:** Optimized workflow row layouts designed for zero-hover dependency. Duplicate, rename inline, or safely delete workspaces instantly across touch targets and mobile screens.
 - **💾 Secure Direct Exports:** Download pristine `PDF` structures via `jspdf` or rasterized `PNG` snapshots via `html-to-image` client-side.
 - **🖨️ Smart Print Optimization:** Pure browser-level alignment filters hidden layout elements (`no-print`) and enforces a baseline layout style across PDF engines.
+- **💳 Dynamic Payment QR Codes:** Generate instant, client-side QR codes for payment links or pre-filled NPCI UPI IDs (complete with balance due, payee name, and invoice reference notes) for quick scanning.
 
 ---
 
@@ -61,12 +62,13 @@ Here are the available command vectors configured for this workspace:
 
 ## 📦 Core Technology Stack
 
-- Frontend Library: React 19
-- Build Tool / Server: Vite 8
-- Styling Engine: Tailwind CSS v4
-- Storage Engine: Hybrid Client-Side Storage Engine (IndexedDB + LocalStorage Wrapper)
-- Document Generators: jsPDF & html-to-image
-- Quality Assurance Gates: ESLint, Prettier, Husky, and `lint-staged`.
+- **Frontend Library:** React 19
+- **Build Tool / Server:** Vite 8
+- **Styling Engine:** Tailwind CSS v4
+- **Storage Engine:** Hybrid Client-Side Storage Engine (IndexedDB + LocalStorage)
+- **QR Code Engine:** qrcode.react
+- **Document Generators:** jsPDF & html-to-image
+- **Quality Assurance Gates:** ESLint, Prettier, Husky, and `lint-staged`
 
 ## 🔒 Privacy & Security
 

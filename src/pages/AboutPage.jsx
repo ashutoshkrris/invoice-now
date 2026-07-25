@@ -101,6 +101,16 @@ export default function AboutPage() {
             <li className="flex items-start gap-2.5">
               <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>
               <span>
+                Integrated{" "}
+                <strong className="text-slate-900 dark:text-white font-bold">
+                  Dynamic Payment QR codes
+                </strong>{" "}
+                supporting custom URLs and pre-filled NPCI UPI payment links.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <span className="text-emerald-500 shrink-0 mt-0.5">✓</span>
+              <span>
                 Intelligent localized configurations for currencies,{" "}
                 <strong className="text-slate-900 dark:text-white font-bold">
                   custom tax labels
