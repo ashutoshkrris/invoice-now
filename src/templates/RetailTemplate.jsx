@@ -2,6 +2,8 @@ import { Icons } from "../components/shared/Icons";
 import LogoUploader from "../components/shared/LogoUploader";
 import EditableField from "../components/EditableField/EditableField";
 import { FIELD_LIMITS } from "../constants/fieldLimits";
+import PaymentQrCode from "../components/shared/PaymentQrCode";
+import { isUpiId } from "../utils/utils";
 
 export default function RetailTemplate({
   invoice,
@@ -15,6 +17,8 @@ export default function RetailTemplate({
   activeCurrencySymbol,
   isExporting,
 }) {
+  const hasQr = invoice.showQrCode && invoice.paymentLink && invoice.paymentLink.trim().length > 0;
+
   return (
     <div className="p-8 max-w-170 mx-auto text-slate-900 font-mono text-xs text-left spec-pdf-container">
       {/* SECTION wrapper to cleanly enforce unified header breaks */}
@@ -593,22 +597,95 @@ export default function RetailTemplate({
         <div className="border-t border-dashed border-slate-300 my-4 no-print-margin"></div>
 
         {/* --- FOOTER DIRECTIONS & BRANDING --- */}
-        <div className="text-center space-y-4 class-spec-remittance-footer">
-          <div>
-            <span className="font-bold block uppercase tracking-wider text-[9px] text-slate-500 mb-1">
-              Payment Options
-            </span>
-            <EditableField
-              type="textarea"
-              value={invoice.paymentInstructions}
-              onChange={(e) => onUpdateField("paymentInstructions", e.target.value)}
-              maxLength={FIELD_LIMITS.paymentInstructions}
-              rows="3"
-              className="w-full text-center text-[10px] text-slate-500 bg-transparent"
-              placeholder="Add bank accounts, wire transfer instructions, check details or digital payment links here..."
-              isExporting={isExporting}
-            />
+        <div className="text-center space-y-4 class-spec-remittance-footer font-sans">
+          {/* Payment Link Controls Panel (Editor Mode Only) */}
+          {!isExporting && (
+            <div className="no-print space-y-2 p-3 bg-slate-50 rounded-lg border border-dashed border-slate-300 text-left">
+              <label className="block text-[10px] font-bold text-slate-600">
+                Direct Payment Link / UPI ID
+              </label>
+              <EditableField
+                value={invoice.paymentLink || ""}
+                onChange={(e) => onUpdateField("paymentLink", e.target.value)}
+                maxLength={FIELD_LIMITS.paymentLink}
+                className="w-full text-slate-700 bg-white border border-slate-200 rounded px-2 py-1 text-[10px]"
+                placeholder="Paste Stripe link, PayPal.me, Wise, or UPI ID (e.g. name@upi)"
+                isExporting={isExporting}
+              />
+              {invoice.paymentLink && invoice.paymentLink.trim() && (
+                <label className="inline-flex items-center gap-2 cursor-pointer select-none mt-1">
+                  <input
+                    type="checkbox"
+                    checked={invoice.showQrCode ?? true}
+                    onChange={(e) => onUpdateField("showQrCode", e.target.checked)}
+                    className="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-3 w-3 cursor-pointer"
+                  />
+                  <span className="text-[10px] font-semibold text-slate-600">
+                    Display QR code on receipt layout
+                  </span>
+                </label>
+              )}
+            </div>
+          )}
+
+          {/* Payment Details Container */}
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-left">
+            <div className="flex-1 w-full space-y-1">
+              <span className="font-bold block uppercase tracking-wider text-[9px] text-slate-500 mb-1 text-center sm:text-left">
+                Payment Options
+              </span>
+              <EditableField
+                type="textarea"
+                value={invoice.paymentInstructions}
+                onChange={(e) => onUpdateField("paymentInstructions", e.target.value)}
+                maxLength={FIELD_LIMITS.paymentInstructions}
+                rows="3"
+                className="w-full text-center sm:text-left text-[10px] text-slate-500 bg-transparent"
+                placeholder="Add bank accounts, wire transfer instructions, check details or digital payment links here..."
+                isExporting={isExporting}
+              />
+              {invoice.paymentLink &&
+                invoice.paymentLink.trim() &&
+                (() => {
+                  const paymentLink = invoice.paymentLink.trim();
+                  const isUpi = isUpiId(paymentLink);
+
+                  return (
+                    <div className="text-[10px] text-center sm:text-left pt-1">
+                      {isUpi ? (
+                        <>
+                          <span className="font-semibold text-slate-500">
+                            If the QR code doesn&apos;t work, pay via UPI:{" "}
+                          </span>
+                          <span className="font-bold text-slate-800 select-all">{paymentLink}</span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="font-semibold text-slate-500">
+                            If the QR code doesn&apos;t work, pay online:
+                          </div>
+                          <a
+                            href={paymentLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block font-bold text-brand-600 hover:underline break-all"
+                          >
+                            {paymentLink}
+                          </a>
+                        </>
+                      )}
+                    </div>
+                  );
+                })()}
+            </div>
+
+            {hasQr && (
+              <div className="shrink-0 mx-auto sm:mx-0">
+                <PaymentQrCode invoice={invoice} totals={totals} size={76} />
+              </div>
+            )}
           </div>
+
           <div>
             <EditableField
               type="textarea"

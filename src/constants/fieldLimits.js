@@ -18,6 +18,7 @@ export const FIELD_LIMITS = {
   itemName: 80,
   itemDescription: 200,
   paymentInstructions: 350,
+  paymentLink: 500,
   terms: 450,
   notes: 300,
 };

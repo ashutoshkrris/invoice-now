@@ -8,4 +8,6 @@ export const CONSTANTS = {
   REGISTRY_KEY: "invoicenow_invoice_registry_v1",
   ACTIVE_ID_KEY: "invoicenow_active_invoice_id_v1",
   V2_ANNOUNCED_KEY: "invoice_now_v2_announced",
+
+  UPI_REGEX: /^[a-zA-Z0-9.\-_]+@[a-zA-Z0-9]+$/,
 };

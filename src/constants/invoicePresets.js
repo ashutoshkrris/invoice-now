@@ -57,6 +57,8 @@ export const INITIAL_INVOICE_STATE = {
   amountPaid: 0,
 
   paymentInstructions: "",
+  paymentLink: "",
+  showQrCode: true,
   terms: "Please make the payment by the due date.",
   notes: "It was great doing business with you.",
 
