@@ -25,7 +25,9 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
 
-  const triggerToast = (message, type = "success") => setToast({ message, type });
+  const triggerToast = (message, type = "success", subtext = "", action = null) => {
+    setToast({ message, type, subtext, action });
+  };
   const editor = useInvoiceEditor(triggerToast);
 
   useEffect(() => {
@@ -108,7 +110,13 @@ export default function App() {
       <Footer />
 
       {toast && !isExporting && (
-        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+          subtext={toast.subtext}
+          action={toast.action}
+        />
       )}
 
       <ExportLoader isExporting={isExporting} />
