@@ -81,7 +81,16 @@ export const exportToPNG = async (invoice, setIsExporting, triggerToast) => {
     link.download = `${invoice.invoiceNumber || "invoice"}.png`;
     link.href = dataUrl;
     link.click();
-    triggerToast("PNG Image generated successfully!");
+
+    triggerToast(
+      "Invoice generated!",
+      "success",
+      "If Invoice Now saved you time today, consider supporting the project.",
+      {
+        label: "Sponsor on GitHub ☕",
+        url: "https://github.com/sponsors/ashutoshkrris",
+      }
+    );
   } catch (err) {
     console.error(err);
     triggerToast("PNG generation failed", "error");
@@ -221,7 +230,16 @@ export const exportToPDF = async (invoice, setIsExporting, triggerToast) => {
       }
 
       pdf.save(`${invoice.invoiceNumber || "invoice"}.pdf`);
-      triggerToast("PDF document generated successfully!");
+
+      triggerToast(
+        "Invoice generated!",
+        "success",
+        "If Invoice Now saved you time today, consider supporting the project.",
+        {
+          label: "Sponsor on GitHub ☕",
+          url: "https://github.com/sponsors/ashutoshkrris",
+        }
+      );
     } catch (err) {
       console.error(err);
       triggerToast("PDF generation failed", "error");

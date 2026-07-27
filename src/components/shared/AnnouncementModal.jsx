@@ -109,32 +109,45 @@ export default function AnnouncementModal() {
 
           <hr className="border-slate-100 dark:border-slate-800/60" />
 
-          {/* PRODUCT HUNT UPVOTE ZONE */}
-          <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-            <div className="space-y-1">
+          {/* PRODUCT HUNT & SPONSOR SUPPORT ZONE */}
+          <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl p-4 space-y-3">
+            <div className="space-y-1 text-center sm:text-left">
               <h4 className="text-xs font-bold text-slate-950 dark:text-white">
                 Loved these upgrades?
               </h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                Help us reach more creators with an honest upvote!
+                Help us keep Invoice Now free and independent!
               </p>
             </div>
-            {/* OFFICIAL PRODUCT HUNT EMBED */}
-            <div className="shrink-0 select-none">
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+              {/* GITHUB SPONSORS CTA */}
               <a
-                href="https://www.producthunt.com/products/invoice-now?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-invoice-now"
+                href="https://github.com/sponsors/ashutoshkrris"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block transition-opacity duration-200 hover:opacity-90"
+                className="w-full sm:w-auto px-3.5 py-2 bg-pink-50 hover:bg-pink-100 dark:bg-pink-950/40 dark:hover:bg-pink-900/60 text-pink-600 dark:text-pink-400 border border-pink-200 dark:border-pink-800/50 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <img
-                  alt="Invoice Now - Privacy-first invoice builder that runs entirely locally | Product Hunt"
-                  width="250"
-                  height="54"
-                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1198464&amp;theme=light&amp;t=1784394098394"
-                  className="w-[140px] md:w-[150px] h-auto object-contain dark:invert-[0.05] dark:hue-rotate-180"
-                />
+                💖 Sponsor on GitHub
               </a>
+
+              {/* OFFICIAL PRODUCT HUNT EMBED */}
+              <div className="shrink-0 select-none">
+                <a
+                  href="https://www.producthunt.com/products/invoice-now?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-invoice-now"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block transition-opacity duration-200 hover:opacity-90"
+                >
+                  <img
+                    alt="Invoice Now - Privacy-first invoice builder that runs entirely locally | Product Hunt"
+                    width="250"
+                    height="54"
+                    src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1198464&amp;theme=light&amp;t=1784394098394"
+                    className="w-[140px] md:w-[150px] h-auto object-contain dark:invert-[0.05] dark:hue-rotate-180"
+                  />
+                </a>
+              </div>
             </div>
           </div>
         </div>

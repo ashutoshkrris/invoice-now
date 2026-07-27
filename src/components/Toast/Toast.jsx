@@ -1,15 +1,14 @@
 import { useEffect } from "react";
 import { Icons } from "../shared/Icons";
 
-export default function Toast({ message, type, onClose }) {
-  // Automatically trigger dismiss cleanup after 2 seconds
+export default function Toast({ message, type, onClose, subtext, action }) {
+  // Trigger dismiss cleanup after 5s when action is provided, otherwise 2.5s
   useEffect(() => {
-    const timer = setTimeout(onClose, 2000);
+    const displayDuration = action || subtext ? 5000 : 2500;
+    const timer = setTimeout(onClose, displayDuration);
 
-    // Clear the timer context if the component unmounts prematurely
-    // to prevent memory leaks or calling callbacks on dead states
     return () => clearTimeout(timer);
-  }, [onClose]);
+  }, [onClose, action, subtext]);
 
   // Map dynamic alert notification classifications to theme definitions
   const colors = {
@@ -38,9 +37,30 @@ export default function Toast({ message, type, onClose }) {
       role="alert"
       aria-live="polite"
     >
-      <span className="flex-1 text-xs font-semibold tracking-wide break-words whitespace-normal">
-        {message}
-      </span>
+      <div className="flex-1 space-y-1">
+        <span className="block text-xs font-semibold tracking-wide break-words whitespace-normal">
+          {message}
+        </span>
+
+        {subtext && (
+          <p className="text-[11px] opacity-90 leading-tight font-normal break-words whitespace-normal">
+            {subtext}
+          </p>
+        )}
+
+        {action && (
+          <div className="pt-1">
+            <a
+              href={action.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[11px] font-bold underline underline-offset-2 hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              {action.label}
+            </a>
+          </div>
+        )}
+      </div>
 
       {/* Close button */}
       <button
